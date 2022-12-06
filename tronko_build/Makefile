@@ -11,11 +11,11 @@ DBGCFLAGS = -g -w
 LIBS = -lm -pthread -lz -lrt -std=gnu99
 OPTIMIZATION = -march=native
 #sources
-SOURCES = tronko_build.c getclade.c readfasta.c readreference.c allocatetreememory.c math.c likelihood.c opt.c options.c printtree.c
+SOURCES = tronko-build.c getclade.c readfasta.c readreference.c allocatetreememory.c math.c likelihood.c opt.c options.c printtree.c
 HASHMAP = hashmap.c
 OBJECTS = (SOURCES: .c = .o)
 # the build target executable:
-TARGET = tronko_build
+TARGET = tronko-build
 
 all: $(TARGET)
 $(TARGET): $(TARGET).c
