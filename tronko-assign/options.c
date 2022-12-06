@@ -33,7 +33,7 @@ static struct Options long_options[]=
 	{"score-constant",required_argument,0, 'u'}
 };
 
-char usage[] = "\nfast-placer [OPTIONS]\n\
+char usage[] = "\ntronko-assign [OPTIONS]\n\
 	\n\
 	-h, --help			usage: [-paired] [-single] [-reference] [-ntree]\n\
 	-p, --paired			use paired reads\n\
@@ -53,9 +53,7 @@ char usage[] = "\nfast-placer [OPTIONS]\n\
 	-1, --paired-read-file1		path to paired read 1 file\n\
 	-2, --paired-read-file2		path to paired read 2 file\n\
 	-a, --fasta-file		path to fasta file (for bwa database)\n\
-	-c, --cinterval			\n\
-	-3, print alignments directory\n\
-	-4, print tree directory \n\
+	-c, --cinterval			score cut-off to use [default:5]\n\
 	-C, --number-of-cores		number of cores\n\
 	-L, --number-of-lines-to-read	number of lines to read for assignment\n\
 	-P, --print-alignments		print alignments to stdout\n\

@@ -738,6 +738,7 @@ int main(int argc, char **argv){
 	opt.print_alignments_to_file=0; //don't print alignments to file
 	opt.use_leaf_portion=0;
 	opt.padding=0;
+	opt.cinterval=5;
 	opt.skip_build=0;
 	opt.number_of_cores=1;
 	opt.number_of_lines_to_read=50000;

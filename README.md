@@ -26,3 +26,38 @@ In the tronko package there are two modules: `tronko-build` and `tronko-assign`.
 
 
 # tronko-assign
+`tronko-assign` is for species assignment of queries. It requires a `tronko-build` database.
+
+	tronko-assign [OPTIONS]
+	
+		-h, --help			usage: [-paired] [-single] [-reference] [-ntree]
+		-p, --paired			use paired reads
+		-s, --single			use single reads
+		-r, --reference			use a reference
+		-q, --fastq			reads to assign are fastq
+		-y, --partition-directory	use a partition directory
+		-v, --reverse-single-read	when using single read reverse it
+		-z, --reverse-paired-read	when using pairs reverse second read
+		-f, --reference-file		path to reference file
+		-t, --tree-file			path to treefile
+		-m, --msa-file			path to msa file
+		-d, --partitions-directory	path to output partitions files
+		-o, --results			path to output file
+		-x, --tax-file			path to tax file
+		-g, --single-read-file		path to single read file
+		-1, --paired-read-file1		path to paired read 1 file
+		-2, --paired-read-file2		path to paired read 2 file
+		-a, --fasta-file		path to fasta file (for bwa database)
+		-c, --cinterval			score cut-off to use [default:5]
+		-C, --number-of-cores		number of cores
+		-L, --number-of-lines-to-read	number of lines to read for assignment
+		-P, --print-alignments		print alignments to stdout
+		-w, --use-nw			use Needleman-Wunsch
+		-q, --fastq			Query is FASTQ [default is FASTA]
+		-U, --print-unassigned		Print unassigned reads
+		-e, --use-leaf-portion		Use only a portion of leaf
+		-n, --padding [INT]		Padding to use in leaf portion
+		-5, --print-node-info		[FILE] Print tree number and leaf number
+		-6, --skip-bowtie2-build	Skip the bowtie2 build
+		-u, --score-constant		Score constant [default: 0.01]
+
