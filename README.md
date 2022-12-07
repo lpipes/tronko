@@ -3,7 +3,7 @@ A rapid phylogeny-based method for accurate community profiling of large-scale m
 
 In the tronko package there are two modules: `tronko-build` and `tronko-assign`. `tronko-build` is for building custom reference databases that tronko-assign uses as input. We have two reference databases currently available for download with `tronko-assign`. Cytochrome oxidase I (COI) which was custom built with <a href="https://github.com/limey-bean/CRUX_Creating-Reference-libraries-Using-eXisting-tools">CRUX</a> using forward primer `GGWACWGGWTGAACWGTWTAYCCYCC` and reverse primer `TANACYTCnGGRTGNCCRAARAAYCA`. 16S which was custom built with <a href="https://github.com/limey-bean/CRUX_Creating-Reference-libraries-Using-eXisting-tools">CRUX</a> using forward primer `GTGCCAGCMGCCGCGGTAA` and reverse primer `GACTACHVGGGTATCTAATCC`. 
 
-<img src="https://github.com/lpipes/tronko/blob/master/Overview_Figure.jpg?raw=true">
+<img src="https://github.com/lpipes/tronko/blob/main/Overview_Figure.jpg?raw=true">
 
 # tronko-build
 `tronko-build` is for building custom reference databases to be used with `tronko-assign`.
