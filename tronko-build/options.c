@@ -19,23 +19,23 @@ static struct Options long_options[]=
 	{"no-change-missingdata", no_argument, 0, 'g'},
 };
 
-char usage[] = "\ntronko_build [OPTIONS]\n\
+char usage[] = "\ntronko-build [OPTIONS]\n\
 	\n\
-	-h, --help			usage: [-paired] [-single] [-reference] [-ntree]\n\
-	-y, --partition-directory	use a partition directory\n\
-	-u, --sum-of-pairs		minimum sum of pairs score\n\
-	-f, --minimum-leaf-nodes to retain	don't partition less than the minimum\n\
-	-l, --single-tree		use only single tree (do not partition)\n\
-	-t, --tree-file			path to treefile\n\
-	-m, --msa-file			path to msa file\n\
-	-d, --partitions-directory	path to output partitions files\n\
-	-x, --tax-file			path to tax file\n\
-	-e, --read-directory		path to directory to read\n\
-	-n, --number-of-partitions	number of partitions in read directory\n\
-	-b, --where-to-restart-partitions\n\
-	-s, --use-spscore\n\
-	-v, --use-minleaves\n\
-	-g, --no-change-missingdata\n\
+	-h, --help				usage:\n\
+	-y, --partition-directory		use a partition directory (you have multiple clusters)\n\
+	-l, --single-tree			use only single tree (do not partition)\n\
+	-t, --tree-file				rooted phylogenetic tree [FILE: Newick]\n\
+	-m, --msa-file				multiple sequence alignment [FILE: FASTA]\n\
+	-d, --partitions-directory		output directory for partitions\n\
+	-x, --tax-file				taxonomy file [FILE: FASTA_header\tdomain;phylum;class;order;family;genus;species]\n\
+	-e, --read-directory			directory for multiple cluster\n\
+	-n, --number-of-partitions		number of partitions in read directory\n\
+	-b, --where-to-restart-partitions	restart partitions with partition number\n\
+	-s, --use-spscore			partition using sum-of-pairs score [can't use with -f]\n\
+	-u, --sum-of-pairs			minimum threshold for sum of pairs score [default: 0.1]\n\
+	-v, --use-minleaves			partition using minimum number of leaf nodes [can't use with -s, use with -f]\n\
+	-f, --minimum-leaf-nodes to retain	don't partition less than the minimum number of leaf nodes [can't use with -s, use with -v]\n\
+	-g, --no-change-missingdata		don't flag missing data\n\
 	\n";
 
 void print_help_statement(){
