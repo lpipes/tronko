@@ -30,9 +30,9 @@ char usage[] = "\ntronko-build [OPTIONS]\n\
 	-x, --tax-file				taxonomy file [FILE: FASTA_header\tdomain;phylum;class;order;family;genus;species]\n\
 	-e, --read-directory			directory for multiple cluster\n\
 	-n, --number-of-partitions		number of partitions in read directory\n\
-	-b, --where-to-restart-partitions	restart partitions with partition number\n\
+	-b, --where-to-restart-partitions	restart partitions with partition number [default: 0]\n\
 	-s, --use-spscore			partition using sum-of-pairs score [can't use with -f]\n\
-	-u, --sum-of-pairs			minimum threshold for sum of pairs score [default: 0.1]\n\
+	-u, --sum-of-pairs			minimum threshold for sum of pairs score [default: 0.5]\n\
 	-v, --use-minleaves			partition using minimum number of leaf nodes [can't use with -s, use with -f]\n\
 	-f, --minimum-leaf-nodes to retain	don't partition less than the minimum number of leaf nodes [can't use with -s, use with -v]\n\
 	-g, --no-change-missingdata		don't flag missing data\n\

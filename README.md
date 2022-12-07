@@ -91,7 +91,26 @@ sed -i ':a; $!N; /^>/!s/\n\([^>]\)/\1/; ta; P; D' test.fasta
 
 ## `tronko-build` Usage with multiple trees
 
-`tronko-build` requires a multiple sequence alignment (FASTA format), rooted phylogenetic tree (Newick format), and a corresponding taxonomy file for each cluster build.
+`tronko-build` requires a multiple sequence alignment (FASTA format), rooted phylogenetic tree (Newick format), and a corresponding taxonomy file for each cluster build. All of the files should be in one directory and specify the directory with `-e` with each cluster being designated by a number. MSA files should be named `[Number]_MSA.fasta`, taxonomy files should be named `[Number]_taxonomy.txt`, and tree files should be named `RAxML_bestTree.[Number].reroot`. Example of the contents of a directory containing 3 clusters:
+```
+1_MSA.fasta
+2_MSA.fasta
+3_MSA.fasta
+1_taxonomy.txt
+2_taxonomy.txt
+3_taxonomy.txt
+RAxML_bestTree.1.reroot
+RAxML_bestTree.2.reroot
+RAxML_bestTree.3.reroot
+```
+Once you have the cluster files prepared, an example command is
+```
+tronko-build -y -e [DIRECTORY CONTAINING MSA, TAX, and TREE FILES] -n [NUMBER OF PARTITIONS] -d [OUTPUT DIRECTORY] -s
+```
+For the example with 3 clusters, an example command partitioning by sum-of-pairs score would be:
+```
+tronko-build -y -e [DIRECTORY CONTAINING MSA, TAX, and TREE FILES] -n 3 -d output -s
+```
 
 # Performance
 <img src="https://github.com/lpipes/tronko/blob/main/LSO.png?raw=true">

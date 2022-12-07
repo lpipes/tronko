@@ -767,6 +767,8 @@ int main(int argc, char **argv){
 	opt.use_min_leaves=0;
 	opt.sp_score = 0.05;
 	opt.missing_data=1;
+	opt.restart = 0;
+	opt.number_of_partitions = 0;
 	parse_options(argc, argv, &opt);
 	int i, j, k, numberOfTrees;
 	int max_nodename = 0;
