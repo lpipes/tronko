@@ -103,7 +103,7 @@ RAxML_bestTree.1.reroot
 RAxML_bestTree.2.reroot
 RAxML_bestTree.3.reroot
 ```
-Once you have the cluster files prepared, an example command is
+Once you have the cluster files prepared and you have created an output directory (the program assumes the output directory already exists), an example command is
 ```
 tronko-build -y -e [DIRECTORY CONTAINING MSA, TAX, and TREE FILES] -n [NUMBER OF PARTITIONS] -d [OUTPUT DIRECTORY] -s
 ```
@@ -111,8 +111,12 @@ For the example with 3 clusters, an example command partitioning by sum-of-pairs
 ```
 tronko-build -y -e [DIRECTORY CONTAINING MSA, TAX, and TREE FILES] -n 3 -d output -s
 ```
+The reference database file will be output to `[OUTPUT DIRECTORY]/reference_tree.txt`. The `reference_tree.txt` file is the reference database file that `tronko-assign` requires for assignment.
 
 # Performance
+
+We performed a leave-one-species-out test comparing Tronko (with LCA cut-offs for the score of 0, 5, 10, 15, and 20 with Needleman-Wunsch alignment) to kraken2, metaphlan2, and MEGAN for 1,467 COI sequences from 253 species from the order Charadriiformes using 150bp x 2 paired-end sequences and 150bp and 300bp single-end sequences using 0, 1, and 2% error/polymorphism.
 <img src="https://github.com/lpipes/tronko/blob/main/LSO.png?raw=true">
+Using leave-one-species-out and simulating reads (both paired-end and single-end) with a 0-2% error (or polymorphism), Tronko detected the correct genus more accurately than the other methods even when using an aggressive cut-off (i.e., when cut-off=0) (D and G).
 
 # Citation
