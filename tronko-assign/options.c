@@ -29,7 +29,7 @@ static struct Options long_options[]=
 	{"padding",required_argument, 0, 'n'},
 	{"fastq",no_argument, 0, 'q'},
 	{"print-node-info",required_argument, 0, '5'},
-	{"skip-bowtie2-build",no_argument,0, '6'},
+	{"skip-bwa-build",no_argument,0, '6'},
 	{"score-constant",required_argument,0, 'u'}
 };
 
@@ -56,7 +56,7 @@ char usage[] = "\ntronko-assign [OPTIONS]\n\
 	-e, --use-leaf-portion		Use only a portion of leaf\n\
 	-n, --padding [INT]		Padding to use in leaf portion\n\
 	-5, --print-node-info		[FILE] Print tree number and leaf number\n\
-	-6, --skip-bowtie2-build	Skip the bowtie2 build\n\
+	-6, --skip-bwa-build		Skip the bwa build\n\
 	-u, --score-constant		Score constant [default: 0.01]\n\
 	\n";
 

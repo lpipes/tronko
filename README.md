@@ -54,7 +54,7 @@ Alignment-based and composition-based assignment methods calculate the lowest co
 		-e, --use-leaf-portion		Use only a portion of leaf
 		-n, --padding [INT]		Padding to use in leaf portion
 		-5, --print-node-info		[FILE] Print tree number and leaf number
-		-6, --skip-bowtie2-build	Skip the bowtie2 build
+		-6, --skip-bwa-build		Skip the bwa build
 		-u, --score-constant		Score constant [default: 0.01]
 
 # INSTALLATION
@@ -65,11 +65,11 @@ Alignment-based and composition-based assignment methods calculate the lowest co
 	make
 
 # `tronko-assign` Usage
-Assigning paired-end reads in FASTA format
+Tronko does not detect the correct orientation of the reads. If your reverse read needs to be reverse complemented use the option `-z`. The default options of Tronko assume that your reads are in FASTA format. If you want to assign reads in FASTQ format, use the option `-q`. The reads (and reference database file) can be gzipped or unzipped. Assigning paired-end reads in FASTA format:
 ```
 tronko-assign -r -f [tronko-build REFERENCE DB FILE] -p -1 [FORWARD READS FASTA] -2 [REVERSE READS FASTA] -a [REFERENCE SEQUENCES FASTA] -o [OUTPUT FILE]
 ```
-Assigning single-end reads in FASTA format
+Assigning single-end reads in FASTA format:
 ```
 tronko-assign -r -f [tronko-build REFERENCE DB FILE] -s -g [READS FASTA] -a [REFERENCE SEQUENCES FASTA] -o [OUTPUT FILE]
 ```
