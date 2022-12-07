@@ -58,7 +58,19 @@ Alignment-based and composition-based assignment methods calculate the lowest co
 		-u, --score-constant		Score constant [default: 0.01]
 
 Tronko uses the <a href="https://github.com/smarco/WFA2-lib">Wavefront Alignment Algorithm (version 2)</a> or <a href="https://github.com/noporpoise/seq-align">Needleman-Wunsch Algorithm</a> for semi-global alignments. It uses <a href="https://github.com/lh3/bwa">bwa</a> for alignment to leaf nodes, and uses <a href="https://github.com/DavidLeeds/hashmap">David Leeds' hashmap</a> for hashmap implementation in C.
- 
+
+##Example output
+
+The output file is a tab-delimited text file where only the forward readname is retained (if using paired-end reads). The output displays the taxonomic path for assignment, the score, the number of forward read mismatches with the `bwa` hit, the number of reverse read mismatches with the `bwa` hit, the tree number for the best assignment (0 if using 1 tree), and the node number the read (or reads in the case of paired-end reads) was assigned to.
+
+```
+Readname	Taxonomic_Path	Score	Forward_Mismatch	Reverse_Mismatch	Tree_Number	Node_Number
+M00160:15:000000000-JHG8V:1:1101:9131:1243_1:N:0:GTGCAGA+TACCATC	Eukaryota;Arthropoda;Insecta;Ephemeroptera;Baetidae;Fallceon;Fallceon sp. BOLD:AAL8084	0.000000	0.000000	1.000000	5718	44
+M00160:15:000000000-JHG8V:1:1101:21631:1259_1:N:0:GTGCAGA+TACCATC	Eukaryota;Arthropoda;Insecta;Ephemeroptera;Baetidae;Fallceon;Fallceon sp. BOLD:AAL8084	0.000000	0.000000	1.000000	5718	44
+M00160:15:000000000-JHG8V:1:1101:15032:1369_1:N:0:GTGCAGA+TACCATC	Eukaryota;Arthropoda;Insecta;Ephemeroptera;Baetidae;Baetis;Baetis adonis	-4.605170	1.000000	1.000000	8901	66
+M00160:15:000000000-JHG8V:1:1101:15129:1391_1:N:0:GTGCAGA+TACCATC	Eukaryota;Arthropoda;Insecta;Ephemeroptera;Baetidae;Baetis;Baetis adonis	0.000000	0.000000	1.000000	8901	66
+```
+
 # INSTALLATION
 
 	cd tronko-build
