@@ -67,19 +67,29 @@ Alignment-based and composition-based assignment methods calculate the lowest co
 # `tronko-assign` Usage
 Assigning paired-end reads in FASTA format
 ```
-tronko-assign -r -f REFERENCE_TREE.txt -p -1 READ1.fasta -2 READ2.fasta -a REFERENCE_SEQUENCES.fasta -o OUTPUT.txt
+tronko-assign -r -f [tronko-build REFERENCE DB FILE] -p -1 [FORWARD READS FASTA] -2 [REVERSE READS FASTA] -a [REFERENCE SEQUENCES FASTA] -o [OUTPUT FILE]
 ```
 Assigning single-end reads in FASTA format
 ```
-tronko-assign -r -f REFERENCE_TREE.txt -s -g READS.fasta -a REFERENCE_SEQUENCES.fasta -o OUTPUT.txt
+tronko-assign -r -f [tronko-build REFERENCE DB FILE] -s -g [READS FASTA] -a [REFERENCE SEQUENCES FASTA] -o [OUTPUT FILE]
 ```
 
 # `tronko-build` Usage
 
 ## `tronko-build` Simple Usage (using 1 phylogenetic tree)
 ```
-tronko-build 
+tronko-build -l -t [Rooted Newick Tree] -m [Multiple Sequence Alignment FASTA] -x [TAXONOMY FILE] -d [OUTPUT DIRECTORY] 
 ```
+The taxonomy file is a `.txt` file that has the following format:
+```
+FASTA_header\tdomain;phylum;class;order;family;genus;species
+```
+The tree file, MSA file, and the taxonomy file must all contain identical corresponding names. The MSA file should not contain any line breaks. To remove line breaks we recommend
+```
+sed -i ':a; $!N; /^>/!s/\n\([^>]\)/\1/; ta; P; D' test.fasta
+```
+
+## `tronko-build` Usage with multiple trees
 
 `tronko-build` requires a multiple sequence alignment (FASTA format), rooted phylogenetic tree (Newick format), and a corresponding taxonomy file for each cluster build.
 
