@@ -1,15 +1,29 @@
 #include "readreference.h"
 int readInXNumberOfLines_fastq(int numberOfLinesToRead, gzFile query_reads, int whichPair, Options opt, int max_query_length, int max_readname_length){
-	char* buffer = (char *)malloc(sizeof(char)*MAXQUERYLENGTH);
-	char* query = (char *)malloc(sizeof(char)*MAXQUERYLENGTH);
-	char* reverse = (char *)malloc(sizeof(char)*MAXQUERYLENGTH);
+	char* buffer;
+	char* query;
+	char* reverse;
+	int buffer_size = 0;
+	if ( max_query_length > max_readname_length ){
+		buffer_size = max_query_length + 2;
+		buffer = (char *)malloc(sizeof(char)*(max_query_length+2));
+	}else{
+		buffer_size = max_readname_length + 2;
+		buffer = (char *)malloc(sizeof(char)*(max_readname_length+2));
+	}
 	char* s;
-	char seqname[MAXREADNAME];
+	char seqname[max_readname_length+1];
 	int size=0;
 	int i=0;
 	int iter=0;
 	int next=0;
-	while(gzgets(query_reads,buffer,10000)!=NULL){
+	query = (char *)malloc(sizeof(char)*max_query_length+2);
+	reverse = (char *)malloc(sizeof(char)*max_query_length+2);
+	for(i=0; i<max_query_length+2; i++){
+		query[i] = '\0';
+		reverse[i] = '\0';
+	}
+	while(gzgets(query_reads,buffer,buffer_size)!=NULL){
 		s = strtok(buffer,"\n");
 		size = strlen(s);
 		if ( buffer[0] == '@' && whichPair==1){
@@ -18,9 +32,9 @@ int readInXNumberOfLines_fastq(int numberOfLinesToRead, gzFile query_reads, int 
 				seqname[i-1]=buffer[i];
 			}
 			seqname[i-1] = '\0';
-			memset(pairedQueryMat->forward_name[iter],'\0',MAXREADNAME*sizeof(char));
+			memset(pairedQueryMat->forward_name[iter],'\0',max_readname_length);
 			strcpy(pairedQueryMat->forward_name[iter],seqname);
-			memset(seqname,'\0',MAXREADNAME*sizeof(char));
+			memset(seqname,'\0',max_readname_length);
 			next=1;
 		}else if ( buffer[0] == '@' && whichPair==2){
 			for(i=1; i<size; i++){
@@ -28,8 +42,8 @@ int readInXNumberOfLines_fastq(int numberOfLinesToRead, gzFile query_reads, int 
 				seqname[i-1]=buffer[i];
 			}
 			seqname[i-1] = '\0';
-			char tempname[MAXREADNAME];
-			memset(tempname,'\0',MAXREADNAME*sizeof(char));
+			char tempname[max_readname_length];
+			memset(tempname,'\0',max_readname_length);
 			for(i=0; i<size-1; i++){
 				if ( pairedQueryMat->forward_name[iter][i] == '1' && pairedQueryMat->forward_name[iter][i-1] == '_'){
 					tempname[i] = '2';
@@ -52,9 +66,9 @@ int readInXNumberOfLines_fastq(int numberOfLinesToRead, gzFile query_reads, int 
 				if (skipped == numberOfLinesToRead){ break; }
 			}*/
 			if (skipped == iter){
-				memset(pairedQueryMat->reverse_name[iter],'\0',MAXREADNAME*sizeof(char));
+				memset(pairedQueryMat->reverse_name[iter],'\0',max_readname_length);
 				strcpy(pairedQueryMat->reverse_name[iter],seqname);
-				memset(seqname,'\0',MAXREADNAME*sizeof(char));
+				memset(seqname,'\0',max_readname_length);
 				next=1;
 			}else{
 				shiftUp(iter,skipped-iter,numberOfLinesToRead);
@@ -69,10 +83,14 @@ int readInXNumberOfLines_fastq(int numberOfLinesToRead, gzFile query_reads, int 
 				if ( buffer[i]==' '){ buffer[i] = '_'; }
 				seqname[i-1]=buffer[i];
 			}
-			seqname[i-1]=buffer[i];
-			memset(singleQueryMat->name[iter],'\0',MAXREADNAME*sizeof(char));
+			seqname[i-1]='\0';
+			for(i=0; i<max_readname_length; i++){
+				singleQueryMat->name[iter][i]='\0';
+			}
 			strcpy(singleQueryMat->name[iter],seqname);
-			memset(seqname,'\0',MAXREADNAME*sizeof(char));
+			for (i=0; i<size-1; i++){
+				seqname[i]='\0';
+			}
 			next=1;
 		}else if (next==1){
 			for(i=0; i<size; i++){
@@ -96,10 +114,14 @@ int readInXNumberOfLines_fastq(int numberOfLinesToRead, gzFile query_reads, int 
 				}else{
 					getReverseComplement(query,reverse,max_query_length);
 					strcpy(pairedQueryMat->query2Mat[iter],reverse);
-					memset(reverse,'\0',size*sizeof(char));
+					for(i=0; i<size; i++){
+						reverse[i] = '\0';
+					}
 				}
 			}
-			memset(query,'\0',size*sizeof(char));
+			for(i=0; i<size; i++){
+				query[i] = '\0';
+			}
 			iter++;
 			next=0;
 			if(iter==numberOfLinesToRead){ break; }

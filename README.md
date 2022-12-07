@@ -37,16 +37,10 @@ Alignment-based and composition-based assignment methods calculate the lowest co
 		-p, --paired			use paired reads
 		-s, --single			use single reads
 		-r, --reference			use a reference
-		-q, --fastq			reads to assign are fastq
-		-y, --partition-directory	use a partition directory
 		-v, --reverse-single-read	when using single read reverse it
 		-z, --reverse-paired-read	when using pairs reverse second read
 		-f, --reference-file		path to reference file
-		-t, --tree-file			path to treefile
-		-m, --msa-file			path to msa file
-		-d, --partitions-directory	path to output partitions files
 		-o, --results			path to output file
-		-x, --tax-file			path to tax file
 		-g, --single-read-file		path to single read file
 		-1, --paired-read-file1		path to paired read 1 file
 		-2, --paired-read-file2		path to paired read 2 file
@@ -57,12 +51,28 @@ Alignment-based and composition-based assignment methods calculate the lowest co
 		-P, --print-alignments		print alignments to stdout
 		-w, --use-nw			use Needleman-Wunsch
 		-q, --fastq			Query is FASTQ [default is FASTA]
-		-U, --print-unassigned		Print unassigned reads
 		-e, --use-leaf-portion		Use only a portion of leaf
 		-n, --padding [INT]		Padding to use in leaf portion
 		-5, --print-node-info		[FILE] Print tree number and leaf number
 		-6, --skip-bowtie2-build	Skip the bowtie2 build
 		-u, --score-constant		Score constant [default: 0.01]
+
+# INSTALLATION
+
+	cd tronko-build
+	make
+	../tronko-assign
+	make
+
+# Usage
+Assigning paired-end reads in FASTA format
+```
+tronko-assign -r -f REFERENCE_TREE.txt -p -1 READ1.fasta -2 READ2.fasta -a REFERENCE_SEQUENCES.fasta -o OUTPUT.txt
+```
+Assigning single-end reads in FASTA format
+```
+tronko-assign -r -f REFERENCE_TREE.txt -s -g READS.fasta -a REFERENCE_SEQUENCES.fasta -o OUTPUT.txt
+```
 
 # Performance
 
