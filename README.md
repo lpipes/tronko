@@ -65,7 +65,7 @@ Alignment-based and composition-based assignment methods calculate the lowest co
 	../tronko-assign
 	make
 
-# Usage
+# `tronko-assign` Usage
 Assigning paired-end reads in FASTA format
 ```
 tronko-assign -r -f REFERENCE_TREE.txt -p -1 READ1.fasta -2 READ2.fasta -a REFERENCE_SEQUENCES.fasta -o OUTPUT.txt
@@ -74,6 +74,9 @@ Assigning single-end reads in FASTA format
 ```
 tronko-assign -r -f REFERENCE_TREE.txt -s -g READS.fasta -a REFERENCE_SEQUENCES.fasta -o OUTPUT.txt
 ```
+
+# `tronko-build` Usage
+
 
 # Performance
 <img src="https://github.com/lpipes/tronko/blob/main/LSO.png?raw=true">
