@@ -77,4 +77,5 @@ tronko-assign -r -f REFERENCE_TREE.txt -s -g READS.fasta -a REFERENCE_SEQUENCES.
 
 # Performance
 <img src="https://github.com/lpipes/tronko/blob/main/LSO.png?raw=true">
+
 # Citation
