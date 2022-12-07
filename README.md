@@ -10,24 +10,23 @@ Alignment-based and composition-based assignment methods calculate the lowest co
 # tronko-build
 `tronko-build` is for building custom reference databases to be used with `tronko-assign`.
 
-	tronko_build [OPTIONS]
+	tronko-build [OPTIONS]
 	
-		-h, --help				usage: [-paired] [-single] [-reference] [-ntree]
-		-y, --partition-directory		use a partition directory
-		-u, --sum-of-pairs			minimum sum of pairs score
-		-f, --minimum-leaf-nodes to retain	don't partition less than the minimum
+		-h, --help				usage:
+		-y, --partition-directory		use a partition directory (you have multiple clusters)
 		-l, --single-tree			use only single tree (do not partition)
-		-t, --tree-file				path to treefile
-		-m, --msa-file				path to msa file
-		-d, --partitions-directory		path to output partitions files
-		-x, --tax-file				path to tax file
-		-e, --read-directory			path to directory to read
+		-t, --tree-file				rooted phylogenetic tree [FILE: Newick]
+		-m, --msa-file				multiple sequence alignment [FILE: FASTA]
+		-d, --partitions-directory		output directory for partitions
+		-x, --tax-file				taxonomy file [FILE: FASTA_header\tdomain;phylum;class;order;family;genus;species]
+		-e, --read-directory			directory for multiple cluster
 		-n, --number-of-partitions		number of partitions in read directory
-		-b, --where-to-restart-partitions
-		-s, --use-spscore
-		-v, --use-minleaves
-		-g, --no-change-missingdata
-
+		-b, --where-to-restart-partitions	restart partitions with partition number
+		-s, --use-spscore			partition using sum-of-pairs score [can't use with -f]
+		-u, --sum-of-pairs			minimum threshold for sum of pairs score [default: 0.1]
+		-v, --use-minleaves			partition using minimum number of leaf nodes [can't use with -s, use with -f]
+		-f, --minimum-leaf-nodes to retain	don't partition less than the minimum number of leaf nodes [can't use with -s, use with -v]
+		-g, --no-change-missingdata		don't flag missing data
 
 # tronko-assign
 `tronko-assign` is for species assignment of queries. It requires a `tronko-build` database.
@@ -77,6 +76,12 @@ tronko-assign -r -f REFERENCE_TREE.txt -s -g READS.fasta -a REFERENCE_SEQUENCES.
 
 # `tronko-build` Usage
 
+## `tronko-build` Simple Usage (using 1 phylogenetic tree)
+```
+tronko-build 
+```
+
+`tronko-build` requires a multiple sequence alignment (FASTA format), rooted phylogenetic tree (Newick format), and a corresponding taxonomy file for each cluster build.
 
 # Performance
 <img src="https://github.com/lpipes/tronko/blob/main/LSO.png?raw=true">
