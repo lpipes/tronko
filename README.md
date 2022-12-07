@@ -3,7 +3,7 @@ A rapid phylogeny-based method for accurate community profiling of large-scale m
 
 In the tronko package there are two modules: `tronko-build` and `tronko-assign`. `tronko-build` is for building custom reference databases that tronko-assign uses as input. We have two reference databases currently available for download with `tronko-assign`. Cytochrome oxidase I (COI) which was custom built with <a href="https://github.com/limey-bean/CRUX_Creating-Reference-libraries-Using-eXisting-tools">CRUX</a> using forward primer `GGWACWGGWTGAACWGTWTAYCCYCC` and reverse primer `TANACYTCnGGRTGNCCRAARAAYCA`. 16S which was custom built with <a href="https://github.com/limey-bean/CRUX_Creating-Reference-libraries-Using-eXisting-tools">CRUX</a> using forward primer `GTGCCAGCMGCCGCGGTAA` and reverse primer `GACTACHVGGGTATCTAATCC`. 
 
-Alignment-based and composition-based assignment methods calculate the lowest common ancestor (LCA) using data only in the leaf nodes of a phylogeny (A). Tronko stores fractional likelihoods in all nodes of a phylogeny and calculates the LCA based on all nodes in the tree (B).
+Alignment-based and composition-based assignment methods calculate the lowest common ancestor (LCA) using data only in the leaf nodes of a phylogeny (A). The advantage of Tronko is that it stores fractional likelihoods in all nodes of a phylogeny and calculates the LCA based on all nodes in the tree (B).
 <img src="https://github.com/lpipes/tronko/blob/main/Overview_Figure.jpg?raw=true">
 
 # tronko-build
@@ -64,3 +64,6 @@ Alignment-based and composition-based assignment methods calculate the lowest co
 		-6, --skip-bowtie2-build	Skip the bowtie2 build
 		-u, --score-constant		Score constant [default: 0.01]
 
+# Performance
+
+# Citation
