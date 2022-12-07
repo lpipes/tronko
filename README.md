@@ -57,6 +57,8 @@ Alignment-based and composition-based assignment methods calculate the lowest co
 		-6, --skip-bwa-build		Skip the bwa build
 		-u, --score-constant		Score constant [default: 0.01]
 
+Tronko uses the <a href="https://github.com/smarco/WFA2-lib">Wavefront Alignment Algorithm (version 2)</a> or <a href="https://github.com/noporpoise/seq-align">Needleman-Wunsch Algorithm</a> for semi-global alignments. It uses <a href="https://github.com/lh3/bwa">bwa</a> for alignment to leaf nodes, and uses <a href="https://github.com/DavidLeeds/hashmap">David Leeds' hashmap</a> for hashmap implementation in C.
+ 
 # INSTALLATION
 
 	cd tronko-build
