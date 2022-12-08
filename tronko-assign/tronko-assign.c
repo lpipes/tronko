@@ -640,7 +640,7 @@ void *runAssignmentOnChunk_WithBWA(void *ptr){
 			}
 			strcat(resultsPath,"\t");
 			if (unassigned==1 ){
-				strcat(resultsPath, "unassigned Main tree Euk or Bac");
+				strcat(resultsPath, "unassigned Eukaryote or Bacteria");
 				//if (print_unassigned==0){
 				//	print_un=0;
 				//}
@@ -733,12 +733,12 @@ int main(int argc, char **argv){
 	opt.reverse_second_of_paired_read=0;
 	opt.print_alignments = 0;
 	opt.print_node_info[0] = '\0';
+	opt.results_file[0] = '\0';
 	opt.fastq=0; //default is FASTA
 	opt.unassigned=0; //don't print unassigned sequences
 	opt.print_alignments_to_file=0; //don't print alignments to file
 	opt.use_leaf_portion=0;
 	opt.padding=0;
-	opt.cinterval=5;
 	opt.skip_build=0;
 	opt.number_of_cores=1;
 	opt.number_of_lines_to_read=50000;
@@ -849,6 +849,7 @@ int main(int argc, char **argv){
 		}
 		FILE *results = fopen(opt.results_file,"w");
 		if ( results == NULL ){ printf("Error opening file!\n"); exit(1); }
+		fprintf(results,"Readname\tTaxonomic_Path\tScore\tForward_Mismatch\tReverse_Mismatch\tTree_Number\tNode_Number\n");	
 		int keepTrackOfReadLine=0;
 		pthread_t threads[opt.number_of_cores];//array of our threads
 		int divideFile, start, end;
@@ -1002,6 +1003,7 @@ int main(int argc, char **argv){
 		}
 		FILE *results = fopen(opt.results_file,"w");
 		if ( results == NULL ){ printf("Error opening file!\n"); exit(1); }
+		fprintf(results,"Readname\tTaxonomic_Path\tScore\tForward_Mismatch\tReverse_Mismatch\tTree_Number\tNode_Number\n");	
 		int keepTrackOfReadLine=0;
 		pthread_t threads[opt.number_of_cores];//array of our thrads
 		int divideFile, start, end;
