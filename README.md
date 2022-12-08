@@ -33,7 +33,7 @@ Alignment-based and composition-based assignment methods calculate the lowest co
 
 	tronko-assign [OPTIONS]
 	
-		-h, --help			usage: [-paired] [-single] [-reference] [-ntree]
+		-h, --help			usage:
 		-p, --paired			use paired reads
 		-s, --single			use single reads
 		-r, --reference			use a reference
@@ -134,3 +134,6 @@ We performed a leave-one-species-out test comparing Tronko (with LCA cut-offs fo
 Using leave-one-species-out and simulating reads (both paired-end and single-end) with a 0-2% error (or polymorphism), Tronko detected the correct genus more accurately than the other methods even when using an aggressive cut-off (i.e., when cut-off=0) (D and G).
 
 # Citation
+
+Pipes L, and Nielsen R (2022) A rapid phylogeny-based method for accurate community profiling of large-scale metabarcoding datasets. bioRXiv.
+https://www.biorxiv.org/content/10.1101/2022.12.06.519402v1 

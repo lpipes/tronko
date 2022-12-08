@@ -35,7 +35,7 @@ static struct Options long_options[]=
 
 char usage[] = "\ntronko-assign [OPTIONS]\n\
 	\n\
-	-h, --help			usage: [-paired] [-single] [-reference] [-ntree]\n\
+	-h, --help			usage:\n\
 	-p, --paired			use paired reads\n\
 	-s, --single			use single reads\n\
 	-r, --reference			use a reference\n\
