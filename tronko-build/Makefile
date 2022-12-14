@@ -8,7 +8,7 @@ CFLAGS = -w -pg
 DBGCFLAGS = -g -w
 # -lm links the math library
 #LIBS = -lm -lpthread -lz
-LIBS = -lm -pthread -lz -lrt -std=gnu99
+LIBS = -lm -pthread -lz -lrt
 OPTIMIZATION = -march=native
 #sources
 SOURCES = tronko-build.c getclade.c readfasta.c readreference.c allocatetreememory.c math.c likelihood.c opt.c options.c printtree.c
