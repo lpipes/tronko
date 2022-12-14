@@ -36,3 +36,25 @@ jobs:
         with:
           name: tronko-build
           path: tronko-build/tronko-build
+      - name: tronko-assign make clean
+        run: make clean
+        working-directory: ./tronko-assign
+      - name: build tronko-assign debug
+        run: make debug
+        working-directory: ./tronko-assign
+      - name: Archive tronko-assign binary
+        uses: actions/upload-artifact@v3
+        with:
+          name: tronko-assign-debug
+          path: tronko-assign/tronko-assign
+      - name: tronko-build make clean
+        run: make clean
+        working-directory: ./tronko-build
+      - name: build tronko-build debug
+        run: make debug
+        working-directory: ./tronko-build
+      - name: Archive tronko-build binary
+        uses: actions/upload-artifact@v3
+        with:
+          name: tronko-build-debug
+          path: tronko-build/tronko-build
