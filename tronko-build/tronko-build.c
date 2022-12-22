@@ -567,9 +567,9 @@ void createNewRoots(int rootCount, Options opt, int max_nodename, int max_lineTa
 				printf("can't fork, error occured\n");
 			}else if (pid==0){
 				printf("child process, pid = %u\n",getpid());
-				char *arguments[] = {"/home/lenore/bin/famsa",buf2,buf3,NULL};
+				char *arguments[] = {"famsa",buf2,buf3,NULL};
 				printf("ARGUMENTS: %s %s %s\n",arguments[0],arguments[1],arguments[2]);
-				execv("/home/lenore/bin/famsa",arguments);
+				execvp("famsa",arguments);
 				exit(0);
 			}else{
 				printf("parent process, pid = %u\n",getppid());
