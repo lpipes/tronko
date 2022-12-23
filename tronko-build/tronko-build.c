@@ -605,10 +605,10 @@ void createNewRoots(int rootCount, Options opt, int max_nodename, int max_lineTa
 				dup2(reroot_file,1);
 				close(reroot_file);
 				char *arguments[3];
-				arguments[0]="/space/s1/lenore/software/newick-utils-1.6/src/nw_reroot";
+				arguments[0]="nw_reroot";
 				arguments[1]=buf4;
 				arguments[2]=NULL;
-				ret=execv("/space/s1/lenore/software/newick-utils-1.6/src/nw_reroot",arguments);
+				ret=execvp("nw_reroot",arguments);
 				exit(0);
 			}else{
 				printf("parent process, pid = %u\n",getppid());
