@@ -594,7 +594,7 @@ void createNewRoots(int rootCount, Options opt, int max_nodename, int max_lineTa
 			char buf4[BUFFER_SIZE];
 			char buf5[BUFFER_SIZE];
 			snprintf(buf4,BUFFER_SIZE,"%s/RAxML_bestTree.partition%d",opt.partitions_directory,which);
-			snprintf(buf5,BUFFER_SIZE,"%s/RAxML_bestTree.partition%d.reroot",opt.partitions_directory,which);
+			snprintf(buf5,BUFFER_SIZE,"> %s/RAxML_bestTree.partition%d.reroot",opt.partitions_directory,which);
 			pid=fork();
 			if (pid==-1){
 				printf("can't fork, error occured\n");
@@ -604,11 +604,14 @@ void createNewRoots(int rootCount, Options opt, int max_nodename, int max_lineTa
 				reroot_file = open(buf5, O_WRONLY | O_TRUNC | O_CREAT, S_IRUSR | S_IRGRP | S_IWGRP | S_IWUSR);
 				dup2(reroot_file,1);
 				close(reroot_file);
-				char *arguments[3];
+				/*char *arguments[3];
 				arguments[0]="nw_reroot";
 				arguments[1]=buf4;
 				arguments[2]=NULL;
 				ret=execvp("nw_reroot",arguments);
+				exit(0);*/
+				char *arguments[] = {"nw_reroot",buf4,buf5,NULL};
+				execvp("nw_reroot",arguments);
 				exit(0);
 			}else{
 				printf("parent process, pid = %u\n",getppid());
