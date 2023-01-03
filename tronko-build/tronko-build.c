@@ -594,22 +594,27 @@ void createNewRoots(int rootCount, Options opt, int max_nodename, int max_lineTa
 			char buf4[BUFFER_SIZE];
 			char buf5[BUFFER_SIZE];
 			snprintf(buf4,BUFFER_SIZE,"%s/RAxML_bestTree.partition%d",opt.partitions_directory,which);
-			snprintf(buf5,BUFFER_SIZE,"> %s/RAxML_bestTree.partition%d.reroot",opt.partitions_directory,which);
+			snprintf(buf5,BUFFER_SIZE,"%s/RAxML_bestTree.partition%d.reroot",opt.partitions_directory,which);
+			pid=0;
+			int pipefd[2];
+			pipe(pipefd);
 			pid=fork();
 			if (pid==-1){
 				printf("can't fork, error occured\n");
 			}else if (pid==0){	
 				printf("child process reroot, pid = %u\n",getpid());
-				int reroot_file;
-				reroot_file = open(buf5, O_WRONLY | O_TRUNC | O_CREAT, S_IRUSR | S_IRGRP | S_IWGRP | S_IWUSR);
-				dup2(reroot_file,1);
-				close(reroot_file);
+				//int reroot_file;
+				//reroot_file = open(buf5, O_WRONLY | O_TRUNC | O_CREAT, S_IRUSR | S_IRGRP | S_IWGRP | S_IWUSR);
+				//dup2(reroot_file,1);
+				//close(reroot_file);
 				/*char *arguments[3];
 				arguments[0]="nw_reroot";
 				arguments[1]=buf4;
 				arguments[2]=NULL;
 				ret=execvp("nw_reroot",arguments);
 				exit(0);*/
+				close(pipefd[0]);
+				dup2(pipefd[1], STDOUT_FILENO);
 				char *arguments[] = {"nw_reroot",buf4,buf5,NULL};
 				execvp("nw_reroot",arguments);
 				exit(0);
@@ -626,6 +631,14 @@ void createNewRoots(int rootCount, Options opt, int max_nodename, int max_lineTa
 				}else{
 					printf("waitpid() failed\n");
 				}
+			}
+			close(pipefd[1]);
+			fcntl(pipefd[0], F_SETFL, fcntl(pipefd[0], F_GETFL) | O_NONBLOCK );
+			char* child_process_output_fd = pipefd[0];
+			FILE *reroot_file = fopen(buf5, "w");
+			if (reroot_file != NULL ){
+				fputs(child_process_output_fd, reroot_file);
+				fclose(reroot_file);
 			}
 		}
 		snprintf(buf,BUFFER_SIZE,"%s/partition%d_MSA.fasta",opt.partitions_directory,which);
