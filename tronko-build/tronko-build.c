@@ -615,7 +615,7 @@ void createNewRoots(int rootCount, Options opt, int max_nodename, int max_lineTa
 				exit(0);*/
 				close(pipefd[0]);
 				dup2(pipefd[1], STDOUT_FILENO);
-				char *arguments[] = {"nw_reroot",buf4,buf5,NULL};
+				char *arguments[] = {"nw_reroot",buf4,NULL};
 				execvp("nw_reroot",arguments);
 				exit(0);
 			}else{
