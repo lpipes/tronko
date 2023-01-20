@@ -645,8 +645,8 @@ void *runAssignmentOnChunk_WithBWA(void *ptr){
 				//	print_un=0;
 				//}
 			}else{
-			int taxIndex1=minLevel-1;
-			for(i=6;i>taxIndex1;i--){
+			int taxIndex1=minLevel;
+			for(i=6;i>=taxIndex1;i--){
 				if (i==taxIndex1){
 					strcat(resultsPath,taxonomyArr[taxRoot][treeArr[taxRoot][taxNode].taxIndex[0]][i]);
 				}else{
@@ -657,13 +657,36 @@ void *runAssignmentOnChunk_WithBWA(void *ptr){
 			}
 			strcat(resultsPath,"\t");
 			//char* appendScores = (char*)malloc(18*sizeof(char));
-			char *appendScores = NULL;
-			asprintf(&appendScores,"%lf\t%d\t%d\t%d\t%d",results->minimum[0],results->minimum[1],results->minimum[2],maxRoot,LCA);
-			strcat(resultsPath,appendScores);
-			if (print_un==1){
+			//char *appendScores = NULL;
+			//asprintf(&appendScores,"%lf\t%d\t%d\t%d\t%d",results->minimum[0],results->minimum[1],results->minimum[2],maxRoot,LCA);
+			char *num = NULL;
+			asprintf(&num,"%lf",results->minimum[0]);
+			strcat(resultsPath,num);
+			strcat(resultsPath,"\t");
+			//free(num);
+			char *num2 = NULL;
+			asprintf(&num2,"%lf",results->minimum[1]);
+			strcat(resultsPath,num2);
+			strcat(resultsPath,"\t");
+			//free(num2);
+			char *num3 = NULL;
+			asprintf(&num3,"%lf",results->minimum[2]);
+			strcat(resultsPath,num3);
+			strcat(resultsPath,"\t");
+			//free(num3);
+			char *num4 = NULL;
+			asprintf(&num4,"%d",maxRoot);
+			strcat(resultsPath,num4);
+			strcat(resultsPath,"\t");
+			//free(num4);
+			char *num5 = NULL;
+			asprintf(&num5,"%d",LCA);
+			strcat(resultsPath,num5);
+			//strcat(resultsPath,appendScores);
+			//if (print_un==1){
 				strcpy(results->taxonPath[iter],resultsPath);
-			}
-			free(appendScores);
+			//}
+			//free(appendScores);
 		}
 		//free(bwa_results[iter].concordant_matches);
 		//free(bwa_results[iter].discordant_matches);
