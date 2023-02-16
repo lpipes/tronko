@@ -9,13 +9,11 @@ type_of_PP **assignScores_Arr(int rootNum, int node, char *locQuery, int *positi
 		//treeArr[rootNum][node].score = getscore_Arr(alength,node,rootNum,locQuery,positions);
 		//printf("node %d, score %lf, root %d\n",node,tree[node].score[rootNum],nodesToCutMinVar[rootNum]);
 		return scores;
-	}
-	if (child0 != -1 ){
+	}else if (child0 != -1 ){
 		scores[rootNum][node] = getscore_Arr(alength,node,rootNum,locQuery,positions);
 		//treeArr[rootNum][node].score = getscore_Arr(alength,node,rootNum);
 		assignScores_Arr(rootNum, child0, locQuery, positions, scores, alength);
-	}
-	if (child1 != -1 ){
+	}else if (child1 != -1 ){
 		scores[rootNum][node] = getscore_Arr(alength,node,rootNum,locQuery,positions);
 		//treeArr[rootNum][node].score = getscore_Arr(alength,node,rootNum);
 		assignScores_Arr(rootNum, child1, locQuery, positions, scores, alength);
@@ -37,8 +35,7 @@ void assignScores_Arr_paired( int rootNum, int node, char *locQuery, int *positi
 		//}
 		//treeArr[rootNum][node].score += getscore_Arr(alength,node,rootNum,locQuery,positions);
 		//printf("node %d, score %lf, tree %d\n",node,scores[search_number][rootNum][node],rootNum);
-	}
-	if(child0 != -1 ){
+	}else if(child0 != -1 ){
 		scores[search_number][rootNum][node] += getscore_Arr(alength,node,rootNum,locQuery,positions);
 		//treeArr[rootNum][node].score += getscore_Arr(alength,node,rootNum,locQuery,positions);
 		//printf("node %d, score %lf, tree %d\n",node,scores[search_number][rootNum][node],rootNum);
@@ -49,8 +46,7 @@ void assignScores_Arr_paired( int rootNum, int node, char *locQuery, int *positi
 		//	scores[search_number][rootNum].score2 = getscore_Arr(alength,node,rootNum,locQuery,positions);
 		//}
 		assignScores_Arr_paired(rootNum, child0,locQuery, positions, scores, alength, search_number);
-	}
-	if(child1 != -1 ){
+	}else if(child1 != -1 ){
 		scores[search_number][rootNum][node] +=  getscore_Arr(alength,node,rootNum,locQuery,positions);
 		//treeArr[rootNum][node].score += getscore_Arr(alength,node,rootNum,locQuery,positions);
 		//printf("node %d, score %lf, tree %d\n",node,scores[search_number][rootNum][node],rootNum);
