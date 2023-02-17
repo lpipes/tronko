@@ -124,7 +124,7 @@ void parse_options(int argc, char **argv, Options *opt){
 					fprintf(stderr, "Invalid reference file.\n");
 				break;
 			case 'u':
-				success = sscanf(optarg, "%lf", opt->score_constant);
+				success = sscanf(optarg, "%lf", &(opt->score_constant));
 				if (!success)
 					fprintf(stderr, "Could not read score constant\n");
 				break;
