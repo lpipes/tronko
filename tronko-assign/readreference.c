@@ -461,7 +461,7 @@ void find_specs_for_reads(int* specs, gzFile file, int format){
 	while(gzgets(file,buffer,FASTA_MAXLINE) != NULL){
 		s = strtok(buffer,"\n");
 		if (buffer[0] == '>' || buffer[0] == '@' ){
-			size = strlen(s) - 1;
+			size = strlen(s);
 			if (max_name_length < size ){
 				max_name_length = size;
 			}
