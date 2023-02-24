@@ -125,6 +125,9 @@ void readSeqArr_UsePartitions(FILE *partitionsFile, int whichPartitions, int*** 
 void readseq(FILE* infile, int max_nodename, struct masterArr *master){
 	char buffer[FASTA_MAXLINE];
 	int i, j, test, m, k=0, row=0;
+	for(i=0; i<FASTA_MAXLINE; i++){
+		buffer[i] = '\0';
+	}
 	char c;
 	int size;
 	char nodename[max_nodename];
@@ -133,8 +136,9 @@ void readseq(FILE* infile, int max_nodename, struct masterArr *master){
 	int index=0;
 	int tmp1=0;
 	while( fgets(buffer,FASTA_MAXLINE,infile) != NULL){
-		s = strtok(buffer,"\n");
-		size = strlen(s);
+		char* buffer2;
+		s = strtok_r(buffer,"\n\0",&buffer2);
+		size = strlen(buffer);
 		if ( buffer[0] == '>'){
 			if ( size > max_nodename ){ size = max_nodename; }
 			for(i=1; i<size; i++){
