@@ -102,6 +102,12 @@ The tree file, MSA file, and the taxonomy file must all contain identical corres
 ```
 sed -i ':a; $!N; /^>/!s/\n\([^>]\)/\1/; ta; P; D' test.fasta
 ```
+## `tronko-build` example datasets
+
+An example dataset for a single tree is provided in `example_datasets/single_tree`. The dataset includes 1466 COI sequences from the order Charadriiformes. The MSA is `example_datasets/single_tree/Charadriiformes_MSA.fasta`, the taxonomy file is `example_datasets/single_tree/Charadriiformes_taxonomy.txt`, and the tree file is `RAxML_bestTree.Charadriiformes.reroot`. To build the reference database for `tronko-assign` for this dataset, run `tronko-build` with the following command (`-l` specifies using a single tree):
+```
+tronko-build -l -m example_datasets/single_tree/Charadriiformes_MSA.fasta -x example_datasets/single_tree/Charadriiformes_taxonomy.txt -t example_datasets/single_tree/RAxML_bestTree.Charadriiformes.reroot -d example_datasets/single_tree
+```
 
 ## `tronko-build` Usage with multiple trees
 
