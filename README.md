@@ -109,6 +109,8 @@ An example dataset for a single tree is provided in `example_datasets/single_tre
 tronko-build -l -m example_datasets/single_tree/Charadriiformes_MSA.fasta -x example_datasets/single_tree/Charadriiformes_taxonomy.txt -t example_datasets/single_tree/RAxML_bestTree.Charadriiformes.reroot -d example_datasets/single_tree
 ```
 
+A successful run will produce a `tronko-assign` reference database named `example_datasets/single_tree/reference_tree.txt`. The `reference_tree.txt` database file is what is used to run `tronko-assign`.
+
 ## `tronko-build` Usage with multiple trees
 
 `tronko-build` requires a multiple sequence alignment (FASTA format), rooted phylogenetic tree (Newick format), and a corresponding taxonomy file for each cluster build. All of the files should be in one directory and specify the directory with `-e` with each cluster being designated by a number. MSA files should be named `[Number]_MSA.fasta`, taxonomy files should be named `[Number]_taxonomy.txt`, and tree files should be named `RAxML_bestTree.[Number].reroot`. Example of the contents of a directory containing 3 clusters:
