@@ -1,0 +1,10 @@
+Readname	Taxonomic_Path	Score	Forward_Mismatch	Reverse_Mismatch	Tree_Number	Node_Number
+GU572157.1_8_1	Eukaryota;Chordata;Aves;Charadriiformes;Alcidae;Uria;Uria aalge	-54.258690	5.000000	4.000000	0	1095
+GU572157.1_7_1	Eukaryota;Chordata;Aves;Charadriiformes;Alcidae;Uria;Uria aalge	-42.871226	1.000000	6.000000	0	1095
+GU572157.1_6_1	Eukaryota;Chordata;Aves;Charadriiformes;Alcidae;Uria;Uria aalge	-59.952407	7.000000	3.000000	0	1098
+GU572157.1_5_1	Eukaryota;Chordata;Aves;Charadriiformes;Alcidae;Uria;Uria aalge	-31.483761	2.000000	4.000000	0	1095
+GU572157.1_4_1	Eukaryota;Chordata;Aves;Charadriiformes;Alcidae;Uria;Uria aalge	-31.483761	2.000000	3.000000	0	1095
+GU572157.1_3_1	Eukaryota;Chordata;Aves;Charadriiformes;Alcidae;Uria;Uria aalge	-54.258690	2.000000	7.000000	0	1095
+GU572157.1_2_1	Eukaryota;Chordata;Aves;Charadriiformes;Alcidae;Uria;Uria aalge	-31.483761	4.000000	2.000000	0	1095
+GU572157.1_1_1	Eukaryota;Chordata;Aves;Charadriiformes;Alcidae;Uria;Uria aalge	-42.871226	2.000000	5.000000	0	1095
+GU572157.1_0_1	Eukaryota;Chordata;Aves;Charadriiformes;Alcidae;Uria;Uria aalge	-42.871226	4.000000	3.000000	0	1095

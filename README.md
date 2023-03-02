@@ -104,12 +104,33 @@ sed -i ':a; $!N; /^>/!s/\n\([^>]\)/\1/; ta; P; D' test.fasta
 ```
 ## `tronko-build` example datasets
 
-An example dataset for a single tree is provided in `example_datasets/single_tree`. The dataset includes 1466 COI sequences from the order Charadriiformes. The MSA is `example_datasets/single_tree/Charadriiformes_MSA.fasta`, the taxonomy file is `example_datasets/single_tree/Charadriiformes_taxonomy.txt`, and the tree file is `RAxML_bestTree.Charadriiformes.reroot`. To build the reference database for `tronko-assign` for this dataset, run `tronko-build` with the following command (`-l` specifies using a single tree):
+An example dataset for a single tree is provided in `tronko-build/example_datasets/single_tree`. The dataset includes 1466 COI sequences from the order Charadriiformes. The MSA is `tronko-build/example_datasets/single_tree/Charadriiformes_MSA.fasta`, the taxonomy file is `tronko-build/example_datasets/single_tree/Charadriiformes_taxonomy.txt`, and the tree file is `tronko-build/example_datasets/single_tree/RAxML_bestTree.Charadriiformes.reroot`. To build the reference database for `tronko-assign` for this dataset, run `tronko-build` with the following command (`-l` specifies using a single tree):
 ```
-tronko-build -l -m example_datasets/single_tree/Charadriiformes_MSA.fasta -x example_datasets/single_tree/Charadriiformes_taxonomy.txt -t example_datasets/single_tree/RAxML_bestTree.Charadriiformes.reroot -d example_datasets/single_tree
+tronko-build -l -m tronko-build/example_datasets/single_tree/Charadriiformes_MSA.fasta -x tronko-build/example_datasets/single_tree/Charadriiformes_taxonomy.txt -t tronko-build/example_datasets/single_tree/RAxML_bestTree.Charadriiformes.reroot -d tronko-build/example_datasets/single_tree
 ```
 
 A successful run will produce a `tronko-assign` reference database named `example_datasets/single_tree/reference_tree.txt`. The `reference_tree.txt` database file is what is used to run `tronko-assign`.
+
+## `tronko-assign` example datasets
+
+An example dataset for `tronko-assign` is provided in `example_datasets/single_tree`. This dataset contains single-end reads (`example_datasets/single_tree/missingreads_singleend_150bp_2error.fasta`) and paired-end reads (forward read: `example_datasets/single_tree/missingreads_pairedend_150bp_2error_read1.fasta` and reverse read: `example_datasets/single_tree/missingreads_pairedend_150bp_2error_read2.fasta`). For the single-end reads, there are 164 150bp reads with 2% simulated error/polymorphisms from the following sequence (taxonomically classified on NCBI as Uria aalge):
+
+```
+>GU572157.1
+CCTGGCTGGTAATCTAGCCCATGCCGGAGCTTCAGTGGATTTAGCAATCTTCTCCCTTCACTTAGCAGGTGTATCATCTATTCTAGGCGCTATCAACTTTATCACAACAGCCATCAACATAAAGCCTCCAGCCCTCTCACAATACCAAACCCCCCTATTCGTATGATCAGTACTTATCACTGCTGTCCTACTACTACTCTCACTCCCAGTACTTGCTGCTGGTATCACTATATTACTAACAGATCGAAACTTAAACACAACATTCTTTGATCCAGCTGGAGGTGGTGACCCAGTACTTTACCAACACCTCTTC
+``` 
+
+This particular sequence, `GU572157.1`, has been removed from the single tree example database. To obtain assignments, run `tronko-assign` with the single tree example database from `tronko-build` with the following command for the single-end reads (using the Needleman-Wunsch alignment and a default LCA cut-off of 5):
+
+```
+tronko-assign -r -f tronko-build/example_datasets/single_tree/reference_tree.txt -a tronko-build/example_datasets/single_tree/Charadriiformes.fasta -s -g example_datasets/single_tree/missingreads_singleend_150bp_2error.fasta -o example_datasets/single_tree/missingreads_singleend_150bp_2error_results.txt -w
+```
+
+To obtain assignments, run `tronko-assign` with the single tree example database from `tronko-build` with the following command for the paired-end reads (using the Needleman-Wunsch alignment and a default LCA cut-off of 5):
+
+```
+tronko-assign -r -f tronko-build/example_datasets/single_tree/reference_tree.txt -a tronko-build/example_datasets/single_tree/Charadriiformes.fasta -p -1 example_datasets/single_tree/missingreads_pairedend_150bp_2error_read1.fasta -2 example_datasets/single_tree/missingreads_pairedend_150bp_2error_read2.fasta -o example_datasets/single_tree/missingreads_pairedend_150bp_2error_results.txt -w
+```
 
 ## `tronko-build` Usage with multiple trees
 
