@@ -156,6 +156,20 @@ tronko-build -y -e [DIRECTORY CONTAINING MSA, TAX, and TREE FILES] -n 3 -d outpu
 ```
 The reference database file will be output to `[OUTPUT DIRECTORY]/reference_tree.txt`. The `reference_tree.txt` file is the reference database file that `tronko-assign` requires for assignment.
 
+To partition the reference database further (see manuscript for details) the following dependencies are needed to be installed in your path (no dependencies needed for `tronko-assign`). <a href="https://github.com/stamatak/standard-RAxML">`raxmlHPC-PTHREADS`</a>, <a href="https://github.com/refresh-bio/FAMSA">`famsa`</a>, `nw_reroot` from <a href="https://anaconda.org/bioconda/newick_utils/files">Newick utilties</a>, <a href="https://raw.githubusercontent.com/lpipes/tronko/main/scripts/fasta2phyml.pl">`fasta2phyml.pl</a>, and <a href="https://ftp.gnu.org/gnu/sed/">`sed`</a>. Partitioning the database further is only needed when the underlying MSA is unreliable. An example command to create the reference database and partition a database that contains 100 initial clusters using the sum-of-squares approach (`outdir` NEEDS TO BE CREATED BEFORE THE COMMAND IS RUN):
+
+```
+tronko-build -y -e initial_clusters_directory -d outdir -n 100 -s
+```
+
+The `reference_tree.txt` file will be output to the `outdir` (which needs to be created before the job is run) directory. An example command to create the reference database a;nd partition a database that contains 100 initial clusters using a threshold for the number of leaf nodes (i.e., 500 leaf nodes) also make sure `outdir` is created before the command is run:
+
+```
+tronko-build -y -e initial_clusters_directory -d outdir -n 100 -v -f 500
+```
+
+The `reference_tree.txt` file will be output to the `outdir` directory.
+
 # Performance
 
 We performed a leave-one-species-out test comparing Tronko (with LCA cut-offs for the score of 0, 5, 10, 15, and 20 with Needleman-Wunsch alignment) to kraken2, metaphlan2, and MEGAN for 1,467 COI sequences from 253 species from the order Charadriiformes using 150bp x 2 paired-end sequences and 150bp and 300bp single-end sequences using 0, 1, and 2% error/polymorphism.
