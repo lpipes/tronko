@@ -7,6 +7,9 @@
 #include <time.h>
 #include <pthread.h>
 #include <assert.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 #include "needleman_wunsch.h"
 #include "global.h"
 #include "options.h"
@@ -767,6 +770,11 @@ int main(int argc, char **argv){
 	opt.number_of_lines_to_read=50000;
 	opt.score_constant = 0.01;
 	parse_options(argc, argv, &opt);
+	struct stat st = {0};
+	if ( stat(opt.reference_file, &st) == -1){
+		printf("Cannot find reference_tree.txt file. Exiting...\n");
+		exit(1);
+	}
 	gzFile referenceTree = Z_NULL;
 	referenceTree = gzopen(opt.reference_file,"r");
 	assert(Z_NULL!=referenceTree);
