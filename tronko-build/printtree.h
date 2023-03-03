@@ -5,6 +5,9 @@
 #include <stdlib.h>
 #include <math.h>
 #include <ctype.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 #include "global.h"
 #include "opt.h"
 

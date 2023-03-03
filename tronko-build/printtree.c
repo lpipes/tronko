@@ -31,6 +31,10 @@ void printtreeArr(int whichRoot){
 void printTreeFile(int numberOfTrees, int max_nodename, int max_tax_name, int max_lineTaxonomy, Options opt){
 	int i, j, k, l;
 	char buf[BUFFER_SIZE];
+	struct stat st = {0};
+	if ( stat(opt.partitions_directory, &st) == -1){
+		mkdir(opt.partitions_directory, 0700);
+	}
 	snprintf(buf,BUFFER_SIZE,"%s/reference_tree.txt",opt.partitions_directory);
 	FILE *outputTree = fopen(buf,"w");
 	if  ( outputTree == NULL ){ printf("Error opening reference tree file!\n"); exit(1); }
