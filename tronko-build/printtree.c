@@ -37,7 +37,7 @@ void printTreeFile(int numberOfTrees, int max_nodename, int max_tax_name, int ma
 	}
 	snprintf(buf,BUFFER_SIZE,"%s/reference_tree.txt",opt.partitions_directory);
 	FILE *outputTree = fopen(buf,"w");
-	if  ( outputTree == NULL ){ printf("Error opening reference tree file!\n"); exit(1); }
+	if  ( outputTree == NULL ){ printf("Error opening reference tree file!\n"); exit(-1); }
 	fprintf(outputTree,"%d\n",numberOfTrees);
 	fprintf(outputTree,"%d\n",max_nodename);
 	fprintf(outputTree,"%d\n",max_tax_name);

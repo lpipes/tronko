@@ -12,7 +12,7 @@
 #include <dirent.h>
 #include <regex.h>
 //void readFilesInDir(char *directory, int number_of_partitions, partition_files *pf);
-int readInXNumberOfLines_fastq(int numberOfLinesToRead, gzFile query_reads, int whichPair, Options opt, int max_query_length, int max_readname_length);
+int readInXNumberOfLines_fastq(int numberOfLinesToRead, gzFile query_reads, int whichPair, Options opt, int max_query_length, int max_readname_length,int first_iter);
 int readInXNumberOfLines(int numberOfLinesToRead, gzFile query_reads, int whichPair, Options opt, int max_query_length, int max_readname_length);
 int readReferenceTree( gzFile referenceTree,int* name_specs);
 int setNumbase_setNumspec(int numberOfPartitions,int* specs);

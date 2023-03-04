@@ -1,5 +1,5 @@
 #include "readreference.h"
-int readInXNumberOfLines_fastq(int numberOfLinesToRead, gzFile query_reads, int whichPair, Options opt, int max_query_length, int max_readname_length){
+int readInXNumberOfLines_fastq(int numberOfLinesToRead, gzFile query_reads, int whichPair, Options opt, int max_query_length, int max_readname_length,int first_iter){
 	char* buffer;
 	char* query;
 	char* reverse;
@@ -17,7 +17,6 @@ int readInXNumberOfLines_fastq(int numberOfLinesToRead, gzFile query_reads, int 
 	int i=0;
 	int iter=0;
 	int next=0;
-	int first_iter = 0;
 	query = (char *)malloc(sizeof(char)*max_query_length+2);
 	reverse = (char *)malloc(sizeof(char)*max_query_length+2);
 	for(i=0; i<max_query_length+2; i++){
@@ -27,12 +26,12 @@ int readInXNumberOfLines_fastq(int numberOfLinesToRead, gzFile query_reads, int 
 	while(gzgets(query_reads,buffer,buffer_size)!=NULL){
 		s = strtok(buffer,"\n");
 		size = strlen(s);
-		if ( first_iter == 0 ){
+		if ( first_iter == 1 ){
 			if ( buffer[0] != '@' ){
 				printf("Query reads are not in FASTQ format\n");
 				exit(-1);
 			}
-			first_iter=1;
+			first_iter=0;
 		}
 		if ( buffer[0] == '@' && whichPair==1){
 			for(i=1; i<size; i++){

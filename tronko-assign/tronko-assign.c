@@ -889,6 +889,7 @@ int main(int argc, char **argv){
 		if (seqinfile == (gzFile) Z_NULL){
 			printf("*** fasta file could not be opened.\n");
 		}
+		int first_iter=1;
 		for(i=0; i<opt.number_of_cores; i++){
 			mstr[i].str = malloc(sizeof(struct resultsStruct));
 			if ( opt.fastq == 0){
@@ -915,12 +916,13 @@ int main(int argc, char **argv){
 			if (opt.fastq==0){
 				returnLineNumber=readInXNumberOfLines(numberOfLinesToRead/2,seqinfile,0,opt,max_query_length,max_name_length,maxNumBase);
 			}else{
-				returnLineNumber=readInXNumberOfLines_fastq(numberOfLinesToRead/4,seqinfile,0,opt,max_query_length,max_name_length,maxNumBase);
+				returnLineNumber=readInXNumberOfLines_fastq(numberOfLinesToRead/4,seqinfile,0,opt,max_query_length,max_name_length,maxNumBase,first_iter);
 			}
 			if (returnLineNumber==0){
 				break;
 			}
 			divideFile = returnLineNumber/opt.number_of_cores;
+			first_iter=0;
 			j=0;
 			for (i=0; i<opt.number_of_cores; i++){
 				start=j;
@@ -1049,6 +1051,7 @@ int main(int argc, char **argv){
 		if (seqinfile_2 == (gzFile) Z_NULL){
 			printf("*** fasta/fastq file could not be opened.\n");
 		}
+		int first_iter=1;
 		for(i=0;i<opt.number_of_cores;i++){
 			mstr[i].str = malloc(sizeof(struct resultsStruct));
 			if ( opt.fastq == 0){
@@ -1075,16 +1078,17 @@ int main(int argc, char **argv){
 			if (opt.fastq==0){
 				returnLineNumber=readInXNumberOfLines(numberOfLinesToRead/2,seqinfile_1,1,opt,max_query_length,max_name_length);
 			}else{
-				returnLineNumber=readInXNumberOfLines_fastq(numberOfLinesToRead/4,seqinfile_1,1,opt,max_query_length,max_name_length);
+				returnLineNumber=readInXNumberOfLines_fastq(numberOfLinesToRead/4,seqinfile_1,1,opt,max_query_length,max_name_length,first_iter);
 			}
 			if (returnLineNumber==0)
 				break;
 			if (opt.fastq==0){
 				returnLineNumber2 = readInXNumberOfLines ( numberOfLinesToRead/2, seqinfile_2, 2, opt,max_query_length,max_name_length);
 			}else{
-				returnLineNumber2 = readInXNumberOfLines_fastq(numberOfLinesToRead/4,seqinfile_2, 2, opt,max_query_length,max_name_length);
+				returnLineNumber2 = readInXNumberOfLines_fastq(numberOfLinesToRead/4,seqinfile_2, 2, opt,max_query_length,max_name_length,first_iter);
 			}
 			returnLineNumber = returnLineNumber2;
+			first_iter=0;
 			divideFile= returnLineNumber/opt.number_of_cores;
 			j=0;
 			for ( i=0; i<opt.number_of_cores; i++){
