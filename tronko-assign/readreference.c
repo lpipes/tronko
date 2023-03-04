@@ -165,7 +165,7 @@ int readInXNumberOfLines(int numberOfLinesToRead, gzFile query_reads, int whichP
 		query[i]='\0';
 		reverse[i]='\0';
 	}
-	int first_iter=0;
+	int first_iter=1;
 	while(gzgets(query_reads,buffer,buffer_size)!=NULL){
 		s = strtok(buffer,"\n");
 		size = strlen(s);
@@ -174,7 +174,7 @@ int readInXNumberOfLines(int numberOfLinesToRead, gzFile query_reads, int whichP
 				printf("Query reads are not in FASTA format. Try specifying -q if using FASTQ reads.\n");
 				exit(-1);
 			}
-			first_iter=1;
+			first_iter=0;
 		}
 		if ( buffer[0] == '>' && whichPair==1 ){
 			for(i=1; i<size; i++){
