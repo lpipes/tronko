@@ -791,7 +791,7 @@ int main(int argc, char **argv){
 	if ( opt.print_node_info[0] != '\0' ){
 		printf("Printing Accession IDs, Tree numbers, and leaf numbers...\n");
 		FILE* tree_info = fopen(opt.print_node_info,"w");
-		if (tree_info == NULL ){ printf("Error opening file!\n"); exit(1); }
+		if (tree_info == NULL ){ printf("Error opening node info file!\n"); exit(1); }
 		for(i=0; i<numberOfTrees; i++){
 			printTreeInfo(i,rootArr[i],tree_info);
 		}
@@ -802,7 +802,7 @@ int main(int argc, char **argv){
 	if (opt.print_leave_seqs == 1){
 		printf("Printingleavesfile\n");
 		FILE* leaves_file = fopen("leaves.fasta","w");
-		if(leaves_file == NULL ){ printf("Error opening file!\n"); exit(1); }
+		if(leaves_file == NULL ){ printf("Error opening leaves file!\n"); exit(1); }
 		for(i=0; i<numberOfTrees; i++){
 			printLeaveSeqsToFile(leaves_file,rootArr[i],i,numbaseArr[i]);	
 		}
@@ -879,7 +879,7 @@ int main(int argc, char **argv){
 			}
 		}
 		FILE *results = fopen(opt.results_file,"w");
-		if ( results == NULL ){ printf("Error opening file!\n"); exit(1); }
+		if ( results == NULL ){ printf("Error opening output file!\n"); exit(1); }
 		fprintf(results,"Readname\tTaxonomic_Path\tScore\tForward_Mismatch\tReverse_Mismatch\tTree_Number\tNode_Number\n");	
 		int keepTrackOfReadLine=0;
 		pthread_t threads[opt.number_of_cores];//array of our threads
@@ -1035,7 +1035,7 @@ int main(int argc, char **argv){
 			}
 		}
 		FILE *results = fopen(opt.results_file,"w");
-		if ( results == NULL ){ printf("Error opening file!\n"); exit(1); }
+		if ( results == NULL ){ printf("Error opening output file!\n"); exit(1); }
 		fprintf(results,"Readname\tTaxonomic_Path\tScore\tForward_Mismatch\tReverse_Mismatch\tTree_Number\tNode_Number\n");	
 		int keepTrackOfReadLine=0;
 		pthread_t threads[opt.number_of_cores];//array of our thrads
