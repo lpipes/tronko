@@ -40,11 +40,9 @@ jobs:
         working-directory: ./tronko-build
       - name: rename tronko-build debug
         run: mv tronko-build/tronko-build bin/tronko-build
-      - name: Zip bin folder
-        run: zip -r release.zip bin
-      - name: Upload release.zip
+      - name: Upload tronko.zip
         uses: actions/upload-artifact@v3
         with:
-          name: release.zip
-          path: release.zip
+          name: tronko.zip
+          path: bin
       
