@@ -17,44 +17,34 @@ jobs:
       - name: tronko-assign make clean
         run: make clean
         working-directory: ./tronko-assign
-      - name: build tronko-assign
-        run: make
-        working-directory: ./tronko-assign
-      - name: Archive tronko-assign binary
-        uses: actions/upload-artifact@v3
-        with:
-          name: tronko-assign
-          path: tronko-assign/tronko-assign
-      - name: tronko-build make clean
-        run: make clean
-        working-directory: ./tronko-build
-      - name: build tronko-build
-        run: make
-        working-directory: ./tronko-build
-      - name: Archive tronko-build binary
-        uses: actions/upload-artifact@v3
-        with:
-          name: tronko-build
-          path: tronko-build/tronko-build
-      - name: tronko-assign make clean
-        run: make clean
-        working-directory: ./tronko-assign
       - name: build tronko-assign debug
         run: make debug
         working-directory: ./tronko-assign
-      - name: Archive tronko-assign binary
-        uses: actions/upload-artifact@v3
-        with:
-          name: tronko-assign-debug
-          path: tronko-assign/tronko-assign
+      - name: rename tronko-assign debug
+        run: mv tronko-assign/tronko-assign bin/tronko-assign-debug
+      - name: build tronko-assign
+        run: make
+        working-directory: ./tronko-assign
+      - name: rename tronko-assign debug
+        run: mv tronko-assign/tronko-assign bin/tronko-assign
       - name: tronko-build make clean
         run: make clean
         working-directory: ./tronko-build
       - name: build tronko-build debug
         run: make debug
         working-directory: ./tronko-build
-      - name: Archive tronko-build binary
+      - name: rename tronko-build debug
+        run: mv tronko-build/tronko-build bin/tronko-build-debug
+      - name: build tronko-build
+        run: make
+        working-directory: ./tronko-build
+      - name: rename tronko-build debug
+        run: mv tronko-build/tronko-build bin/tronko-build
+      - name: Zip bin folder
+        run: zip -r release.zip bin
+      - name: Upload release.zip
         uses: actions/upload-artifact@v3
         with:
-          name: tronko-build-debug
-          path: tronko-build/tronko-build
+          name: release.zip
+          path: release.zip
+      
