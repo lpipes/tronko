@@ -6,6 +6,7 @@ CC = gcc
 # -Wall turns on most, but not all, compiler warnings
 CFLAGS = -w -pg
 DBGCFLAGS = -g -w
+STACKPROTECT = -fno-stack-protector
 # -lm links the math library
 #LIBS = -lm -lpthread -lz
 LIBS = -lm -pthread -lz -lrt -std=gnu99
@@ -22,9 +23,9 @@ TARGET = tronko-assign
 
 all: $(TARGET)
 $(TARGET): $(TARGET).c
-	$(CC) $(OPTIMIZATION) -o $(TARGET) $(NEEDLEMANWUNSCH) $(HASHMAP) $(BWA) $(WFA2) $(SOURCES) $(LIBS)
+	$(CC) $(OPTIMIZATION) $(STACKPROTECT) -o $(TARGET) $(NEEDLEMANWUNSCH) $(HASHMAP) $(BWA) $(WFA2) $(SOURCES) $(LIBS)
 debug: $(TARGET).c
-	$(CC) $(DBGCFLAGS) -o $(TARGET) $(NEEDLEMANWUNSCH) $(HASHMAP) $(BWA) $(WFA2) $(SOURCES) $(LIBS)
+	$(CC) $(DBGCFLAGS) $(STACKPROTECT) -o $(TARGET) $(NEEDLEMANWUNSCH) $(HASHMAP) $(BWA) $(WFA2) $(SOURCES) $(LIBS)
 
 clean:
 	$(RM) $(TARGET)
