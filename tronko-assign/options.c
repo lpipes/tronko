@@ -35,29 +35,29 @@ static struct Options long_options[]=
 
 char usage[] = "\ntronko-assign [OPTIONS]\n\
 	\n\
-	-h, --help			usage:\n\
-	-p, --paired			use paired reads\n\
-	-s, --single			use single reads\n\
-	-r, --reference			use a reference\n\
-	-v, --reverse-single-read	when using single read reverse it\n\
-	-z, --reverse-paired-read	when using pairs reverse second read\n\
-	-f, --reference-file		path to reference file\n\
-	-o, --results			path to output file\n\
-	-g, --single-read-file		path to single read file\n\
-	-1, --paired-read-file1		path to paired read 1 file\n\
-	-2, --paired-read-file2		path to paired read 2 file\n\
-	-a, --fasta-file		path to fasta file (for bwa database)\n\
-	-c, --cinterval			score cut-off to use [default:5]\n\
-	-C, --number-of-cores		number of cores\n\
-	-L, --number-of-lines-to-read	number of lines to read for assignment\n\
-	-P, --print-alignments		print alignments to stdout\n\
-	-w, --use-nw			use Needleman-Wunsch\n\
-	-q, --fastq			Query is FASTQ [default is FASTA]\n\
-	-e, --use-leaf-portion		Use only a portion of leaf\n\
-	-n, --padding [INT]		Padding to use in leaf portion\n\
-	-5, --print-node-info		[FILE] Print tree number and leaf number\n\
-	-6, --skip-bwa-build		Skip the bwa build\n\
-	-u, --score-constant		Score constant [default: 0.01]\n\
+	-h, 	usage:\n\
+	-p, 	use paired reads\n\
+	-s, 	use single reads\n\
+	-r, 	use a reference\n\
+	-v, 	when using single reads, reverse-complement it\n\
+	-z,	when using paired-end reads,  reverse-complement the second read\n\
+	-f [FILE], path to reference database file\n\
+	-o [FILE], path to output file\n\
+	-g [FILE], path to single-end reads file\n\
+	-1 [FILE], path to paired-end forward read file\n\
+	-2 [FILE], path to paired-end reverse read file\n\
+	-a [FILE], path to fasta file (for bwa database)\n\
+	-c [INT], LCA cut-off to use [default:5]\n\
+	-C [INT], number of cores\n\
+	-L [INT], number of lines to read for assignment\n\
+	-P, print alignments to stdout\n\
+	-w, use Needleman-Wunsch Alignment (default: WFA)\n\
+	-q, Query is FASTQ [default is FASTA]\n\
+	-e, Use only a portion of the reference sequences\n\
+	-n [INT], Padding (Number of bases) to use in the portion of the reference sequences\n\
+	-5 [FILE], Print tree number and leaf number\n\
+	-6, Skip the bwa build if already exists\n\
+	-u, Score constant [default: 0.01]\n\
 	\n";
 
 void print_help_statement(){

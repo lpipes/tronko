@@ -12,50 +12,50 @@ Alignment-based and composition-based assignment methods calculate the lowest co
 
 	tronko-build [OPTIONS]
 	
-		-h, --help				usage:
-		-y, --partition-directory		use a partition directory (you have multiple clusters)
-		-l, --single-tree			use only single tree (do not partition)
-		-t, --tree-file				rooted phylogenetic tree [FILE: Newick]
-		-m, --msa-file				multiple sequence alignment [FILE: FASTA]
-		-d, --partitions-directory		output directory for partitions
-		-x, --tax-file				taxonomy file [FILE: FASTA_header\tdomain;phylum;class;order;family;genus;species]
-		-e, --read-directory			directory for multiple cluster
-		-n, --number-of-partitions		number of partitions in read directory
-		-b, --where-to-restart-partitions	restart partitions with partition number
-		-s, --use-spscore			partition using sum-of-pairs score [can't use with -f]
-		-u, --sum-of-pairs			minimum threshold for sum of pairs score [default: 0.1]
-		-v, --use-minleaves			partition using minimum number of leaf nodes [can't use with -s, use with -f]
-		-f, --minimum-leaf-nodes to retain	don't partition less than the minimum number of leaf nodes [can't use with -s, use with -v]
-		-g, --no-change-missingdata		don't flag missing data
+		-h,				usage:
+		-y, use a partition directory (you want to partition or you have multiple clusters)
+		-l, use only single tree (do not partition)
+		-t [FILE], rooted phylogenetic tree [FILE: Newick]
+		-m [FILE], multiple sequence alignment [FILE: FASTA]
+		-d [DIRECTORY], REQUIRED, output directory
+		-x [FILE], taxonomy file [FILE: FASTA_header	domain;phylum;class;order;family;genus;species]
+		-e [DIRECTORY], directory for reading multiple clusters
+		-n [INT], number of partitions in read directory
+		-b [INT], restart partitions with partition number [default: 0]
+		-s, partition using sum-of-pairs score [can't use with -f]
+		-u [FLOAT], minimum threshold for sum of pairs score [default: 0.5]
+		-v, partition using minimum number of leaf nodes [can't use with -s, use with -f]
+		-f [INT], don't partition less than the minimum number of leaf nodes [can't use with -s, use with -v]
+		-g, don't change missing data
 
 # tronko-assign
 `tronko-assign` is for species assignment of queries. It requires a `tronko-build` database.
 
 	tronko-assign [OPTIONS]
 	
-		-h, --help			usage:
-		-p, --paired			use paired reads
-		-s, --single			use single reads
-		-r, --reference			use a reference
-		-v, --reverse-single-read	when using single read reverse it
-		-z, --reverse-paired-read	when using pairs reverse second read
-		-f, --reference-file		path to reference file
-		-o, --results			path to output file
-		-g, --single-read-file		path to single read file
-		-1, --paired-read-file1		path to paired read 1 file
-		-2, --paired-read-file2		path to paired read 2 file
-		-a, --fasta-file		path to fasta file (for bwa database)
-		-c, --cinterval			score cut-off to use [default:5]
-		-C, --number-of-cores		number of cores
-		-L, --number-of-lines-to-read	number of lines to read for assignment
-		-P, --print-alignments		print alignments to stdout
-		-w, --use-nw			use Needleman-Wunsch
-		-q, --fastq			Query is FASTQ [default is FASTA]
-		-e, --use-leaf-portion		Use only a portion of leaf
-		-n, --padding [INT]		Padding to use in leaf portion
-		-5, --print-node-info		[FILE] Print tree number and leaf number
-		-6, --skip-bwa-build		Skip the bwa build
-		-u, --score-constant		Score constant [default: 0.01]
+		-h, 	usage:
+		-p, 	use paired reads
+		-s, 	use single reads
+		-r, 	use a reference
+		-v, 	when using single reads, reverse-complement it
+		-z,	when using paired-end reads,  reverse-complement the second read
+		-f [FILE], path to reference database file
+		-o [FILE], path to output file
+		-g [FILE], path to single-end reads file
+		-1 [FILE], path to paired-end forward read file
+		-2 [FILE], path to paired-end reverse read file
+		-a [FILE], path to fasta file (for bwa database)
+		-c [INT], LCA cut-off to use [default:5]
+		-C [INT], number of cores
+		-L [INT], number of lines to read for assignment
+		-P, print alignments to stdout
+		-w, use Needleman-Wunsch Alignment (default: WFA)
+		-q, Query is FASTQ [default is FASTA]
+		-e, Use only a portion of the reference sequences
+		-n [INT], Padding (Number of bases) to use in the portion of the reference sequences
+		-5 [FILE], Print tree number and leaf number
+		-6, Skip the bwa build if already exists
+		-u, Score constant [default: 0.01]
 
 Tronko uses the <a href="https://github.com/smarco/WFA2-lib">Wavefront Alignment Algorithm (version 2)</a> or <a href="https://github.com/noporpoise/seq-align">Needleman-Wunsch Algorithm</a> for semi-global alignments. It uses <a href="https://github.com/lh3/bwa">bwa</a> for alignment to leaf nodes, and uses <a href="https://github.com/DavidLeeds/hashmap">David Leeds' hashmap</a> for hashmap implementation in C.
 
@@ -65,18 +65,34 @@ The output file is a tab-delimited text file where only the forward readname is 
 
 ```
 Readname	Taxonomic_Path	Score	Forward_Mismatch	Reverse_Mismatch	Tree_Number	Node_Number
-M00160:15:000000000-JHG8V:1:1101:9131:1243_1:N:0:GTGCAGA+TACCATC	Eukaryota;Arthropoda;Insecta;Ephemeroptera;Baetidae;Fallceon;Fallceon sp. BOLD:AAL8084	0.000000	0.000000	1.000000	5718	44
-M00160:15:000000000-JHG8V:1:1101:21631:1259_1:N:0:GTGCAGA+TACCATC	Eukaryota;Arthropoda;Insecta;Ephemeroptera;Baetidae;Fallceon;Fallceon sp. BOLD:AAL8084	0.000000	0.000000	1.000000	5718	44
-M00160:15:000000000-JHG8V:1:1101:15032:1369_1:N:0:GTGCAGA+TACCATC	Eukaryota;Arthropoda;Insecta;Ephemeroptera;Baetidae;Baetis;Baetis adonis	-4.605170	1.000000	1.000000	8901	66
-M00160:15:000000000-JHG8V:1:1101:15129:1391_1:N:0:GTGCAGA+TACCATC	Eukaryota;Arthropoda;Insecta;Ephemeroptera;Baetidae;Baetis;Baetis adonis	0.000000	0.000000	1.000000	8901	66
+GU572157.1_8_1	Eukaryota;Chordata;Aves;Charadriiformes;Alcidae;Uria;Uria aalge	-54.258690	5.000000	4.00000	0	1095
+GU572157.1_7_1	Eukaryota;Chordata;Aves;Charadriiformes;Alcidae;Uria;Uria aalge	-42.871226	1.000000	6.00000	0	1095
+GU572157.1_6_1	Eukaryota;Chordata;Aves;Charadriiformes;Alcidae;Uria;Uria aalge	-59.952407	7.000000	3.00000	0	1098
+GU572157.1_5_1	Eukaryota;Chordata;Aves;Charadriiformes;Alcidae;Uria;Uria aalge	-31.483761	2.000000	4.00000	0	1095
+GU572157.1_4_1	Eukaryota;Chordata;Aves;Charadriiformes;Alcidae;Uria;Uria aalge	-31.483761	2.000000	3.00000	0	1095
+GU572157.1_3_1	Eukaryota;Chordata;Aves;Charadriiformes;Alcidae;Uria;Uria aalge	-54.258690	2.000000	7.00000	0	1095
 ```
 
 # INSTALLATION
 
-	cd tronko-build
+	cd tronko/tronko-build
 	make
 	../tronko-assign
 	make
+
+# SINGULARITY CONTAINER
+
+To use the container download:
+
+	singularity pull library://lpipes/tronko/tronko:1.0
+
+To run `tronko-assign` with the container:
+
+	singularity exec --bind /home tronko.sif tronko-assign
+
+To run `tronko-build` with the container:
+
+	singularity exec --bind /home tronko.sif tronko-build
 
 # `tronko-assign` Usage
 Tronko does not detect the correct orientation of the reads. If your reverse read needs to be reverse complemented use the option `-z`. The default options of Tronko assume that your reads are in FASTA format. If you want to assign reads in FASTQ format, use the option `-q`. You will also need a FASTA file (not gzipped) of all of your reference sequences in the reference database (use the option `-a`). To skip the `bwa index` build use `-6`. The reads (and reference database file) can be gzipped or not gzipped. Assigning paired-end reads in FASTA format:
@@ -108,8 +124,17 @@ An example dataset for a single tree is provided in `tronko-build/example_datase
 ```
 tronko-build -l -m tronko-build/example_datasets/single_tree/Charadriiformes_MSA.fasta -x tronko-build/example_datasets/single_tree/Charadriiformes_taxonomy.txt -t tronko-build/example_datasets/single_tree/RAxML_bestTree.Charadriiformes.reroot -d tronko-build/example_datasets/single_tree
 ```
+An example dataset for multiple trees is provided in `tronko-build/example_datasets/multiple_trees/one_MSA`. The dataset includes 99 COI sequences from different species. The MSA is `tronko-build/example_datasets/multiple_trees/one_MSA/1_MSA.fasta`, the taxonomy file is `tronko-build/example_datasets/multiple_trees/one_MSA/1_taxonomy.txt`, and the tree file is `tronko-build/example_datasets/multiple_trees/one_MSA/RAxML_bestTree.1.reroot`. To build the reference database and partition it using the Sum-of-Pairs score (see manuscript), run `tronko-build` with the following command [-d is REQUIRED and must contain the full path NOT relative path):
+```
+tronko-build -y -e tronko-build/example_datasets/multiple_trees/one_MSA -n 1 -d [FULL PATH TO OUTPUT DIRECTORY] -s
+```
 
-A successful run will produce a `tronko-assign` reference database named `example_datasets/single_tree/reference_tree.txt`. The `reference_tree.txt` database file is what is used to run `tronko-assign`.
+An example dataset to not partition multiple tree is provided in `tronko-build/example_datasets/multiple_trees/multiple_MSA`. The dataset include 99 COI sequences from different species. To build the reference database and not partition the database, set the `-f` parameter higher than the number of sequences in the dataset. Run `tronko-build` with the following command:
+```
+tronko-build -y -e tronko-build/example_datasets/multiple_trees/multiple_MSA -n 5 -d outdir_multiple_MSA -v -f 500
+```
+
+A successful run will produce a `tronko-assign` reference database named `reference_tree.txt` in the output directory. The `reference_tree.txt` database file is what is used to run `tronko-assign`.
 
 ## `tronko-assign` example datasets
 
@@ -132,7 +157,36 @@ To obtain assignments, run `tronko-assign` with the single tree example database
 tronko-assign -r -f tronko-build/example_datasets/single_tree/reference_tree.txt -a tronko-build/example_datasets/single_tree/Charadriiformes.fasta -p -1 example_datasets/single_tree/missingreads_pairedend_150bp_2error_read1.fasta -2 example_datasets/single_tree/missingreads_pairedend_150bp_2error_read2.fasta -o example_datasets/single_tree/missingreads_pairedend_150bp_2error_results.txt -w
 ```
 
-## `tronko-build` Usage with multiple trees
+An example dataset for `tronko-assign` with multiple trees is provided in `example_datasets/multiple_trees`. This dataset contains single-end reads (`example_datasets/multiple_trees/missingreads_singleend_150bp_2error.fasta`) and paired-end reads (forward read: `example_datasets/multiple_trees/missingreads_pairedend_150bp_2error_read1.fasta` and reverse read: `example_datasets/multiple_trees/missingreads_pairedend_150bp_2error_read2.fasta`). For the single-end reads, there are 84 150bp reads with 2% simulated error/polymorphisms from the following sequence (taxonomically classified on NCBI as Sagitta elegans):
+
+```
+>KP857443.1
+TTTGAGCACTGTGGGACATAGGGGTGGAGCAGTGGATTTGGGTATCTTCTCTTTGCACCTGGCTGGCGTTAGAAGAATCTTGGGGAGAGCTAATTTTATTACCACTATCACCAATATAAAAGGGGAAGGTATGACTATAGAACTCATGCCTTTATTCGTGTGGGCGGTGCTCCTCACGGCTGTCTTACTTTTACTCTCTCTACCTGTATTAGCTGGGGCTATCACAATGTTAC
+```
+
+This particular sequence, `KP857443.1`, has been removed from the multiple trees example databases. To obtain assignments, run `tronko-assign` with the multiple trees example database with partitions from `tronko-build` with the following command for the single-end reads (using the Needleman-Wunsch alignment `-w` and a default LCA cut-off of 5 `-c 5`):
+
+```
+tronko-assign -r -f out_oneMSA/reference_tree.txt -s -g example_datasets/multiple_trees/missingreads_singleend_150bp_2error.fasta -o example_datasets/multiple_trees/missingreads_singleend_150bp_2error_partition_results.txt -a tronko-build/example_datasets/multiple_trees/one_MSA/1.fasta
+```
+
+To assign paired-end reads on the same reference database run `tronko-assign`:
+```
+tronko-assign -r -f out_oneMSA/reference_tree.txt -p -1 example_datasets/multiple_trees/missingreads_pairedend_150bp_2error_read1.fasta -2 example_datasets/multiple_trees/missingreads_pairedend_150bp_2error_read2.fasta -o example_datasets/multiple_trees/missingreads_pairedend_150bp_2error_partition_results.txt -a -a tronko-build/example_datasets/multiple_trees/one_MSA/1.fasta
+```
+
+To obtain assignments, run `tronko-assign` with the multiple trees example database with multiple MSAs from `tronko-build` with the following command for the single-end reads (using the Needleman-Wunsch alignment `-w` and a default LCA cut-off of 5 `-c 5`):
+
+```
+tronko-assign -r -f outdir_multiple_MSA/reference_tree.txt -s -g example_datasets/multiple_trees/missingreads_singleend_150bp_2error.fasta -o example_datasets/multiple_trees/missingreads_singleend_150bp_2error_multiple_MSA_results.txt -a tronko-build/example_datasets/multiple_trees/one_MSA/1.fasta
+```
+
+To assign paired-end reads on the same reference database run `tronko-assign`:
+```
+tronko-assign -r -f outdir_multiple_MSA/reference_tree.txt -p -1 example_datasets/multiple_trees/missingreads_pairedend_150bp_2error_read1.fasta -2 example_datasets/multiple_trees/missingreads_pairedend_150bp_2error_read2.fasta -o example_datasets/multiple_trees/missingreads_pairedend_150bp_2error_multiple_MSA_results.txt -a -a tronko-build/example_datasets/multiple_trees/one_MSA/1.fasta
+```
+
+## More on `tronko-build` Usage with multiple trees
 
 `tronko-build` requires a multiple sequence alignment (FASTA format), rooted phylogenetic tree (Newick format), and a corresponding taxonomy file for each cluster build. All of the files should be in one directory and specify the directory with `-e` with each cluster being designated by a number. MSA files should be named `[Number]_MSA.fasta`, taxonomy files should be named `[Number]_taxonomy.txt`, and tree files should be named `RAxML_bestTree.[Number].reroot`. Example of the contents of a directory containing 3 clusters:
 ```
