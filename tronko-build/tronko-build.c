@@ -555,7 +555,7 @@ void createNewRoots(int rootCount, Options opt, int max_nodename, int max_lineTa
 	hashmap_remove(&mastermap,m->index);
 	free(m);
 	rootCount=partitionCount;
-	printf("rootCount=%d\n",rootCount);
+	//printf("rootCount=%d\n",rootCount);
 	int which,status;
 	char buf[BUFFER_SIZE];
 	for(which=rootCount;which<rootCount+3;which++){
@@ -565,24 +565,24 @@ void createNewRoots(int rootCount, Options opt, int max_nodename, int max_lineTa
 			char buf3[BUFFER_SIZE];	
 			char buf2[BUFFER_SIZE];
 			snprintf(buf2,BUFFER_SIZE,"%s/partition%d.fasta",opt.partitions_directory,which);
-			printf("buf2 is %s\n",buf2);
+			//printf("buf2 is %s\n",buf2);
 			snprintf(buf3,BUFFER_SIZE,"%s/partition%d_MSA.fasta",opt.partitions_directory,which);
-			printf("buf3 is %s\n",buf3);
+			//printf("buf3 is %s\n",buf3);
 			pid=fork();
 			if (pid==-1){
 			//pid==-1 means error occured
 				printf("can't fork, error occured\n");
 			}else if (pid==0){
-				printf("child process, pid = %u\n",getpid());
+				//printf("child process, pid = %u\n",getpid());
 				char *arguments[] = {"famsa",buf2,buf3,NULL};
 				printf("ARGUMENTS: %s %s %s\n",arguments[0],arguments[1],arguments[2]);
 				execvp("famsa",arguments);
 				exit(0);
 			}else{
-				printf("parent process, pid = %u\n",getppid());
+				//printf("parent process, pid = %u\n",getppid());
 				if (waitpid(pid, &status, 0) > 0){
 					if (WIFEXITED(status) && !WEXITSTATUS(status))
-					printf("program execution successful\n");
+					//printf("program execution successful\n");
 				else if (WIFEXITED(status) && WEXITSTATUS(status)) {
 					if (WEXITSTATUS(status) == 127) {
 						printf("execv failed\n");
@@ -609,7 +609,7 @@ void createNewRoots(int rootCount, Options opt, int max_nodename, int max_lineTa
 			if (pid==-1){
 				printf("can't fork, error occured\n");
 			}else if (pid==0){	
-				printf("child process reroot, pid = %u\n",getpid());
+				//printf("child process reroot, pid = %u\n",getpid());
 				//int reroot_file;
 				//reroot_file = open(buf5, O_WRONLY | O_TRUNC | O_CREAT, S_IRUSR | S_IRGRP | S_IWGRP | S_IWUSR);
 				//dup2(reroot_file,1);
@@ -635,10 +635,10 @@ void createNewRoots(int rootCount, Options opt, int max_nodename, int max_lineTa
 				execvp(arguments[0],arguments);
 				exit(0);
 			}else{
-				printf("parent process, pid = %u\n",getppid());
+				//printf("parent process, pid = %u\n",getppid());
 				if (waitpid(pid, &status, 0) > 0){
 					if (WIFEXITED(status) && !WEXITSTATUS(status))
-						printf("program execution successful\n");
+						//printf("program execution successful\n");
 					else if (WIFEXITED(status) && WEXITSTATUS(status)) {
 						if (WEXITSTATUS(status) == 127) {
 							printf("execv failed\n");
@@ -688,7 +688,6 @@ void createNewRoots(int rootCount, Options opt, int max_nodename, int max_lineTa
 		int child1 = t->tree[t->root].up[1];
 		t->tree[t->root].depth = 0;
 		assignDepthArr(child0,child1,1,t);
-		printf("NumbaseArr[%d]=%d, numspecArr[%d]=%d, rootArr[%d]=%d\n",t->index,t->numbase,t->index,t->numspec,t->index,t->root);
 		snprintf(buf,BUFFER_SIZE,"%s/partition%d_taxonomy.txt",opt.partitions_directory,which);
 		printf("buffer: %s\n",buf);
 		for(j=0; j<t->numspec; j++){
@@ -804,6 +803,7 @@ int main(int argc, char **argv){
 	int i, j, k, numberOfTrees;
 	for(i=0; i<200; i++){
 		opt.partitions_directory[i] = '\0';
+		opt.readdir[i] = '\0';
 	}
 	parse_options(argc, argv, &opt);
 	int max_nodename = 0;

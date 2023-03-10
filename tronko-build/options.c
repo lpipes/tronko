@@ -144,8 +144,19 @@ void parse_options(int argc, char **argv, Options *opt){
 				break;
 			case 'e':
 				success = sscanf(optarg, "%s", opt->readdir);
-				if (!success)
+				if (!success){
 					fprintf(stderr, "Invalid directory");
+					exit(-1);
+				}
+				int i;
+				for(i=0; i<200; i++){
+					if ( opt->readdir[i] == '\0' ){
+						break;
+					}
+				}
+				if ( opt->readdir[i-1] == '/' ){
+					opt->readdir[i-1] = '\0';
+				}
 				break;
 			case 'D':
 				success = sscanf(optarg, "%s", opt->rmrefdir);
