@@ -99,14 +99,14 @@ void parse_options(int argc, char **argv, Options *opt){
 					fprintf(stderr, "Invalid partitions output directory\n");
 					exit(-1);
 				}
-				int i;
-				for(i=0; i<200; i++){
-					if ( opt->partitions_directory[i] == '\0' ){
+				int j;
+				for(j=0; j<200; j++){
+					if ( opt->partitions_directory[j] == '\0' ){
 						break;
 					}
 				}
-				if ( opt->partitions_directory[i-1] == '/' ){
-					opt->partitions_directory[i-1] = '\0';
+				if ( opt->partitions_directory[j-1] == '/' ){
+					opt->partitions_directory[j-1] = '\0';
 				}
 				break;
 			case 'o':
