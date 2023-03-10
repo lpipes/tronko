@@ -581,16 +581,16 @@ void createNewRoots(int rootCount, Options opt, int max_nodename, int max_lineTa
 			}else{
 				//printf("parent process, pid = %u\n",getppid());
 				if (waitpid(pid, &status, 0) > 0){
-					if (WIFEXITED(status) && !WEXITSTATUS(status))
+					//if (WIFEXITED(status) && !WEXITSTATUS(status))
 					//printf("program execution successful\n");
-				else if (WIFEXITED(status) && WEXITSTATUS(status)) {
+				}else if (WIFEXITED(status) && WEXITSTATUS(status)) {
 					if (WEXITSTATUS(status) == 127) {
 						printf("execv failed\n");
 					}else printf("program terminated normally but returned a non-zero status\n");
-					}else printf("program didn't terminate normally\n");
-					}else{
+				}else printf("program didn't terminate normally\n");
+					/*}else{
 						printf("waitpid() failed\n");
-					}
+					}*/
 			}
 			snprintf(buf,BUFFER_SIZE,"sed -i ':a; $!N; /^>/!s/\\n\\([^>]\\)/\\1/; ta; P; D' %s/partition%d_MSA.fasta",opt.partitions_directory,which);
 			status = system(buf);
@@ -637,9 +637,9 @@ void createNewRoots(int rootCount, Options opt, int max_nodename, int max_lineTa
 			}else{
 				//printf("parent process, pid = %u\n",getppid());
 				if (waitpid(pid, &status, 0) > 0){
-					if (WIFEXITED(status) && !WEXITSTATUS(status))
+					if (WIFEXITED(status) && !WEXITSTATUS(status)){
 						//printf("program execution successful\n");
-					else if (WIFEXITED(status) && WEXITSTATUS(status)) {
+					}else if (WIFEXITED(status) && WEXITSTATUS(status)) {
 						if (WEXITSTATUS(status) == 127) {
 							printf("execv failed\n");
 						}else printf("program terminated normally but returned a non-zero status\n");
