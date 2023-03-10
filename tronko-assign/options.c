@@ -35,12 +35,12 @@ static struct Options long_options[]=
 
 char usage[] = "\ntronko-assign [OPTIONS]\n\
 	\n\
-	-h, 	usage:\n\
-	-p, 	use paired reads\n\
-	-s, 	use single reads\n\
-	-r, 	use a reference\n\
-	-v, 	when using single reads, reverse-complement it\n\
-	-z,	when using paired-end reads,  reverse-complement the second read\n\
+	-h, usage:\n\
+	-p, use paired reads\n\
+	-s, use single reads\n\
+	-r, use a reference\n\
+	-v, when using single reads, reverse-complement it\n\
+	-z, when using paired-end reads,  reverse-complement the second read\n\
 	-f [FILE], path to reference database file\n\
 	-o [FILE], path to output file\n\
 	-g [FILE], path to single-end reads file\n\

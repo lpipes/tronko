@@ -33,12 +33,12 @@ Alignment-based and composition-based assignment methods calculate the lowest co
 
 	tronko-assign [OPTIONS]
 	
-		-h, 	usage:
-		-p, 	use paired reads
-		-s, 	use single reads
-		-r, 	use a reference
-		-v, 	when using single reads, reverse-complement it
-		-z,	when using paired-end reads,  reverse-complement the second read
+		-h, usage:
+		-p, use paired reads
+		-s, use single reads
+		-r, use a reference
+		-v, when using single reads, reverse-complement it
+		-z, when using paired-end reads,  reverse-complement the second read
 		-f [FILE], path to reference database file
 		-o [FILE], path to output file
 		-g [FILE], path to single-end reads file
@@ -57,7 +57,7 @@ Alignment-based and composition-based assignment methods calculate the lowest co
 		-6, Skip the bwa build if already exists
 		-u, Score constant [default: 0.01]
 
-Tronko uses the <a href="https://github.com/smarco/WFA2-lib">Wavefront Alignment Algorithm (version 2)</a> or <a href="https://github.com/noporpoise/seq-align">Needleman-Wunsch Algorithm</a> for semi-global alignments. It uses <a href="https://github.com/lh3/bwa">bwa</a> for alignment to leaf nodes, and uses <a href="https://github.com/DavidLeeds/hashmap">David Leeds' hashmap</a> for hashmap implementation in C.
+Tronko uses the <a href="https://github.com/smarco/WFA2-lib">Wavefront Alignment Algorithm (version 2)</a> or <a href="https://github.com/noporpoise/seq-align">Needleman-Wunsch Algorithm</a> for semi-global alignments. It uses <a href="https://github.com/lh3/bwa">bwa</a> for alignment to leaf nodes, and uses <a href="https://github.com/DavidLeeds/hashmap">David Leeds' hashmap</a> for hashmap implementation in C. `tronko-assign` does not reverse complement your reads automatically. You must use options `-v` or `-z` to reverse complement your read for better alignment to the reference database. For more information on the direction of your reads based on your library prep, please refer to this helpful blog here: <a href="http://onetipperday.blogspot.com/2012/07/how-to-tell-which-library-type-to-use.html">http://onetipperday.blogspot.com/2012/07/how-to-tell-which-library-type-to-use.html</a>.
 
 ## Example output
 
