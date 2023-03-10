@@ -1,0 +1,11 @@
+LS992577.1	Eukaryota;Endomyxa;Phytomyxea;Plasmodiophorida;Plasmodiophoridae;Plasmodiophora;Plasmodiophora brassicae
+KF738139.1	Eukaryota;Endomyxa;Phytomyxea;Plasmodiophorida;Plasmodiophoridae;Spongospora;Spongospora subterranea
+NC_041549.1	Eukaryota;Placozoa;NA;NA;NA;Polyplacotoma;Polyplacotoma mediterranea
+AY690572.1	Eukaryota;Acanthocephala;Palaeacanthocephala;Echinorhynchida;Rhadinorhynchidae;Leptorhynchoides;Leptorhynchoides thecatus
+AY690564.1	Eukaryota;Acanthocephala;Palaeacanthocephala;Echinorhynchida;Rhadinorhynchidae;Leptorhynchoides;Leptorhynchoides thecatus
+NC_008151.3	Eukaryota;Placozoa;NA;NA;Trichoplacidae;Trichoplax;Trichoplax adhaerens
+MG986975.1	Eukaryota;Cnidaria;Anthozoa;Alcyonacea;Primnoidae;Callozostron;Callozostron acanthodes
+HM235381.1	Eukaryota;Apicomplexa;Aconoidasida;Haemosporida;Plasmodiidae;Plasmodium;Plasmodium sp. gorilla clade G2
+KY753530.1	Eukaryota;Apicomplexa;Aconoidasida;Haemosporida;Plasmodiidae;Hepatocystis;Hepatocystis sp.
+KF208322.1	Eukaryota;Dicyemida;NA;NA;Dicyemidae;Dicyema;Dicyema furuyi
+KF208358.1	Eukaryota;Dicyemida;NA;NA;Dicyemidae;Dicyemennea;Dicyemennea floscephalum

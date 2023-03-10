@@ -21,21 +21,21 @@ static struct Options long_options[]=
 
 char usage[] = "\ntronko-build [OPTIONS]\n\
 	\n\
-	-h, --help				usage:\n\
-	-y, --partition-directory		use a partition directory (you have multiple clusters)\n\
-	-l, --single-tree			use only single tree (do not partition)\n\
-	-t, --tree-file				rooted phylogenetic tree [FILE: Newick]\n\
-	-m, --msa-file				multiple sequence alignment [FILE: FASTA]\n\
-	-d, --partitions-directory		output directory for partitions\n\
-	-x, --tax-file				taxonomy file [FILE: FASTA_header\tdomain;phylum;class;order;family;genus;species]\n\
-	-e, --read-directory			directory for multiple cluster\n\
-	-n, --number-of-partitions		number of partitions in read directory\n\
-	-b, --where-to-restart-partitions	restart partitions with partition number [default: 0]\n\
-	-s, --use-spscore			partition using sum-of-pairs score [can't use with -f]\n\
-	-u, --sum-of-pairs			minimum threshold for sum of pairs score [default: 0.5]\n\
-	-v, --use-minleaves			partition using minimum number of leaf nodes [can't use with -s, use with -f]\n\
-	-f, --minimum-leaf-nodes to retain	don't partition less than the minimum number of leaf nodes [can't use with -s, use with -v]\n\
-	-g, --no-change-missingdata		don't flag missing data\n\
+	-h,				usage:\n\
+	-y, use a partition directory (you want to partition or you have multiple clusters)\n\
+	-l, use only single tree (do not partition)\n\
+	-t [FILE], rooted phylogenetic tree [FILE: Newick]\n\
+	-m [FILE], multiple sequence alignment [FILE: FASTA]\n\
+	-d [DIRECTORY], REQUIRED, output directory\n\
+	-x [FILE], taxonomy file [FILE: FASTA_header\tdomain;phylum;class;order;family;genus;species]\n\
+	-e [DIRECTORY], directory for reading multiple clusters\n\
+	-n [INT], number of partitions in read directory\n\
+	-b [INT], restart partitions with partition number [default: 0]\n\
+	-s, partition using sum-of-pairs score [can't use with -f]\n\
+	-u [FLOAT], minimum threshold for sum of pairs score [default: 0.5]\n\
+	-v, partition using minimum number of leaf nodes [can't use with -s, use with -f]\n\
+	-f [INT], don't partition less than the minimum number of leaf nodes [can't use with -s, use with -v]\n\
+	-g, don't change missing data\n\
 	\n";
 
 void print_help_statement(){
@@ -95,8 +95,19 @@ void parse_options(int argc, char **argv, Options *opt){
 				break;
 			case 'd':
 				success = sscanf(optarg, "%s", opt->partitions_directory);
-				if (!success)
+				if (!success){
 					fprintf(stderr, "Invalid partitions output directory\n");
+					exit(-1);
+				}
+				int i;
+				for(i=0; i<200; i++){
+					if ( opt->partitions_directory[i] == '\0' ){
+						break;
+					}
+				}
+				if ( opt->partitions_directory[i-1] == '/' ){
+					opt->partitions_directory[i-1] = '\0';
+				}
 				break;
 			case 'o':
 				success = sscanf(optarg, "%s", opt->results_file);

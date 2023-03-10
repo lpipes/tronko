@@ -1,0 +1,30 @@
+DQ999789.1	Eukaryota;Bryozoa;Gymnolaemata;Cheilostomatida;Hippothoidae;Celleporella;Celleporella hyalina
+MG150579.1	Eukaryota;Arthropoda;Insecta;Diptera;Sciaridae;NA;Sciaridae sp. BIOUG29184-E03
+EU855297.1	Eukaryota;Onychophora;Udeonychophora;Euonychophora;Peripatopsidae;Peripatopsis;Peripatopsis balfouri
+MF327429.1	Eukaryota;Onychophora;Udeonychophora;Euonychophora;Peripatopsidae;Peripatopsis;Peripatopsis moseleyi
+GU125773.1	Eukaryota;Phoronida;NA;NA;NA;Phoronis;Phoronis ovalis
+EU484458.1	Eukaryota;Phoronida;NA;NA;NA;Phoronis;Phoronis australis
+LC006047.1	Eukaryota;Entoprocta;NA;NA;Loxosomatidae;Loxosoma;Loxosoma axisadversum
+FJ196081.1	Eukaryota;Entoprocta;NA;NA;Pedicellinidae;Pedicellina;Pedicellina cernua
+KJ736667.1	Eukaryota;Annelida;Polychaeta;NA;NA;NA;Polychaeta sp. NB-Po566
+KU839799.1	Eukaryota;Nemertea;Pilidiophora;Heteronemertea;Cerebratulidae;Cerebratulus;Cerebratulus marginatus
+MW278416.1	Eukaryota;Mollusca;Gastropoda;Littorinimorpha;Cymatiidae;Gutturnium;Gutturnium muricinum
+MW278160.1	Eukaryota;Mollusca;Gastropoda;Littorinimorpha;Cypraeidae;Cypraea;Cypraea tigris
+MT736099.1	Eukaryota;Priapulida;Priapulimorpha;Priapulimorphida;Priapulidae;Priapulus;Priapulus caudatus
+LC018636.1	Eukaryota;Hemichordata;Enteropneusta;NA;Ptychoderidae;Balanoglossus;Balanoglossus carnosus
+MK092030.1	Eukaryota;Hemichordata;Enteropneusta;NA;NA;NA;Enteropneusta sp. BOLD:ADK9472
+KF597035.1	Eukaryota;Chordata;Actinopteri;Gadiformes;Merlucciidae;Merluccius;Merluccius merluccius
+KP691986.1	Eukaryota;Chordata;Mammalia;Primates;Hominidae;Homo;Homo sapiens
+MN888320.1	Eukaryota;Tardigrada;Eutardigrada;Parachela;Macrobiotidae;Macrobiotus;Macrobiotus polonicus
+MK310380.1	Eukaryota;Gastrotricha;NA;Chaetonotida;Chaetonotidae;Chaetonotus;Chaetonotus sp. 1 MK-2019
+MN161474.1	Eukaryota;Sipuncula;NA;Golfingiida;Sipunculidae;Sipunculus;Sipunculus nudus
+MF382115.1	Eukaryota;Sipuncula;NA;Golfingiida;Sipunculidae;Sipunculus;Sipunculus nudus
+AB491665.1	Eukaryota;Prasinodermophyta;Prasinodermophyceae;Prasinodermales;Prasinodermaceae;Prasinoderma;Prasinoderma coloniale
+KF387569.1	Eukaryota;Prasinodermophyta;Prasinodermophyceae;Prasinodermales;Prasinodermaceae;Prasinoderma;Prasinoderma coloniale
+GU013984.1	Eukaryota;Annelida;Clitellata;Crassiclitellata;Lumbricidae;NA;Lumbricidae sp. DPEW41289
+MG934878.1	Eukaryota;Arthropoda;Malacostraca;Decapoda;Axiidae;Calocarides;Calocarides coronatus
+KU895257.1	Eukaryota;Echinodermata;Ophiuroidea;Amphilepidida;Ophiolepididae;Ophiomusa;Ophiomusa acufera
+MK359655.1	Eukaryota;Bryozoa;Gymnolaemata;Cheilostomatida;Schizoporellidae;Schizoporella;Schizoporella pungens
+KP965861.1	Eukaryota;Gnathostomulida;NA;Bursovaginoidea;Gnathostomulidae;Gnathostomula;Gnathostomula paradoxa
+DQ079967.1	Eukaryota;Gnathostomulida;NA;Bursovaginoidea;Gnathostomulidae;Gnathostomula;Gnathostomula paradoxa
+JN086978.1	Eukaryota;Gastrotricha;NA;Macrodasyida;Turbanellidae;Turbanella;Turbanella ambronensis

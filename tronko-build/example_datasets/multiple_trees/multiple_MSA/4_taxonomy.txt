@@ -1,0 +1,11 @@
+MN413855.1	Eukaryota;Cnidaria;Anthozoa;Scleractinia;Dendrophylliidae;Dendrophyllia;Dendrophyllia sp. BC1
+HE611623.1	Eukaryota;Porifera;Demospongiae;Poecilosclerida;Iotrochotidae;Iotrochota;Iotrochota coccinea
+MN443909.1	Eukaryota;Nematoda;Chromadorea;Rhabditida;Oxyuridae;Trypanoxyuris;Trypanoxyuris minutus
+EU753199.1	Eukaryota;Nematoda;Chromadorea;Strongylida;Strongylidae;Cylicocyclus;Cylicocyclus nassatus
+MH251812.1	Eukaryota;Rotifera;Eurotatoria;Philodinida;Philodinidae;Philodina;Philodina citrina
+JQ309296.1	Eukaryota;Rotifera;Eurotatoria;NA;NA;Rotaria;Rotaria rotatoria
+JQ082796.1	Eukaryota;Porifera;Demospongiae;Dictyoceratida;Thorectidae;NA;cf. Scalarispongia scalaris DE485
+MN367851.1	Eukaryota;Xenacoelomorpha;NA;Acoela;Convolutidae;NA;Convolutidae sp. 227PW
+FR837867.1	Eukaryota;Xenacoelomorpha;NA;Acoela;Isodiametridae;Isodiametra;Isodiametra bajaensis
+KP691375.1	Eukaryota;Tubulinea;Elardia;Arcellinida;Hyalospheniidae;Hyalosphenia;Hyalosphenia papilio
+LC102284.1	Eukaryota;Tubulinea;Elardia;Euamoebida;NA;Copromyxa;Copromyxa protea

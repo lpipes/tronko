@@ -6,6 +6,9 @@
 #include <stdbool.h>
 #include <sys/mman.h>
 #include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 #include "global.h"
 #include "opt.h"
 #include "options.h"
@@ -369,6 +372,10 @@ void printPartitionsToFileArr(int *partition1,int partition1size, int *partition
 	char buf_tax[BUFFER_SIZE];
 	int which = partitionCount;
 	char *seqWithoutDash;
+	struct stat st = {0};
+	if ( stat(opt.partitions_directory, &st) == -1){
+		mkdir(opt.partitions_directory, 0700);
+	}
 	snprintf(buf_fasta,BUFFER_SIZE,"%s/partition%d.fasta",opt.partitions_directory,which);
 	FILE *p1=fopen(buf_fasta,"w");
 	snprintf(buf_tax,BUFFER_SIZE,"%s/partition%d_taxonomy.txt",opt.partitions_directory,which);				
@@ -794,8 +801,11 @@ int main(int argc, char **argv){
 	opt.missing_data=1;
 	opt.restart = 0;
 	opt.number_of_partitions = 0;
-	parse_options(argc, argv, &opt);
 	int i, j, k, numberOfTrees;
+	for(i=0; i<200; i++){
+		opt.partitions_directory[i] = '\0';
+	}
+	parse_options(argc, argv, &opt);
 	int max_nodename = 0;
 	int max_tax_name = 0;
 	int max_lineTaxonomy = 0;

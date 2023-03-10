@@ -1,0 +1,11 @@
+JN211191.1	Eukaryota;Priapulida;Priapulimorpha;Priapulimorphida;Tubiluchidae;Meiopriapulus;Meiopriapulus fijiensis
+AB026507.1	Eukaryota;Brachiopoda;Rhynchonellata;Terebratulida;Laqueidae;Coptothyris;Coptothyris grayi
+AB026508.1	Eukaryota;Brachiopoda;Rhynchonellata;Terebratulida;Laqueidae;Terebratalia;Terebratalia coreanica
+KP857459.1	Eukaryota;Chaetognatha;Sagittoidea;Aphragmophora;Sagittidae;Sagitta;Sagitta elegans
+JQ689527.1	Eukaryota;Tardigrada;Heterotardigrada;Echiniscoidea;Echiniscoididae;Echiniscoides;Echiniscoides sp. SD2B
+KY241180.1	Eukaryota;Kinorhyncha;Cyclorhagida;NA;Echinoderidae;Echinoderes;Echinoderes marthae
+KY241191.1	Eukaryota;Kinorhyncha;Cyclorhagida;NA;Echinoderidae;Echinoderes;Echinoderes marthae
+MG257764.1	Eukaryota;Nematomorpha;Gordioida;Chordodea;Chordodidae;Chordodes;Chordodes sp. VVA-2019
+KF381359.1	Eukaryota;Nematomorpha;Gordioida;Chordodea;Chordodidae;Chordodes;Chordodes kenyaensis
+AY218084.1	Eukaryota;Cycliophora;NA;NA;NA;Symbion;Symbion pandora
+AY218085.1	Eukaryota;Cycliophora;NA;NA;NA;Symbion;Symbion sp. GG-2003
