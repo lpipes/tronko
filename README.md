@@ -224,6 +224,19 @@ tronko-build -y -e initial_clusters_directory -d outdir -n 100 -v -f 500
 
 The `reference_tree.txt` file will be output to the `outdir` directory.
 
+# `tronko-assign` using pre-built 16S and COI databases
+
+First download the databases from Zenodo (<a href="https://doi.org/10.5281/zenodo.7407318"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.7407318.svg" alt="DOI"></a>). To assign FASTQ (`-q`) paired-end reads (`-p`) using the 16S database (and reverse-complement the reverse read `-z`) with Needleman-Wunsch (`-w`), 16 cores (`-C 16`), and an LCA cut-off of 5 (`-c 5`):
+
+```
+tronko-assign -r -q -p -z -w -C 16 -c 5 -f 16S_tronko_build.txt.gz -a 16S.fasta -1 16S_TW-DR-1-S88_F_filt.fastq.gz -2 16S_TW-DR-1-S88_R_filt.fastq.gz -o 16S_TW-DR-1-S88_results.txt 
+```  
+
+With the CO1 database and same parameters:
+```
+tronko-assign -r -q -p -z -w -C 16 -c 5 -f CO1_tronko_build.txt.gz -a CO1.fasta -1 CO1_TW-DR-1-S88_F_filt.fastq.gz -2 CO1_TW-DR-1-S88_R_filt.fastq.gz -o CO1_TW-DR-1-S88_results.txt
+```
+
 # Performance
 
 We performed a leave-one-species-out test comparing Tronko (with LCA cut-offs for the score of 0, 5, 10, 15, and 20 with Needleman-Wunsch alignment) to kraken2, metaphlan2, and MEGAN for 1,467 COI sequences from 253 species from the order Charadriiformes using 150bp x 2 paired-end sequences and 150bp and 300bp single-end sequences using 0, 1, and 2% error/polymorphism.
