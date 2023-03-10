@@ -75,6 +75,8 @@ GU572157.1_3_1	Eukaryota;Chordata;Aves;Charadriiformes;Alcidae;Uria;Uria aalge	-
 
 # INSTALLATION
 
+`tronko-assign` has no dependencies. `tronko-build` only has dependencies if using the partition procedure for the initial trees. These are <a href="https://github.com/stamatak/standard-RAxML">`raxmlHPC-PTHREADS`</a>, <a href="https://github.com/refresh-bio/FAMSA">`famsa`</a>, `nw_reroot` from <a href="https://anaconda.org/bioconda/newick_utils/files">Newick utilties</a>, <a href="https://raw.githubusercontent.com/lpipes/tronko/main/scripts/fasta2phyml.pl">`fasta2phyml.pl`</a>, and <a href="https://ftp.gnu.org/gnu/sed/">`sed`</a>, which must be installed in your path.
+
 	cd tronko/tronko-build
 	make
 	../tronko-assign
