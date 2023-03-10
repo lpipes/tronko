@@ -90,11 +90,11 @@ To use the container download:
 
 To run `tronko-assign` with the container:
 
-	singularity exec --bind <root-dir-to-bind-to-container> tronko.sif tronko-assign
+	singularity exec --bind <root-dir-to-bind-to-container> tronko_1.0.sif tronko-assign
 
 To run `tronko-build` with the container:
 
-	singularity exec --bind <root-dir-to-bind-to-container> tronko.sif tronko-build
+	singularity exec --bind <root-dir-to-bind-to-container> tronko_1.0.sif tronko-build
 
 # `tronko-assign` Usage
 Tronko does not detect the correct orientation of the reads. If your reverse read needs to be reverse complemented use the option `-z`. The default options of Tronko assume that your reads are in FASTA format. If you want to assign reads in FASTQ format, use the option `-q`. You will also need a FASTA file (not gzipped) of all of your reference sequences in the reference database (use the option `-a`). To skip the `bwa index` build use `-6`. The reads (and reference database file) can be gzipped or not gzipped. Assigning paired-end reads in FASTA format:
