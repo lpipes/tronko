@@ -81,10 +81,12 @@ GU572157.1_3_1	Eukaryota;Chordata;Aves;Charadriiformes;Alcidae;Uria;Uria aalge	-
 2. Run `make` in the `tronko-build` and `tronko-assign` directories.
 3. Copy the `tronko-build` and `tronko-assign` binaries to your path.
 
+
 	cd tronko/tronko-build
 	make
 	../tronko-assign
 	make
+
 
 # SINGULARITY CONTAINER
 
