@@ -1,6 +1,6 @@
 #include "allocateMemoryForResults.h"
 
-void allocateMemForResults( resultsStruct *results, int sizeOfChunk, int num_threads, int numberOfTrees, int print_alignments, int maxNumSpec, int paired, int use_nw, int max_lineTaxonomy, int max_name_length, int max_query_length, int max_numbase, int use_portion, int padding_size){
+void allocateMemForResults( resultsStruct *results, int sizeOfChunk, int num_threads, int numberOfTrees, int print_alignments, int maxNumSpec, int paired, int use_nw, int max_lineTaxonomy, int max_name_length, int max_query_length, int max_numbase, int use_portion, int padding_size, int number_of_total_nodes){
 	int i,j, k;
 	if (use_portion==1){
 		results->positions = malloc((max_query_length+max_query_length+2*padding_size+1)*(sizeof(int)));
@@ -72,10 +72,13 @@ void allocateMemForResults( resultsStruct *results, int sizeOfChunk, int num_thr
 		bool case_sensitive=false;
 		scoring_init(results->scoring, match, mismatch, gap_open, gap_extend, no_start_gap_penalty, no_end_gap_penalty, no_gaps_in_a, no_gaps_in_b, no_mismatches, case_sensitive);
 	}
-	results->minNodes = (int *)malloc((2*maxNumSpec-1)*sizeof(int));
-	results->LCAnames = (char **)malloc((2*maxNumSpec-1)*sizeof(char *));
-	for(i=0;i<2*maxNumSpec-1;i++){
+	results->minNodes = (int *)malloc(number_of_total_nodes*sizeof(int));
+	results->LCAnames = (char **)malloc(number_of_total_nodes*sizeof(char *));
+	for(i=0;i<number_of_total_nodes;i++){
 		results->LCAnames[i]=(char *)malloc(max_lineTaxonomy*sizeof(char));
+		for(j=0; j<max_lineTaxonomy; j++){
+			results->LCAnames[i][j] = '\0';
+		}
 	}
 	results->leaf_coordinates = (int **)malloc(numberOfTrees*sizeof(int *));
 	for(i=0; i<numberOfTrees; i++){
@@ -84,7 +87,7 @@ void allocateMemForResults( resultsStruct *results, int sizeOfChunk, int num_thr
 		results->leaf_coordinates[i][1]=-1;
 	}
 }
-void freeMemForResults ( resultsStruct *results, int sizeOfChunk, int num_threads, int numberOfTrees, int paired, int use_nw, int use_portion, int maxNumSpec){
+void freeMemForResults ( resultsStruct *results, int sizeOfChunk, int num_threads, int numberOfTrees, int paired, int use_nw, int use_portion, int maxNumSpec, int number_of_total_nodes){
 	int i, j, k;
 	free(results->positions);
 	free(results->locQuery);
@@ -100,7 +103,7 @@ void freeMemForResults ( resultsStruct *results, int sizeOfChunk, int num_thread
 		free(results->leaf_coordinates[i]);
 	}
 	free(results->voteRoot);
-	for(i=0; i<2*maxNumSpec-1; i++){
+	for(i=0; i<number_of_total_nodes; i++){
 		free(results->LCAnames[i]);
 	}
 	if (use_portion == 1){

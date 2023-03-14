@@ -150,11 +150,11 @@ void run_bwa(int start, int end, bwaMatches* bwa_results, int concordant, int nu
 		main_mem(databasefile,end-start,number_of_threads, bwa_results, concordant, numberOfTrees, start, paired, start, end, max_query_length, max_readname_length, max_acc_name);
 	}
 }
-int getLCAofArray_Arr(int *minNodes,int whichRoot,int maxNumSpec){
+int getLCAofArray_Arr(int *minNodes,int whichRoot,int maxNumSpec, int number_of_total_nodes){
 	int LCA = minNodes[0];
 	int maxDepth = 1000000000;
 	int i;
-	for( i=1; i<2*maxNumSpec-1; i++){
+	for( i=1; i<number_of_total_nodes; i++){
 		if ( minNodes[i] == -1 ){ return LCA; }
 		if (treeArr[whichRoot][minNodes[i]].depth < maxDepth){
 			LCA = getLCA_Arr(LCA, minNodes[i], whichRoot);
@@ -162,11 +162,11 @@ int getLCAofArray_Arr(int *minNodes,int whichRoot,int maxNumSpec){
 	}
 	return LCA;
 }
-int getLCAofArray_Arr_Multiple(int *minNodes,int whichRoot, int maxNumSpec){
+int getLCAofArray_Arr_Multiple(int *minNodes,int whichRoot, int maxNumSpec, int number_of_total_nodes){
 	int LCA = minNodes[0];
 	int maxDepth = 1000000000;
 	int i;
-	for( i=1; i<2*maxNumSpec-1; i++){
+	for( i=1; i<number_of_total_nodes; i++){
 		if ( minNodes[i] == 0 ){ return LCA; }
 		if (treeArr[whichRoot][minNodes[i]].depth < maxDepth){
 			LCA = getLCA_Arr(LCA, minNodes[i], whichRoot);
@@ -208,6 +208,7 @@ void *runAssignmentOnChunk_WithBWA(void *ptr){
 	int max_readname_length = mstr->max_readname_length;
 	int max_acc_name = mstr->max_acc_name;
 	int max_numbase = mstr->max_numbase;
+	int number_of_total_nodes = mstr->number_of_total_nodes;
 	/*affine_penalties_t affine_penalties = {
 		.match = 0,
 		.mismatch = 4,
@@ -457,7 +458,7 @@ void *runAssignmentOnChunk_WithBWA(void *ptr){
 			}
 		}
 		numberOfTrees = leaf_iter;
-		for(i=0;i<2*maxNumSpec-1;i++){
+		for(i=0;i<number_of_total_nodes;i++){
 			minNodes[i]=-1;
 		}
 		for(i=0; i<leaf_iter; i++){
@@ -518,7 +519,7 @@ void *runAssignmentOnChunk_WithBWA(void *ptr){
 		int taxRoot,taxIndex0,taxIndex1,taxNode;
 		if ( count == 1 ){
 			clock_gettime(CLOCK_MONOTONIC, &tstart);
-			LCA=getLCAofArray_Arr(minNodes,maxRoot,maxNumSpec);
+			LCA=getLCAofArray_Arr(minNodes,maxRoot,maxNumSpec,number_of_total_nodes);
 		}else if (count != 0){
 			for(i=0;i<count;i++){
 				for(j=0; j<mstr->max_lineTaxonomy; j++){
@@ -526,7 +527,7 @@ void *runAssignmentOnChunk_WithBWA(void *ptr){
 				}
 			}
 			for(i=0;i<count;i++){
-				LCAs[i]=getLCAofArray_Arr_Multiple(results->voteRoot[maxRoots[i]],maxRoots[i],maxNumSpec);
+				LCAs[i]=getLCAofArray_Arr_Multiple(results->voteRoot[maxRoots[i]],maxRoots[i],maxNumSpec,number_of_total_nodes);
 				if ( treeArr[maxRoots[i]][LCAs[i]].taxIndex[1]!=-1){ 
 					strcpy(LCAnames[i],taxonomyArr[maxRoots[i]][treeArr[maxRoots[i]][LCAs[i]].taxIndex[0]][treeArr[maxRoots[i]][LCAs[i]].taxIndex[1]]);
 					if ( treeArr[maxRoots[i]][LCAs[i]].taxIndex[1] > minLevel ){
@@ -845,6 +846,10 @@ int main(int argc, char **argv){
 	int *read_specs = (int*)malloc(2*sizeof(int));
 	read_specs[0] = 0;
 	read_specs[1] = 0;
+	int number_of_total_nodes = 0;
+	for(i=0; i<numberOfTrees; i++){
+		number_of_total_nodes += 2*numspecArr[i]-1;
+	}
 	int max_name_length = 0;
 	int max_query_length = 0;
 	int numberOfLinesToRead=opt.number_of_lines_to_read;
@@ -893,9 +898,9 @@ int main(int argc, char **argv){
 		for(i=0; i<opt.number_of_cores; i++){
 			mstr[i].str = malloc(sizeof(struct resultsStruct));
 			if ( opt.fastq == 0){
-				allocateMemForResults(mstr[i].str, numberOfLinesToRead/2, opt.number_of_cores, numberOfTrees, opt.print_alignments,maxNumSpec,0,opt.use_nw,max_lineTaxonomy,max_name_length,max_query_length,maxNumBase,opt.use_leaf_portion,opt.padding);
+				allocateMemForResults(mstr[i].str, numberOfLinesToRead/2, opt.number_of_cores, numberOfTrees, opt.print_alignments,maxNumSpec,0,opt.use_nw,max_lineTaxonomy,max_name_length,max_query_length,maxNumBase,opt.use_leaf_portion,opt.padding,number_of_total_nodes);
 			}else{
-				allocateMemForResults(mstr[i].str, numberOfLinesToRead/4, opt.number_of_cores, numberOfTrees, opt.print_alignments,maxNumSpec,0,opt.use_nw,max_lineTaxonomy,max_name_length,max_query_length,maxNumBase,opt.use_leaf_portion,opt.padding);
+				allocateMemForResults(mstr[i].str, numberOfLinesToRead/4, opt.number_of_cores, numberOfTrees, opt.print_alignments,maxNumSpec,0,opt.use_nw,max_lineTaxonomy,max_name_length,max_query_length,maxNumBase,opt.use_leaf_portion,opt.padding,number_of_total_nodes);
 			}
 			mstr[i].concordant=0;
 			mstr[i].maxNumSpec=maxNumSpec;
@@ -911,6 +916,7 @@ int main(int argc, char **argv){
 			mstr[i].max_acc_name = max_nodename;
 			mstr[i].max_numbase = maxNumBase;
 			mstr[i].max_lineTaxonomy = max_lineTaxonomy;
+			mstr[i].number_of_total_nodes = number_of_total_nodes;
 		}
 		while (1){
 			if (opt.fastq==0){
@@ -1055,9 +1061,9 @@ int main(int argc, char **argv){
 		for(i=0;i<opt.number_of_cores;i++){
 			mstr[i].str = malloc(sizeof(struct resultsStruct));
 			if ( opt.fastq == 0){
-				allocateMemForResults(mstr[i].str, numberOfLinesToRead/2, opt.number_of_cores, numberOfTrees, opt.print_alignments,maxNumSpec,1,opt.use_nw,max_lineTaxonomy,max_name_length,max_query_length,maxNumBase,opt.use_leaf_portion,opt.padding);
+				allocateMemForResults(mstr[i].str, numberOfLinesToRead/2, opt.number_of_cores, numberOfTrees, opt.print_alignments,maxNumSpec,1,opt.use_nw,max_lineTaxonomy,max_name_length,max_query_length,maxNumBase,opt.use_leaf_portion,opt.padding,number_of_total_nodes);
 			}else{
-				allocateMemForResults(mstr[i].str, numberOfLinesToRead/4, opt.number_of_cores, numberOfTrees, opt.print_alignments,maxNumSpec,1,opt.use_nw,max_lineTaxonomy,max_name_length,max_query_length,maxNumBase,opt.use_leaf_portion,opt.padding);
+				allocateMemForResults(mstr[i].str, numberOfLinesToRead/4, opt.number_of_cores, numberOfTrees, opt.print_alignments,maxNumSpec,1,opt.use_nw,max_lineTaxonomy,max_name_length,max_query_length,maxNumBase,opt.use_leaf_portion,opt.padding,number_of_total_nodes);
 			}
 			mstr[i].concordant=concordant;
 			mstr[i].maxNumSpec=maxNumSpec;
@@ -1073,6 +1079,7 @@ int main(int argc, char **argv){
 			mstr[i].max_acc_name = max_nodename;
 			mstr[i].max_numbase = maxNumBase;
 			mstr[i].max_lineTaxonomy = max_lineTaxonomy;
+			mstr[i].number_of_total_nodes = number_of_total_nodes;
 		}
 		while (1){
 			if (opt.fastq==0){
@@ -1152,15 +1159,15 @@ int main(int argc, char **argv){
 	for(i=0; i<opt.number_of_cores; i++){
 		if (opt.fastq == 0){
 			if (strcmp("single",opt.paired_or_single)==0){
-				freeMemForResults(mstr[i].str, numberOfLinesToRead/2, opt.number_of_cores, numberOfTrees, 0, opt.use_nw, opt.use_leaf_portion,maxNumSpec);
+				freeMemForResults(mstr[i].str, numberOfLinesToRead/2, opt.number_of_cores, numberOfTrees, 0, opt.use_nw, opt.use_leaf_portion,maxNumSpec,number_of_total_nodes);
 			}else{
-				freeMemForResults(mstr[i].str, numberOfLinesToRead/2, opt.number_of_cores, numberOfTrees, 1, opt.use_nw, opt.use_leaf_portion,maxNumSpec);
+				freeMemForResults(mstr[i].str, numberOfLinesToRead/2, opt.number_of_cores, numberOfTrees, 1, opt.use_nw, opt.use_leaf_portion,maxNumSpec,number_of_total_nodes);
 			}
 		}else{
 			if (strcmp("single",opt.paired_or_single)==0){
-				freeMemForResults(mstr[i].str, numberOfLinesToRead/4, opt.number_of_cores, numberOfTrees, 0, opt.use_nw, opt.use_leaf_portion,maxNumSpec);
+				freeMemForResults(mstr[i].str, numberOfLinesToRead/4, opt.number_of_cores, numberOfTrees, 0, opt.use_nw, opt.use_leaf_portion,maxNumSpec,number_of_total_nodes);
 			}else{
-				freeMemForResults(mstr[i].str, numberOfLinesToRead/4, opt.number_of_cores, numberOfTrees, 1, opt.use_nw, opt.use_leaf_portion,maxNumSpec);
+				freeMemForResults(mstr[i].str, numberOfLinesToRead/4, opt.number_of_cores, numberOfTrees, 1, opt.use_nw, opt.use_leaf_portion,maxNumSpec,number_of_total_nodes);
 			}
 		}
 	}

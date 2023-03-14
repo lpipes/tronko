@@ -112,6 +112,7 @@ typedef struct mystruct{
 	int max_acc_name;
 	int max_numbase;
 	int max_lineTaxonomy;
+	int number_of_total_nodes;
 }mystruct;
 
 typedef struct bwaMatches{
