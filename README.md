@@ -15,17 +15,17 @@ Alignment-based and composition-based assignment methods calculate the lowest co
 		-h,				usage:
 		-y, use a partition directory (you want to partition or you have multiple clusters)
 		-l, use only single tree (do not partition)
-		-t [FILE], rooted phylogenetic tree [FILE: Newick]
-		-m [FILE], multiple sequence alignment [FILE: FASTA]
+		-t [FILE], rooted phylogenetic tree [FILE: Newick, use only with -l]
+		-m [FILE], multiple sequence alignment [FILE: FASTA, use only with -l]
 		-d [DIRECTORY], REQUIRED, output directory
-		-x [FILE], taxonomy file [FILE: FASTA_header	domain;phylum;class;order;family;genus;species]
-		-e [DIRECTORY], directory for reading multiple clusters
-		-n [INT], number of partitions in read directory
-		-b [INT], restart partitions with partition number [default: 0]
-		-s, partition using sum-of-pairs score [can't use with -f]
-		-u [FLOAT], minimum threshold for sum of pairs score [default: 0.5]
-		-v, partition using minimum number of leaf nodes [can't use with -s, use with -f]
-		-f [INT], don't partition less than the minimum number of leaf nodes [can't use with -s, use with -v]
+		-x [FILE], taxonomy file [FILE: FASTA_header	domain;phylum;class;order;family;genus;species, use only with -l]
+		-e [DIRECTORY], directory for reading multiple clusters [use only with -y]
+		-n [INT], number of partitions in read directory [use only with -y]
+		-b [INT], restart partitions with partition number [default: 0, use only with -y]
+		-s, partition using sum-of-pairs score [can't use with -f, use only with -y]
+		-u [FLOAT], minimum threshold for sum of pairs score [default: 0.5, use only with -y]
+		-v, partition using minimum number of leaf nodes [can't use with -s, use with -f, use only with -y]
+		-f [INT], don't partition less than the minimum number of leaf nodes [can't use with -s, use with -v, use only with -y]
 		-g, don't change missing data
 
 # tronko-assign

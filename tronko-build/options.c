@@ -24,17 +24,17 @@ char usage[] = "\ntronko-build [OPTIONS]\n\
 	-h,				usage:\n\
 	-y, use a partition directory (you want to partition or you have multiple clusters)\n\
 	-l, use only single tree (do not partition)\n\
-	-t [FILE], rooted phylogenetic tree [FILE: Newick]\n\
-	-m [FILE], multiple sequence alignment [FILE: FASTA]\n\
+	-t [FILE], rooted phylogenetic tree [FILE: Newick, use only with -l]\n\
+	-m [FILE], multiple sequence alignment [FILE: FASTA, use only with -l]\n\
 	-d [DIRECTORY], REQUIRED, output directory\n\
-	-x [FILE], taxonomy file [FILE: FASTA_header\tdomain;phylum;class;order;family;genus;species]\n\
-	-e [DIRECTORY], directory for reading multiple clusters\n\
-	-n [INT], number of partitions in read directory\n\
-	-b [INT], restart partitions with partition number [default: 0]\n\
-	-s, partition using sum-of-pairs score [can't use with -f]\n\
-	-u [FLOAT], minimum threshold for sum of pairs score [default: 0.5]\n\
-	-v, partition using minimum number of leaf nodes [can't use with -s, use with -f]\n\
-	-f [INT], don't partition less than the minimum number of leaf nodes [can't use with -s, use with -v]\n\
+	-x [FILE], taxonomy file [FILE: FASTA_header\tdomain;phylum;class;order;family;genus;species, use only with -l]\n\
+	-e [DIRECTORY], directory for reading multiple clusters [use only with -y]\n\
+	-n [INT], number of partitions in read directory [use only with -y]\n\
+	-b [INT], restart partitions with partition number [default: 0, use only with -y]\n\
+	-s, partition using sum-of-pairs score [can't use with -f, use only with -y]\n\
+	-u [FLOAT], minimum threshold for sum of pairs score [default: 0.5, use only with -y]\n\
+	-v, partition using minimum number of leaf nodes [can't use with -s, use with -f, use only with -y]\n\
+	-f [INT], don't partition less than the minimum number of leaf nodes [can't use with -s, use with -v, use only with -y]\n\
 	-g, don't change missing data\n\
 	\n";
 
