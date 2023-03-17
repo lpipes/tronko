@@ -806,6 +806,10 @@ int main(int argc, char **argv){
 		opt.readdir[i] = '\0';
 	}
 	parse_options(argc, argv, &opt);
+	if ( opt.partitions_directory[0] == '\0' ){
+		fprintf(stderr, "You must specify an output directory with -d\n");
+		exit(-1);
+	}
 	int max_nodename = 0;
 	int max_tax_name = 0;
 	int max_lineTaxonomy = 0;
