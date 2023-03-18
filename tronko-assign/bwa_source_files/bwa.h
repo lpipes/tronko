@@ -32,6 +32,8 @@ typedef struct {
 	char *name, *comment, *seq, *qual, *sam;
 } bseq1_t;
 
+int bwa_index(int num_arguments, char *fasta);
+
 extern int bwa_verbose;
 extern char bwa_rg_id[256];
 
