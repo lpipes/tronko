@@ -53,6 +53,24 @@ typedef struct {
 	bseq1_t *seqs;
 } ktp_data_t;
 
+int dec2bin(int n){
+	int binaryNum[32];
+	int i=0;
+	while(n>0){
+		binaryNum[i] = n%2;
+		n = n/2;
+		i++;
+	}
+	int j=i;
+	//}else if (binaryNum[3]==1){ //mate unpaired
+	if (binaryNum[3]==1){
+		return 2;
+	}else{
+		//if binaryNum[6] == 1, first in pair, if binaryNum[6] == 0 second in pair
+		return binaryNum[6];
+	}
+}
+
 static void *process(void *shared, int step, void *_data)
 {
 	ktp_aux_t *aux = (ktp_aux_t*)shared;

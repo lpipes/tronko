@@ -10,11 +10,15 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include "needleman_wunsch.h"
 #include "global.h"
+#include "placement.h"
+#include "needleman_wunsch.h"
+#include "readreference.h"
 #include "options.h"
+#include "printAlignments.h"
 #include "bwa_source_files_include.h"
 #include "hashmap.h"
+#include "allocateMemoryForResults.h"
 #include "WFA2/wavefront_align.h"
 #include "hashmap_base.h"
 //int numspec, numbase, root/***seq, numundspec[MAXNUMBEROFINDINSPECIES+1]*/;
@@ -55,23 +59,6 @@ void store_PPs_Arr(int numberOfRoots, double c){
 				}
 			}
 		}
-	}
-}
-int dec2bin(int n){
-	int binaryNum[32];
-	int i=0;
-	while(n>0){
-		binaryNum[i] = n%2;
-		n = n/2;
-		i++;
-	}
-	int j=i;
-	//}else if (binaryNum[3]==1){ //mate unpaired
-	if (binaryNum[3]==1){
-		return 2;
-	}else{
-		//if binaryNum[6] == 1, first in pair, if binaryNum[6] == 0 second in pair
-		return binaryNum[6];
 	}
 }
 void assignDepthArr(int node0, int node1, int depth, int whichPartitions){
@@ -150,6 +137,16 @@ void run_bwa(int start, int end, bwaMatches* bwa_results, int concordant, int nu
 		main_mem(databasefile,end-start,number_of_threads, bwa_results, concordant, numberOfTrees, start, paired, start, end, max_query_length, max_readname_length, max_acc_name);
 	}
 }
+int getLCA_Arr(int node1, int node2, int whichRoot){
+	if (node1 == node2){ return node1; }
+	if (treeArr[whichRoot][node1].depth > treeArr[whichRoot][node2].depth){
+		int tmp = node1;
+		node1 = node2;
+		node2 = tmp;
+	}
+	node2 = treeArr[whichRoot][node2].down;
+	return getLCA_Arr(node1,node2,whichRoot);
+}
 int getLCAofArray_Arr(int *minNodes,int whichRoot,int maxNumSpec, int number_of_total_nodes){
 	int LCA = minNodes[0];
 	int maxDepth = 1000000000;
@@ -173,16 +170,6 @@ int getLCAofArray_Arr_Multiple(int *minNodes,int whichRoot, int maxNumSpec, int 
 		}
 	}
 	return LCA;
-}
-int getLCA_Arr(int node1, int node2, int whichRoot){
-	if (node1 == node2){ return node1; }
-	if (treeArr[whichRoot][node1].depth > treeArr[whichRoot][node2].depth){
-		int tmp = node1;
-		node1 = node2;
-		node2 = tmp;
-	}
-	node2 = treeArr[whichRoot][node2].down;
-	return getLCA_Arr(node1,node2,whichRoot);
 }
 void *runAssignmentOnChunk_WithBWA(void *ptr){
 	struct mystruct *mstr = (mystruct *) ptr;
@@ -920,9 +907,9 @@ int main(int argc, char **argv){
 		}
 		while (1){
 			if (opt.fastq==0){
-				returnLineNumber=readInXNumberOfLines(numberOfLinesToRead/2,seqinfile,0,opt,max_query_length,max_name_length,maxNumBase);
+				returnLineNumber=readInXNumberOfLines(numberOfLinesToRead/2,seqinfile,0,opt,max_query_length,max_name_length);
 			}else{
-				returnLineNumber=readInXNumberOfLines_fastq(numberOfLinesToRead/4,seqinfile,0,opt,max_query_length,max_name_length,maxNumBase,first_iter);
+				returnLineNumber=readInXNumberOfLines_fastq(numberOfLinesToRead/4,seqinfile,0,opt,max_query_length,max_name_length,first_iter);
 			}
 			if (returnLineNumber==0){
 				break;

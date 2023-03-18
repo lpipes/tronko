@@ -4,6 +4,7 @@
 #include "bwt.h"
 #include "bntseq.h"
 #include "bwa.h"
+#include "../global.h"
 
 #define MEM_MAPQ_COEF 30.0
 #define MEM_MAPQ_MAX  60
@@ -22,6 +23,8 @@ typedef struct __smem_i smem_i;
 #define MEM_F_PRIMARY5  0x800
 #define MEM_F_KEEP_SUPP_MAPQ 0x1000
 #define MEM_F_XB        0x2000
+
+int main_mem(char* databaseFile, int number_of_seqs, int number_of_threads, bwaMatches* bwa_results, int concordant, int numberOfTrees, int startline, int paired, int start, int end, int max_query_length, int max_readname_length, int max_acc_name);
 
 typedef struct {
 	int a, b;               // match score and mismatch penalty

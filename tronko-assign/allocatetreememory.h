@@ -7,7 +7,6 @@
 #include <ctype.h>
 #include "global.h"
 
-void allocatetreememmory();
-void allocatetreememmory_for_nucleotide();
 void allocatetreememory_for_nucleotide_Arr(int numberOfTrees);
+void allocateTreeArrMemory(int whichPartition, int max_nodename);
 #endif /* _ALLOC_TREE */
