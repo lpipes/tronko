@@ -8,6 +8,7 @@
 #include "tools.h"
 #include "opt.h"
 #include "global.h"
+#include "math.h"
 
 //void makecon(int node);
 void makecon_Arr(int node, int whichRoot);

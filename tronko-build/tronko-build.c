@@ -13,6 +13,13 @@
 #include "opt.h"
 #include "options.h"
 #include "hashmap.h"
+#include "allocatetreememory.h"
+#include "printtree.h"
+#include "likelihood.h"
+#include "getclade.h"
+#include "readfasta.h"
+#include "readreference.h"
+
 HASHMAP(int, struct masterArr) mastermap;
 struct node **treeArr;
 int numspec, numbase, **seq, numundspec[MAXNUMBEROFINDINSPECIES+1];
@@ -596,7 +603,8 @@ void createNewRoots(int rootCount, Options opt, int max_nodename, int max_lineTa
 				fd = open(buf5, O_WRONLY | O_CREAT, 0777 );
 				if (fd == -1 ){
 					perror(buf5);
-					return EXIT_FAILURE;
+					printf("system call failure\n");
+					exit(-1);
 				}
 				fclose(stdout);
 				dup2( fd, STDOUT_FILENO);

@@ -9,7 +9,7 @@ DBGCFLAGS = -g -w
 # -lm links the math library
 #LIBS = -lm -lpthread -lz
 LIBS = -lm -pthread -lz -lrt -std=gnu99
-OPTIMIZATION = -march=native
+OPTIMIZATION = -O3
 #sources
 SOURCES = tronko-build.c getclade.c readfasta.c readreference.c allocatetreememory.c math.c likelihood.c opt.c options.c printtree.c
 HASHMAP = hashmap.c

@@ -32,7 +32,6 @@ void setNumspec(FILE* infile, int* specs){
 	if (specs[2] < max_numbase){
 		specs[2] = max_numbase;
 	}
-	return specs;
 }
 int setNumspecArr(FILE *partitionsFile){
 	char buffer[FASTA_MAXLINE];
@@ -44,7 +43,7 @@ int setNumspecArr(FILE *partitionsFile){
 	}
 	return countLeafNodes;
 }
-void readSeqArr_UsePartitions(FILE *partitionsFile, int whichPartitions, int*** seqArr_heap,char*** nodeIDsArr_heap){
+/*void readSeqArr_UsePartitions(FILE *partitionsFile, int whichPartitions, int*** seqArr_heap,char*** nodeIDsArr_heap){
 	char buffer[FASTA_MAXLINE];
 	int i, j, m, k=0, row=0;
 	char c;
@@ -121,7 +120,7 @@ void readSeqArr_UsePartitions(FILE *partitionsFile, int whichPartitions, int*** 
 		}
 	}
 	if (numspecArr[whichPartitions] < 3) {printf("This is for more than two seq.s only!\n"); exit(-1);}
-}
+}*/
 void readseq(FILE* infile, int max_nodename, struct masterArr *master){
 	char buffer[FASTA_MAXLINE];
 	int i, j, test, m, k=0, row=0;

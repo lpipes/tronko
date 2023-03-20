@@ -14,11 +14,12 @@
 #include <sys/mman.h>
 #include <errno.h>                      
 #include <fcntl.h>
+#include <string.h>
 
 void setNumspec(FILE* infile, int* specs);
 int setNumspecArr(FILE *partitionsFile);
-void readSeqArr(FILE *partitionsFile, int whichPartitions, int maxname);
-void readSeqArr_UsePartitions(FILE *partitionsFile, int whichPartitions,int*** seqArr_heap, char*** nodeIDsArr_heap);
+//void readSeqArr(FILE *partitionsFile, int whichPartitions, int maxname);
+//void readSeqArr_UsePartitions(FILE *partitionsFile, int whichPartitions,int*** seqArr_heap, char*** nodeIDsArr_heap);
 FILE *openFasta(char *infile);
 void readfasta(FILE *infile);
 void readseq(FILE* infile, int max_nodename, struct masterArr *m);

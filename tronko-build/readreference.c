@@ -14,11 +14,11 @@ void readFilesInDir(char *directory, int number_of_partitions, partition_files* 
 	reti = regcomp(&regex1, "\_MSA\.fasta$", 0);
 	if (reti){
 		printf(stderr, "Could not compile regex\n");
-		exit(1);
+		exit(-1);
 	}
 	if (dr==NULL){
 		printf("Could not open directory for reads");
-		return 0;
+		exit(-1);
 	}
 	while((de=readdir(dr)) != NULL){
 		reti = regexec(&regex1, de->d_name, 0, NULL, 0);
@@ -47,7 +47,6 @@ void readFilesInDir(char *directory, int number_of_partitions, partition_files* 
 		}
 	}
 	closedir(dr);
-	return pf;
 }
 int readReferenceTree(gzFile referenceTree){
 	char buffer[BUFFER_SIZE];
