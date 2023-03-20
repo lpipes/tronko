@@ -98,6 +98,40 @@ int getLCA_Arr(int node1, int node2, int whichRoot){
 	node2 = treeArr[whichRoot][node2].down;
 	return getLCA_Arr(node1,node2,whichRoot);
 }
+int getKeysCount(int whichRoot, int node, int* minNodes, int matching_nodes, int* ancestors, int numMinNodes){
+	int child0 = treeArr[whichRoot][node].up[0];
+	int child1 = treeArr[whichRoot][node].up[1];
+	if ( child0 != -1 && child1 != -1 ){
+		matching_nodes += getKeysCount(whichRoot,child0,minNodes,matching_nodes,ancestors,numMinNodes) + getKeysCount(whichRoot,child1,minNodes,matching_nodes,ancestors,numMinNodes);
+	}
+	int i;
+	for(i=0; i<numMinNodes; i++){
+		if ( minNodes[i] == node ){
+			matching_nodes++;
+		}
+	}
+	if ( matching_nodes == numMinNodes ){
+		for(i=0; i<2*numspecArr[whichRoot]-1; i++){
+			if ( ancestors[i] == -1 ){
+				break;
+			}
+		}
+		ancestors[i] = node;
+	}
+	return matching_nodes;
+}
+int LCA_of_nodes(int whichRoot, int root_node, int* minNodes, int numMinNodes){
+	int* ancestors = (int*)malloc((2*numspecArr[whichRoot]-1)*sizeof(int));
+	int i;
+	for(i=0; i<2*numspecArr[whichRoot]-1; i++){
+		ancestors[i] = -1;
+	}
+	int matching_nodes = 0;
+	getKeysCount(whichRoot, root_node, minNodes, matching_nodes, ancestors, numMinNodes);
+	int LCA = ancestors[0];
+	free(ancestors);
+	return LCA;
+}
 int getLCAofArray_Arr(int *minNodes,int whichRoot,int maxNumSpec, int number_of_total_nodes){
 	int LCA = minNodes[0];
 	int maxDepth = 1000000000;
@@ -110,8 +144,8 @@ int getLCAofArray_Arr(int *minNodes,int whichRoot,int maxNumSpec, int number_of_
 	}
 	return LCA;
 }
-int getLCAofArray_Arr_Multiple(int *minNodes,int whichRoot, int maxNumSpec, int number_of_total_nodes){
-	int LCA = minNodes[0];
+int getLCAofArray_Arr_Multiple(int *voteroot,int whichRoot, int maxNumSpec, int number_of_total_nodes){
+	/*int LCA = minNodes[0];
 	int maxDepth = 1000000000;
 	int i;
 	for( i=1; i<number_of_total_nodes; i++){
@@ -120,6 +154,21 @@ int getLCAofArray_Arr_Multiple(int *minNodes,int whichRoot, int maxNumSpec, int 
 			LCA = getLCA_Arr(LCA, minNodes[i], whichRoot);
 		}
 	}
+	return LCA;*/
+	int i;
+	int* minNodes = (int*)malloc((2*numspecArr[whichRoot]-1)*sizeof(int));
+	for(i=0; i<2*numspecArr[whichRoot]-1; i++){
+		minNodes[i]=-1;
+	}
+	int count=0;
+	for(i=0; i<2*numspecArr[whichRoot]-1; i++){
+		if ( voteroot[i] == 1 ){
+			minNodes[count]=i;
+			count++;
+		}
+	}
+	int LCA = LCA_of_nodes(whichRoot,rootArr[whichRoot],minNodes,count);
+	free(minNodes);
 	return LCA;
 }
 void *runAssignmentOnChunk_WithBWA(void *ptr){
@@ -420,6 +469,9 @@ void *runAssignmentOnChunk_WithBWA(void *ptr){
 			}
 		}
 		int countVotes[mstr->ntree];
+		for(i=0; i<mstr->ntree; i++){
+			countVotes[i]=0;
+		}
 		int count=0;
 		for(i=0; i<mstr->ntree; i++){
 			countVotes[i]=0;
@@ -457,7 +509,8 @@ void *runAssignmentOnChunk_WithBWA(void *ptr){
 		int taxRoot,taxIndex0,taxIndex1,taxNode;
 		if ( count == 1 ){
 			clock_gettime(CLOCK_MONOTONIC, &tstart);
-			LCA=getLCAofArray_Arr(minNodes,maxRoot,maxNumSpec,number_of_total_nodes);
+			//LCA=getLCAofArray_Arr(minNodes,maxRoot,maxNumSpec,number_of_total_nodes);
+			LCA = LCA_of_nodes(maxRoot,rootArr[maxRoot],minNodes,numMinNodes);
 		}else if (count != 0){
 			for(i=0;i<count;i++){
 				for(j=0; j<mstr->max_lineTaxonomy; j++){
@@ -475,6 +528,7 @@ void *runAssignmentOnChunk_WithBWA(void *ptr){
 					unassigned=1;
 				}
 			}
+			LCA = LCAs[0];
 			int correctTax=0;
 			int stop=0;
 			while(stop==0 && minLevel<=6){
