@@ -469,9 +469,6 @@ void *runAssignmentOnChunk_WithBWA(void *ptr){
 			}
 		}
 		int countVotes[mstr->ntree];
-		for(i=0; i<mstr->ntree; i++){
-			countVotes[i]=0;
-		}
 		int count=0;
 		for(i=0; i<mstr->ntree; i++){
 			countVotes[i]=0;
