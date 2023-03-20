@@ -168,37 +168,6 @@ void assignTaxonomyToLeavesArr(int node,char *tax,struct masterArr *m, int max_n
 		assignTaxonomyToLeavesArr(child1,tax,m,max_nodename,max_tax_name);
 	}
 }
-// by default calloc returns a pointer to allocated memory that has been
-// initialized to zero (vs malloc, which just returns a pointer to allocated
-// memory and doesn't initialize it), but it's good practice to check that the
-// returned pointer is valid, since calloc (and malloc) will return NULL if
-// the system is out of memory.
-void *calloc_check(size_t nmemb, size_t size){
-	void *ptr = calloc(nmemb, size);
-	if(!ptr){   // if calloc returns NULL, we've run out of memory
-		fprintf(stderr, "Out of memory!\n");
-		exit(1);
-	}
-	return ptr;
-}
-void allocateMemoryForTaxArr(int whichPartitions, int max_tax_name){
-	int phylogenyLevels = 7;
-	int max_tax_name_len = max_tax_name;
-	int i,j,k;
-	// allocate the array to contain the different 'base' taxonomies / lists
-	taxonomyArr = (char ****)calloc_check(whichPartitions,sizeof(char ***));
-	for(k=0;k<whichPartitions;k++){
-		taxonomyArr[k] = (char ***)calloc_check(numspecArr[k], sizeof(char **));
-		for(i=0; i<numspecArr[k]; i++){
-			// first, allocate the space for each taxonomy  (= list of taxonomic
-			// classifications, from most specific to least specific)
-			taxonomyArr[k][i] = (char **)calloc_check(phylogenyLevels, sizeof(char *));
-			for(j=0; j<phylogenyLevels; j++){
-				taxonomyArr[k][i][j] = (char *)calloc_check(max_tax_name_len, sizeof(char));
-			}
-		}
-	}
-}
 int* getTaxonomyArr(int node, struct masterArr *m){
 	int* taxIndexA = NULL;
 	int* taxIndexB = NULL;

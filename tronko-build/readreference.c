@@ -107,7 +107,7 @@ int readReferenceTree(gzFile referenceTree){
 			for(i=0;i<numberOfTrees;i++){
 				printf("Tree %d Numbase: %d, Root: %d, Numspec %d\n",i,numbaseArr[i],rootArr[i],numspecArr[i]);
 			}
-			allocateMemoryForTaxArr(numberOfTrees);
+			allocateMemoryForTaxArr(numberOfTrees,max_tax_name);
 			for(i=0;i<numberOfTrees;i++){
 				for(j=0; j<numspecArr[i]; j++){
 					refTreeFlag = gzgets(referenceTree,buffer,BUFFER_SIZE);

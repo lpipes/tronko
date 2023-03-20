@@ -9,6 +9,7 @@
 #include <ctype.h>
 #include "global.h"
 #include "opt.h"
+#include "allocatetreememory.h"
 #include <string.h>
 #include <dirent.h>
 #include <regex.h>

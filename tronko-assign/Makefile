@@ -10,7 +10,7 @@ STACKPROTECT = -fno-stack-protector
 # -lm links the math library
 #LIBS = -lm -lpthread -lz
 LIBS = -lm -pthread -lz -lrt -std=gnu99
-OPTIMIZATION = -march=native
+OPTIMIZATION = -O3
 #sources
 SOURCES = tronko-assign.c readreference.c assignment.c allocateMemoryForResults.c allocatetreememory.c getSequenceinRoot.c placement.c options.c printAlignments.c
 NEEDLEMANWUNSCH = needleman_wunsch.c alignment.c alignment_scoring.c
