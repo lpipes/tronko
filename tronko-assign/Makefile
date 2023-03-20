@@ -9,8 +9,7 @@ DBGCFLAGS = -g -w
 STACKPROTECT = -fno-stack-protector
 # -lm links the math library
 #LIBS = -lm -lpthread -lz
-#LIBS = -lm -pthread -lz -lrt -std=gnu99
-LIBS = -lm -pthread -lz -std=gnu99
+LIBS = -lm -pthread -lz -lrt -std=gnu99
 OPTIMIZATION = -O3
 #sources
 SOURCES = tronko-assign.c readreference.c assignment.c allocateMemoryForResults.c allocatetreememory.c getSequenceinRoot.c placement.c options.c printAlignments.c
