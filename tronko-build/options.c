@@ -19,23 +19,23 @@ static struct Options long_options[]=
 	{"no-change-missingdata", no_argument, 0, 'g'},
 };
 
-char usage[] = "\ntronko-build [OPTIONS]\n\
+char usage[] = "\ntronko-build [OPTIONS] -d [OUTPUT DIRECTORY]\n\
 	\n\
-	-h,				usage:\n\
+	-h, usage:\n\
+	-d [DIRECTORY], REQUIRED, output directory\n\
 	-y, use a partition directory (you want to partition or you have multiple clusters)\n\
 	-l, use only single tree (do not partition)\n\
-	-t [FILE], rooted phylogenetic tree [FILE: Newick, use only with -l]\n\
-	-m [FILE], multiple sequence alignment [FILE: FASTA, use only with -l]\n\
-	-d [DIRECTORY], REQUIRED, output directory\n\
+	-t [FILE], compatible only with -l, rooted phylogenetic tree [FILE: Newick]\n\
+	-m [FILE], comptabile only with -l, multiple sequence alignment [FILE: FASTA]\n\
 	-x [FILE], taxonomy file [FILE: FASTA_header\tdomain;phylum;class;order;family;genus;species, use only with -l]\n\
-	-e [DIRECTORY], directory for reading multiple clusters [use only with -y]\n\
-	-n [INT], number of partitions in read directory [use only with -y]\n\
-	-b [INT], restart partitions with partition number [default: 0, use only with -y]\n\
-	-s, partition using sum-of-pairs score [can't use with -f, use only with -y]\n\
-	-u [FLOAT], minimum threshold for sum of pairs score [default: 0.5, use only with -y]\n\
-	-v, partition using minimum number of leaf nodes [can't use with -s, use with -f, use only with -y]\n\
+	-e [DIRECTORY], compatible only with -y, directory for reading multiple clusters\n\
+	-n [INT], compatible only with -y, number of partitions in read directory\n\
+	-b [INT], comptabile only with -y, restart partitions with partition number [default: 0]\n\
+	-s, compatible only with -y, partition using sum-of-pairs score [can't use with -f, use with -s]\n\
+	-u [FLOAT], compatible only with -y, minimum threshold for sum of pairs score [default: 0.5]\n\
+	-v, compatible only with -y, partition using minimum number of leaf nodes [can't use with -s, use with -f]\n\
 	-f [INT], don't partition less than the minimum number of leaf nodes [can't use with -s, use with -v, use only with -y]\n\
-	-g, don't change missing data\n\
+	-g, don't flag missing data\n\
 	\n";
 
 void print_help_statement(){

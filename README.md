@@ -10,51 +10,51 @@ Alignment-based and composition-based assignment methods calculate the lowest co
 # tronko-build
 `tronko-build` is for building custom reference databases to be used with `tronko-assign`.
 
-	tronko-build [OPTIONS]
+	tronko-build [OPTIONS] -d [OUTPUT DIRECTORY]
 	
-		-h,				usage:
+		-h, usage:
+		-d [DIRECTORY], REQUIRED, output directory
 		-y, use a partition directory (you want to partition or you have multiple clusters)
 		-l, use only single tree (do not partition)
-		-t [FILE], rooted phylogenetic tree [FILE: Newick, use only with -l]
-		-m [FILE], multiple sequence alignment [FILE: FASTA, use only with -l]
-		-d [DIRECTORY], REQUIRED, output directory
+		-t [FILE], compatible only with -l, rooted phylogenetic tree [FILE: Newick]
+		-m [FILE], comptabile only with -l, multiple sequence alignment [FILE: FASTA]
 		-x [FILE], taxonomy file [FILE: FASTA_header	domain;phylum;class;order;family;genus;species, use only with -l]
-		-e [DIRECTORY], directory for reading multiple clusters [use only with -y]
-		-n [INT], number of partitions in read directory [use only with -y]
-		-b [INT], restart partitions with partition number [default: 0, use only with -y]
-		-s, partition using sum-of-pairs score [can't use with -f, use only with -y]
-		-u [FLOAT], minimum threshold for sum of pairs score [default: 0.5, use only with -y]
-		-v, partition using minimum number of leaf nodes [can't use with -s, use with -f, use only with -y]
+		-e [DIRECTORY], compatible only with -y, directory for reading multiple clusters
+		-n [INT], compatible only with -y, number of partitions in read directory
+		-b [INT], comptabile only with -y, restart partitions with partition number [default: 0]
+		-s, compatible only with -y, partition using sum-of-pairs score [can't use with -f, use with -s]
+		-u [FLOAT], compatible only with -y, minimum threshold for sum of pairs score [default: 0.5]
+		-v, compatible only with -y, partition using minimum number of leaf nodes [can't use with -s, use with -f]
 		-f [INT], don't partition less than the minimum number of leaf nodes [can't use with -s, use with -v, use only with -y]
-		-g, don't change missing data
+		-g, don't flag missing data
 
 # tronko-assign
 `tronko-assign` is for species assignment of queries. It requires a `tronko-build` database.
 
-	tronko-assign [OPTIONS]
+	tronko-assign [OPTIONS] -r -f [TRONKO-BUILD DB FILE] -a [REF FASTA FILE] -o [OUTPUT FILE]
 	
 		-h, usage:
-		-p, use paired reads
+		-r, REQUIRED, use a reference
+		-f [FILE], REQUIRED, path to reference database file, can be gzipped
+		-a [FILE], REQUIRED, path to reference fasta file (for bwa database)
+		-o [FILE], REQUIRED, path to output file
+		-p, use paired-end reads
 		-s, use single reads
-		-r, use a reference
 		-v, when using single reads, reverse-complement it
 		-z, when using paired-end reads,  reverse-complement the second read
-		-f [FILE], path to reference database file
-		-o [FILE], path to output file
-		-g [FILE], path to single-end reads file
-		-1 [FILE], path to paired-end forward read file
-		-2 [FILE], path to paired-end reverse read file
-		-a [FILE], path to fasta file (for bwa database)
+		-g [FILE], compatible only with -s, path to single-end reads file
+		-1 [FILE], compatible only with -p, path to paired-end forward read file
+		-2 [FILE], compatible only with -p, path to paired-end reverse read file
 		-c [INT], LCA cut-off to use [default:5]
-		-C [INT], number of cores
-		-L [INT], number of lines to read for assignment
+		-C [INT], number of cores [default:1]
+		-L [INT], number of lines to read for assignment [default:50000]
 		-P, print alignments to stdout
-		-w, use Needleman-Wunsch Alignment (default: WFA)
+		-w, use Needleman-Wunsch Alignment Algorithm (default: WFA)
 		-q, Query is FASTQ [default is FASTA]
 		-e, Use only a portion of the reference sequences
-		-n [INT], Padding (Number of bases) to use in the portion of the reference sequences
-		-5 [FILE], Print tree number and leaf number
-		-6, Skip the bwa build if already exists
+		-n [INT], compatible only with -e, Padding (Number of bases) to use in the portion of the reference sequences
+		-5 [FILE], Print tree number and leaf number and exit
+		-6, Skip the bwa build if database already exists
 		-u, Score constant [default: 0.01]
 
 Tronko uses the <a href="https://github.com/smarco/WFA2-lib">Wavefront Alignment Algorithm (version 2)</a> or <a href="https://github.com/noporpoise/seq-align">Needleman-Wunsch Algorithm</a> for semi-global alignments. It uses <a href="https://github.com/lh3/bwa">bwa</a> for alignment to leaf nodes, and uses <a href="https://github.com/DavidLeeds/hashmap">David Leeds' hashmap</a> for hashmap implementation in C. `tronko-assign` does not reverse complement your reads automatically. You must use options `-v` or `-z` to reverse complement your read for better alignment to the reference database. For more information on the direction of your reads based on your library prep, please refer to this helpful blog here: <a href="http://onetipperday.blogspot.com/2012/07/how-to-tell-which-library-type-to-use.html">http://onetipperday.blogspot.com/2012/07/how-to-tell-which-library-type-to-use.html</a>.

@@ -33,30 +33,30 @@ static struct Options long_options[]=
 	{"score-constant",required_argument,0, 'u'}
 };
 
-char usage[] = "\ntronko-assign [OPTIONS]\n\
+char usage[] = "\ntronko-assign [OPTIONS] -r -f [TRONKO-BUILD DB FILE] -a [REF FASTA FILE] -o [OUTPUT FILE]\n\
 	\n\
 	-h, usage:\n\
-	-p, use paired reads\n\
+	-r, REQUIRED, use a reference\n\
+	-f [FILE], REQUIRED, path to reference database file, can be gzipped\n\
+	-a [FILE], REQUIRED, path to reference fasta file (for bwa database)\n\
+	-o [FILE], REQUIRED, path to output file\n\
+	-p, use paired-end reads\n\
 	-s, use single reads\n\
-	-r, use a reference\n\
 	-v, when using single reads, reverse-complement it\n\
 	-z, when using paired-end reads,  reverse-complement the second read\n\
-	-f [FILE], path to reference database file\n\
-	-o [FILE], path to output file\n\
-	-g [FILE], path to single-end reads file\n\
-	-1 [FILE], path to paired-end forward read file\n\
-	-2 [FILE], path to paired-end reverse read file\n\
-	-a [FILE], path to fasta file (for bwa database)\n\
+	-g [FILE], compatible only with -s, path to single-end reads file\n\
+	-1 [FILE], compatible only with -p, path to paired-end forward read file\n\
+	-2 [FILE], compatible only with -p, path to paired-end reverse read file\n\
 	-c [INT], LCA cut-off to use [default:5]\n\
-	-C [INT], number of cores\n\
-	-L [INT], number of lines to read for assignment\n\
+	-C [INT], number of cores [default:1]\n\
+	-L [INT], number of lines to read for assignment [default:50000]\n\
 	-P, print alignments to stdout\n\
-	-w, use Needleman-Wunsch Alignment (default: WFA)\n\
+	-w, use Needleman-Wunsch Alignment Algorithm (default: WFA)\n\
 	-q, Query is FASTQ [default is FASTA]\n\
 	-e, Use only a portion of the reference sequences\n\
-	-n [INT], Padding (Number of bases) to use in the portion of the reference sequences\n\
-	-5 [FILE], Print tree number and leaf number\n\
-	-6, Skip the bwa build if already exists\n\
+	-n [INT], compatible only with -e, Padding (Number of bases) to use in the portion of the reference sequences\n\
+	-5 [FILE], Print tree number and leaf number and exit\n\
+	-6, Skip the bwa build if database already exists\n\
 	-u, Score constant [default: 0.01]\n\
 	\n";
 
