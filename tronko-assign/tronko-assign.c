@@ -762,8 +762,8 @@ int main(int argc, char **argv){
 	opt.score_constant = 0.01;
 	parse_options(argc, argv, &opt);
 	struct stat st = {0};
-	if ( opt.reference_file[0] == '\0' ){
-		printf("reference_tree.txt file not specified. Exiting...\n");
+	if ( stat(opt.reference_file, &st) == -1 ){
+		printf("Cannot find reference_tree.txt file. Exiting...\n");
 		exit(-1);
 	}
 	gzFile referenceTree = Z_NULL;
