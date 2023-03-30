@@ -750,6 +750,7 @@ int main(int argc, char **argv){
 	opt.print_alignments = 0;
 	opt.print_node_info[0] = '\0';
 	opt.results_file[0] = '\0';
+	opt.reference_file[0] = '\0';
 	opt.fastq=0; //default is FASTA
 	opt.unassigned=0; //don't print unassigned sequences
 	opt.print_alignments_to_file=0; //don't print alignments to file
@@ -761,9 +762,9 @@ int main(int argc, char **argv){
 	opt.score_constant = 0.01;
 	parse_options(argc, argv, &opt);
 	struct stat st = {0};
-	if ( stat(opt.reference_file, &st) == -1){
-		printf("Cannot find reference_tree.txt file. Exiting...\n");
-		exit(1);
+	if ( opt.reference_file[0] == '\0' ){
+		printf("reference_tree.txt file not specified. Exiting...\n");
+		exit(-1);
 	}
 	gzFile referenceTree = Z_NULL;
 	referenceTree = gzopen(opt.reference_file,"r");
