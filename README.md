@@ -189,7 +189,7 @@ tronko-assign -r -f outdir_multiple_MSA/reference_tree.txt -s -g example_dataset
 
 To assign paired-end reads on the same reference database run `tronko-assign`:
 ```
-tronko-assign -r -f outdir_multiple_MSA/reference_tree.txt -p -1 example_datasets/multiple_trees/missingreads_pairedend_150bp_2error_read1.fasta -2 example_datasets/multiple_trees/missingreads_pairedend_150bp_2error_read2.fasta -o example_datasets/multiple_trees/missingreads_pairedend_150bp_2error_multiple_MSA_results.txt -a -a tronko-build/example_datasets/multiple_trees/one_MSA/1.fasta
+tronko-assign -r -f outdir_multiple_MSA/reference_tree.txt -p -1 example_datasets/multiple_trees/missingreads_pairedend_150bp_2error_read1.fasta -2 example_datasets/multiple_trees/missingreads_pairedend_150bp_2error_read2.fasta -o example_datasets/multiple_trees/missingreads_pairedend_150bp_2error_multiple_MSA_results.txt -a tronko-build/example_datasets/multiple_trees/one_MSA/1.fasta
 ```
 
 ## More on `tronko-build` Usage with multiple trees
