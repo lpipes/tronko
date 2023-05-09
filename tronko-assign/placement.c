@@ -1047,8 +1047,12 @@ void place_paired_with_nw( char *query_1, char *query_2, char **rootSeqs, int nu
 		if (match==0 && print_alignments_to_file==1){
 			char alignmentFileName[1000];
 			snprintf(alignmentFileName,1000,"%s/%s.fasta",alignments_dir,treeArr[leaf_coordinates[match][0]][leaf_coordinates[match][1]].name);
-			snprintf(alignmentFileName,1000,"%s",alignments_dir);
-			printToFile2(treeArr[leaf_coordinates[match][0]][leaf_coordinates[match][1]].name, alignments_dir, aln, forward_name, query_length, positionsInRoot);
+			//snprintf(alignmentFileName,1000,"%s",alignments_dir);
+			if ( access(alignmentFileName, F_OK ) != -1 ){
+				printToFile2(treeArr[leaf_coordinates[match][0]][leaf_coordinates[match][1]].name, alignments_dir, aln, forward_name, query_length, positionsInRoot);
+			}else{
+				createNewFile2(treeArr[leaf_coordinates[match][0]][leaf_coordinates[match][1]].name, alignments_dir, aln, forward_name, query_length);
+			}
 		}
 		if (print_alignments==1){
 			printf("Using Needleman-Wunsch\n");
@@ -1421,7 +1425,11 @@ void place_paired_with_nw( char *query_1, char *query_2, char **rootSeqs, int nu
 		if (match==0 && print_alignments_to_file==1){
 			char alignmentFileName[1000];
 			snprintf(alignmentFileName,1000,"%s/%s.fasta",alignments_dir,treeArr[leaf_coordinates[match][0]][leaf_coordinates[match][1]].name);
-			printToFile2(treeArr[leaf_coordinates[match][0]][leaf_coordinates[match][1]].name, alignments_dir, aln, reverse_name, query_length, positionsInRoot);
+			if ( access(alignmentFileName, F_OK ) != -1 ){
+				printToFile2(treeArr[leaf_coordinates[match][0]][leaf_coordinates[match][1]].name, alignments_dir, aln, reverse_name, query_length, positionsInRoot);
+			}else{
+				createNewFile2(treeArr[leaf_coordinates[match][0]][leaf_coordinates[match][1]].name, alignments_dir, aln, reverse_name, query_length);
+			}
 		}
 		if (print_alignments==1){
 			printf("\n");
