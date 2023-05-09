@@ -69,7 +69,7 @@ void createNewFile2( char *referenceName, char *alignments_directory, alignment_
 		}
 	}
 	fprintf(alignmentFile,"\n");*/
-	fprintf(alignmentFile,"%s\t%s\t%d\n",readname,referenceName,length_of_read);
+	fprintf(alignmentFile,">%s\t%s\t%d\n",readname,referenceName,length_of_read);
 	int counter=0;
 	int iter=0;
 	int offset=0;
@@ -102,8 +102,8 @@ void createNewFile2( char *referenceName, char *alignments_directory, alignment_
 void printToFile2 (char *referenceName, char *alignments_directory, alignment_t *aln, char *readname, int length_of_read, int* positionsInRoot){
 	FILE *alignmentFile;
 	char fileName[1000];
-	//snprintf(fileName,1000,"%s/%s.fasta",alignments_directory, referenceName);
-	snprintf(fileName,1000,"%s",alignments_directory);
+	snprintf(fileName,1000,"%s/%s.fasta",alignments_directory, referenceName);
+	//snprintf(fileName,1000,"%s",alignments_directory);
 	alignmentFile = fopen(fileName, "a");
 	 if (alignmentFile == NULL){ printf("Error!"); exit(1); }
 	fprintf(alignmentFile,">%s\t%s\t%d\n",readname,referenceName,length_of_read);
