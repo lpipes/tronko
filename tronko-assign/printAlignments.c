@@ -96,7 +96,7 @@ void createNewFile2( char *referenceName, char *alignments_directory, alignment_
 		}
 		counter++;
 	}
-	fprintf(alignmentFile,"\n");
+	fprintf(alignmentFile,";\n");
 	fclose(alignmentFile);
 }
 void printToFile2 (char *referenceName, char *alignments_directory, alignment_t *aln, char *readname, int length_of_read, int* positionsInRoot){
