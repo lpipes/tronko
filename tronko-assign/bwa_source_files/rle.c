@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include "rle.h"
 
-const uint8_t rle_auxtab[8] = { 0x01, 0x11, 0x21, 0x31, 0x03, 0x13, 0x07, 0x17 };
+static const uint8_t rle_auxtab[8] = { 0x01, 0x11, 0x21, 0x31, 0x03, 0x13, 0x07, 0x17 };
 
 // insert symbol $a after $x symbols in $str; marginal counts added to $cnt; returns the size increase
 int rle_insert_cached(uint8_t *block, int64_t x, int a, int64_t rl, int64_t cnt[6], const int64_t ec[6], int *beg, int64_t bc[6])

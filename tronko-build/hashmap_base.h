@@ -9,7 +9,7 @@
 
 struct hashmap_entry;
 
-struct hashmap_base {
+static struct hashmap_base {
     size_t table_size_init;
     size_t table_size;
     size_t size;
