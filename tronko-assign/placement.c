@@ -57,7 +57,7 @@ int perform_WFA_alignment(cigar_t* const cigar, mm_allocator_t* mm_allocator,cha
 	return alignment_length;
 }
 
-void place_paired( char *query_1, char *query_2, char **rootSeqs, int numberOfTotalRoots, int *positions, char *locQuery, type_of_PP ***nodeScores, int **voteRoot, int number_of_matches , int **leaf_coordinates, int paired, type_of_PP* minimum_score, char *alignments_dir, char *forward_name, char *reverse_name, int print_alignments, char *leaf_sequence, int *positionsInRoot, int maxNumSpec, int* starts_forward, char** cigars_forward, int* starts_reverse, char** cigars_reverse, int print_alignments_to_file, int use_leaf_portion, int padding, int max_query_length, int max_numbase){
+void place_paired( char *query_1, char *query_2, char **rootSeqs, int numberOfTotalRoots, int *positions, char *locQuery, type_of_PP ***nodeScores, int **voteRoot, int number_of_matches , int **leaf_coordinates, int paired, type_of_PP* minimum_score, char *alignments_dir, char *forward_name, char *reverse_name, int print_alignments, char *leaf_sequence, int *positionsInRoot, int maxNumSpec, int* starts_forward, char** cigars_forward, int* starts_reverse, char** cigars_reverse, int print_alignments_to_file, int use_leaf_portion, int padding, int max_query_length, int max_numbase, int print_all_nodes){
 	int i, j, k, node, match;
 	type_of_PP forward_mismatch, reverse_mismatch;
 	forward_mismatch=0;
@@ -844,6 +844,11 @@ void place_paired( char *query_1, char *query_2, char **rootSeqs, int numberOfTo
 	int match_number=0;
 	//clock_gettime(CLOCK_MONOTONIC, &tstart);
 	//printf("finding minimum score...\n");
+	FILE* node_scores_file;
+	if ( print_all_nodes == 1 ){
+		if (( node_scores_file = fopen("scores_all_nodes.txt","w")) == (FILE *) NULL ) fprintf(stderr, "File could not be opened.\n");
+		fprintf(node_scores_file,"Tree_Number\tNode_Number\tScore\n");
+	}
 	for (i=0; i<number_of_matches;i++){
 		for (j=leaf_coordinates[i][0]; j<leaf_coordinates[i][0]+1; j++){
 			for(k=0; k<2*numspecArr[j]-1; k++){
@@ -854,8 +859,12 @@ void place_paired( char *query_1, char *query_2, char **rootSeqs, int numberOfTo
 					minRoot=j;
 					minNode=k;
 				}
+				fprintf(node_scores_file,"%d\t%d\t%lf\n",j,k,nodeScores[i][j][k]);
 			}
 		}
+	}
+	if (print_all_nodes == 1){
+		fclose(node_scores_file);
 	}
 	//clock_gettime(CLOCK_MONOTONIC, &tend);
 	//printf("finished... %.5f\n",((double)tend.tv_sec + 1.0e-9*tend.tv_nsec) - ((double)tstart.tv_sec + 1.0e-9*tstart.tv_nsec));
@@ -896,7 +905,7 @@ void place_paired( char *query_1, char *query_2, char **rootSeqs, int numberOfTo
 	//free(leaf_sequence);
 	//free(positionsInRoot);
 }
-void place_paired_with_nw( char *query_1, char *query_2, char **rootSeqs, int numberOfTotalRoots, int *positions, char *locQuery, nw_aligner_t *nw, alignment_t *aln, scoring_t *scoring, type_of_PP ***nodeScores, int **voteRoot, int number_of_matches , int **leaf_coordinates, int paired, type_of_PP* minimum_score, char *alignments_dir, char *forward_name, char *reverse_name, int print_alignments, char *leaf_sequence, int *positionsInRoot, int maxNumSpec, int* starts_forward, char** cigars_forward, int* starts_reverse, char** cigars_reverse, int print_alignments_to_file, int use_leaf_portion, int padding, int max_query_length, int max_numbase){
+void place_paired_with_nw( char *query_1, char *query_2, char **rootSeqs, int numberOfTotalRoots, int *positions, char *locQuery, nw_aligner_t *nw, alignment_t *aln, scoring_t *scoring, type_of_PP ***nodeScores, int **voteRoot, int number_of_matches , int **leaf_coordinates, int paired, type_of_PP* minimum_score, char *alignments_dir, char *forward_name, char *reverse_name, int print_alignments, char *leaf_sequence, int *positionsInRoot, int maxNumSpec, int* starts_forward, char** cigars_forward, int* starts_reverse, char** cigars_reverse, int print_alignments_to_file, int use_leaf_portion, int padding, int max_query_length, int max_numbase, int print_all_nodes){
 	int i, j, k, node, match;
 	type_of_PP forward_mismatch, reverse_mismatch;
 	forward_mismatch=0;
@@ -1654,6 +1663,11 @@ void place_paired_with_nw( char *query_1, char *query_2, char **rootSeqs, int nu
 	int match_number=0;
 	//clock_gettime(CLOCK_MONOTONIC, &tstart);
 	//printf("finding minimum score...\n");
+	FILE* node_scores_file;
+	if ( print_all_nodes == 1 ){
+		if (( node_scores_file = fopen("scores_all_nodes.txt","w")) == (FILE *) NULL ) fprintf(stderr, "File could not be opened.\n");
+		fprintf(node_scores_file,"Tree_Number\tNode_Number\tScore\n");
+	}
 	for (i=0; i<number_of_matches;i++){
 		for (j=leaf_coordinates[i][0]; j<leaf_coordinates[i][0]+1; j++){
 			for(k=0; k<2*numspecArr[j]-1; k++){
@@ -1663,8 +1677,12 @@ void place_paired_with_nw( char *query_1, char *query_2, char **rootSeqs, int nu
 					minRoot=j;
 					minNode=k;
 				}
+				fprintf(node_scores_file,"%d\t%d\t%lf\n",j,k,nodeScores[i][j][k]);
 			}
 		}
+	}
+	if (print_all_nodes == 1){
+		fclose(node_scores_file);
 	}
 	//clock_gettime(CLOCK_MONOTONIC, &tend);
 	//printf("finished... %.5f\n",((double)tend.tv_sec + 1.0e-9*tend.tv_nsec) - ((double)tstart.tv_sec + 1.0e-9*tstart.tv_nsec));

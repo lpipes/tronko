@@ -30,7 +30,8 @@ static struct Options long_options[]=
 	{"fastq",no_argument, 0, 'q'},
 	{"print-node-info",required_argument, 0, '5'},
 	{"skip-bwa-build",no_argument,0, '6'},
-	{"score-constant",required_argument,0, 'u'}
+	{"score-constant",required_argument,0, 'u'},
+	{"print-all-scores",no_argument,0,'7'}
 };
 
 char usage[] = "\ntronko-assign [OPTIONS] -r -f [TRONKO-BUILD DB FILE] -a [REF FASTA FILE] -o [OUTPUT FILE]\n\
@@ -58,6 +59,7 @@ char usage[] = "\ntronko-assign [OPTIONS] -r -f [TRONKO-BUILD DB FILE] -a [REF F
 	-5 [FILE], Print tree number and leaf number and exit\n\
 	-6, Skip the bwa build if database already exists\n\
 	-u, Score constant [default: 0.01]\n\
+	-7, Print scores for all nodes [scores_all_nodes.txt]\n\
 	\n";
 
 void print_help_statement(){
@@ -73,7 +75,7 @@ void parse_options(int argc, char **argv, Options *opt){
 		exit(0);
 	}
 	while(1){
-		c=getopt_long(argc,argv,"hpsrqw6yevUzP5:f:u:t:m:d:o:x:g:1:2:a:c:n:3:4:C:L:",long_options, &option_index);
+		c=getopt_long(argc,argv,"hpsrqw6yevUzP75:f:u:t:m:d:o:x:g:1:2:a:c:n:3:4:C:L:",long_options, &option_index);
 		if (c==-1) break;
 		switch(c){
 			case 'h':
@@ -114,6 +116,9 @@ void parse_options(int argc, char **argv, Options *opt){
 				break;
 			case 'v':
 				opt->reverse_single_read=1;
+				break;
+			case '7':
+				opt->print_all_nodes=1;
 				break;
 			case 'z':
 				opt->reverse_second_of_paired_read=1;
