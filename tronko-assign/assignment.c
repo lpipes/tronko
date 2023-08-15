@@ -1,6 +1,6 @@
 #include "assignment.h"
 
-type_of_PP **assignScores_Arr(int rootNum, int node, char *locQuery, int *positions, type_of_PP **scores, int alength){
+/*type_of_PP **assignScores_Arr(int rootNum, int node, char *locQuery, int *positions, type_of_PP **scores, int alength){
 
 	int child0 = treeArr[rootNum][node].up[0];
 	int child1 = treeArr[rootNum][node].up[1];
@@ -14,21 +14,21 @@ type_of_PP **assignScores_Arr(int rootNum, int node, char *locQuery, int *positi
 		//treeArr[rootNum][node].score = getscore_Arr(alength,node,rootNum);
 		assignScores_Arr(rootNum, child0, locQuery, positions, scores, alength);
 		assignScores_Arr(rootNum, child1, locQuery, positions, scores, alength);
-	}
+	}*/
 	/*if (child1 != -1 ){
 		scores[rootNum][node] = getscore_Arr(alength,node,rootNum,locQuery,positions);
 		//treeArr[rootNum][node].score = getscore_Arr(alength,node,rootNum);
 		assignScores_Arr(rootNum, child1, locQuery, positions, scores, alength);
 	}*/
-}
-void assignScores_Arr_paired( int rootNum, int node, char *locQuery, int *positions, type_of_PP ***scores, int alength, int search_number){
+/*}*/
+void assignScores_Arr_paired( int rootNum, int node, char *locQuery, int *positions, type_of_PP ***scores, int alength, int search_number, int print_all_nodes, FILE* site_scores_file){
 	//if (positions[0]==-1){
 	//	return;
 	//}
 	int child0 = treeArr[rootNum][node].up[0];
 	int child1 = treeArr[rootNum][node].up[1];
 	if (child0 == -1 && child1 == -1){
-		scores[search_number][rootNum][node] += getscore_Arr(alength,node,rootNum,locQuery,positions);
+		scores[search_number][rootNum][node] += getscore_Arr(alength,node,rootNum,locQuery,positions,print_all_nodes,site_scores_file);
 		//scores[search_number][rootNum].nodeNumber = node;
 		//if ( pair == 1 ){
 		//	scores[search_number][rootNum].score1 = getscore_Arr(alength,node,rootNum,locQuery,positions);
@@ -38,7 +38,7 @@ void assignScores_Arr_paired( int rootNum, int node, char *locQuery, int *positi
 		//treeArr[rootNum][node].score += getscore_Arr(alength,node,rootNum,locQuery,positions);
 		//printf("node %d, score %lf, tree %d\n",node,scores[search_number][rootNum][node],rootNum);
 	}else if(child0 != -1 && child1 != -1){
-		scores[search_number][rootNum][node] += getscore_Arr(alength,node,rootNum,locQuery,positions);
+		scores[search_number][rootNum][node] += getscore_Arr(alength,node,rootNum,locQuery,positions,print_all_nodes,site_scores_file);
 		//treeArr[rootNum][node].score += getscore_Arr(alength,node,rootNum,locQuery,positions);
 		//printf("node %d, score %lf, tree %d\n",node,scores[search_number][rootNum][node],rootNum);
 		//scores[search_number][rootNum].nodeNumber = node;
@@ -47,8 +47,8 @@ void assignScores_Arr_paired( int rootNum, int node, char *locQuery, int *positi
 		//}else{
 		//	scores[search_number][rootNum].score2 = getscore_Arr(alength,node,rootNum,locQuery,positions);
 		//}
-		assignScores_Arr_paired(rootNum, child0,locQuery, positions, scores, alength, search_number);
-		assignScores_Arr_paired(rootNum, child1, locQuery, positions,scores,alength, search_number);
+		assignScores_Arr_paired(rootNum, child0,locQuery, positions, scores, alength, search_number,print_all_nodes,site_scores_file);
+		assignScores_Arr_paired(rootNum, child1, locQuery, positions,scores,alength, search_number,print_all_nodes,site_scores_file);
 	}
 	/*if(child1 != -1 ){
 		scores[search_number][rootNum][node] +=  getscore_Arr(alength,node,rootNum,locQuery,positions);
@@ -140,7 +140,7 @@ int checkPolyA(int rootNum, int node, int position){
 	}
 	return isPolyA;
 }
-type_of_PP getscore_Arr(int alength, int node, int rootNum, char *locQuery, int *positions){
+type_of_PP getscore_Arr(int alength, int node, int rootNum, char *locQuery, int *positions, int print_all_nodes, FILE* site_scores_file){
 	type_of_PP score;
 	int pos, i;
 	i=0;
@@ -153,20 +153,53 @@ type_of_PP getscore_Arr(int alength, int node, int rootNum, char *locQuery, int 
 	}
 	for (i=0; i<alength; i++){//We assume that we have already ensured that the sequence only contains a, c, t, and g.  Missing data is not aligned
 		//pos=positions[i];//test if this is faster rather than referencing multiple times.  Compiler optimization may make the latter faster.
+			if ( print_all_nodes == 1){
+				fprintf(site_scores_file,"%d\t",positions[i]);
+			}
 			if (positions[i]==-1){
 				score=score+log(0.01);
+				if ( print_all_nodes == 1 ){
+					fprintf(site_scores_file,"%lf\n",log(0.01));
+				}
 			}else{
 				if ( treeArr[rootNum][node].posteriornc[positions[i]][0]==1 && locQuery[i]=='-' ){
 					score=score+0; 
+					if ( print_all_nodes == 1){
+						fprintf(site_scores_file,"%lf\n",0);
+					}
 				}else{
 					if( treeArr[rootNum][node].posteriornc[positions[i]][0] == 1){
 						score = score + log(0.01);
+						if ( print_all_nodes == 1){
+							fprintf(site_scores_file,"%lf\n",log(0.01));
+						}
 					}else{
-						if (locQuery[i]=='a' || locQuery[i]=='A') score += treeArr[rootNum][node].posteriornc[positions[i]][0];
-						else if (locQuery[i]=='c' || locQuery[i]=='C') score += treeArr[rootNum][node].posteriornc[positions[i]][1];
-						else if (locQuery[i]=='g' || locQuery[i]=='G') score += treeArr[rootNum][node].posteriornc[positions[i]][2];
-						else if (locQuery[i]=='t' || locQuery[i]=='T') score += treeArr[rootNum][node].posteriornc[positions[i]][3];
-						else if (locQuery[i]=='-') score += log(0.25);
+						if (locQuery[i]=='a' || locQuery[i]=='A'){
+							score += treeArr[rootNum][node].posteriornc[positions[i]][0];
+							if ( print_all_nodes == 1){
+								fprintf(site_scores_file,"%lf\n",treeArr[rootNum][node].posteriornc[positions[i]][0]);
+							}
+						}else if (locQuery[i]=='c' || locQuery[i]=='C'){
+							score += treeArr[rootNum][node].posteriornc[positions[i]][1];
+							if ( print_all_nodes == 1){
+								fprintf(site_scores_file,"%lf\n",treeArr[rootNum][node].posteriornc[positions[i]][1]);
+							}
+						}else if (locQuery[i]=='g' || locQuery[i]=='G'){
+							score += treeArr[rootNum][node].posteriornc[positions[i]][2];
+							if ( print_all_nodes == 1){
+								fprintf(site_scores_file,"%lf\n",treeArr[rootNum][node].posteriornc[positions[i]][2]);
+							}
+						}else if (locQuery[i]=='t' || locQuery[i]=='T'){
+							score += treeArr[rootNum][node].posteriornc[positions[i]][3];
+							if ( print_all_nodes == 1){
+								fprintf(site_scores_file,"%lf\n",treeArr[rootNum][node].posteriornc[positions[i]][3]);
+							}
+						}else if (locQuery[i]=='-'){
+							score += log(0.25);
+							if ( print_all_nodes == 1){
+								fprintf(site_scores_file,"%lf\n",log(0.25));
+							}
+						}
 					}
 				}
 			}

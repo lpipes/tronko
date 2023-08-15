@@ -439,8 +439,21 @@ void place_paired( char *query_1, char *query_2, char **rootSeqs, int numberOfTo
 		//assignScores_Arr_paired(topRoots[rootNum],rootArr[topRoots[rootNum]],locQuery, positions, nodeScores, alength);
 		//clock_gettime(CLOCK_MONOTONIC, &tstart);
 		//printf("assignScores_Arr_paired...\n");
-		assignScores_Arr_paired(leaf_coordinates[match][0],rootArr[leaf_coordinates[match][0]],locQuery, positions, nodeScores, alength, match);
+		FILE* site_scores_file;
+		if ( print_all_nodes == 1 && match > 0 && access("site_scores.txt", F_OK ) != -1 ){
+			if (( site_scores_file = fopen("site_scores.txt","a")) == (FILE *) NULL ) fprintf(stderr, "File could not be opened.\n");
+			fprintf(site_scores_file,"%s\t",forward_name);
+		}
+		if ( print_all_nodes == 1 && match > 0 ){
+			if (( site_scores_file = fopen("site_scores.txt","w")) == (FILE *) NULL ) fprintf(stderr, "File could not be opened.\n");
+			fprintf(site_scores_file,"Readname\tSite\tScore\n");
+			fprintf(site_scores_file,"%s\t",forward_name);
+		}
+		assignScores_Arr_paired(leaf_coordinates[match][0],rootArr[leaf_coordinates[match][0]],locQuery, positions, nodeScores, alength, match,print_all_nodes,site_scores_file);
 		//clock_gettime(CLOCK_MONOTONIC, &tend);
+		if ( print_all_nodes == 1){
+			fclose(site_scores_file);
+		}
 		//printf("finished... %.5f\n",((double)tend.tv_sec + 1.0e-9*tend.tv_nsec) - ((double)tstart.tv_sec + 1.0e-9*tstart.tv_nsec));
 		mm_allocator_free(wf_aligner->mm_allocator,pattern_alg);
 		mm_allocator_free(wf_aligner->mm_allocator,ops_alg);
@@ -827,10 +840,18 @@ void place_paired( char *query_1, char *query_2, char **rootSeqs, int numberOfTo
 		//clock_gettime(CLOCK_MONOTONIC, &tstart);
 		//printf("assigningscores to 2nd pair...\n");
 		}
-		assignScores_Arr_paired(leaf_coordinates[match][0],rootArr[leaf_coordinates[match][0]],locQuery,positions,nodeScores,alength,match);
+		FILE* site_scores_file;
+		if ( print_all_nodes == 1 ){
+			if (( site_scores_file = fopen("site_scores.txt","a")) == (FILE *) NULL ) fprintf(stderr, "File could not be opened.\n");
+			fprintf(site_scores_file,"%s\t",reverse_name);
+		}
+		assignScores_Arr_paired(leaf_coordinates[match][0],rootArr[leaf_coordinates[match][0]],locQuery,positions,nodeScores,alength,match,print_all_nodes,site_scores_file);
 		//clock_gettime(CLOCK_MONOTONIC, &tend);
 		//printf("finished... %.5f\n",((double)tend.tv_sec + 1.0e-9*tend.tv_nsec) - ((double)tstart.tv_sec + 1.0e-9*tstart.tv_nsec));
 		//free(leaf_sequence);
+		if ( print_all_nodes == 1 ){
+			fclose(site_scores_file);
+		}
 		mm_allocator_free(wf_aligner->mm_allocator,pattern_alg);
 		mm_allocator_free(wf_aligner->mm_allocator,ops_alg);
 		mm_allocator_free(wf_aligner->mm_allocator,text_alg);
@@ -859,7 +880,9 @@ void place_paired( char *query_1, char *query_2, char **rootSeqs, int numberOfTo
 					minRoot=j;
 					minNode=k;
 				}
-				fprintf(node_scores_file,"%d\t%d\t%lf\n",j,k,nodeScores[i][j][k]);
+				if ( print_all_nodes == 1){
+					fprintf(node_scores_file,"%d\t%d\t%lf\n",j,k,nodeScores[i][j][k]);
+				}
 			}
 		}
 	}
@@ -1271,7 +1294,19 @@ void place_paired_with_nw( char *query_1, char *query_2, char **rootSeqs, int nu
 		//assignScores_Arr_paired(topRoots[rootNum],rootArr[topRoots[rootNum]],locQuery, positions, nodeScores, alength);
 		//clock_gettime(CLOCK_MONOTONIC, &tstart);
 		//printf("assignScores_Arr_paired...\n");
-			assignScores_Arr_paired(leaf_coordinates[match][0],rootArr[leaf_coordinates[match][0]],locQuery, positions, nodeScores, alength, match);
+		FILE* site_scores_file;
+		if ( print_all_nodes == 1 && match > 0 && access("site_scores.txt", F_OK ) != -1 ){
+			if (( site_scores_file = fopen("site_scores.txt","a")) == (FILE *) NULL ) fprintf(stderr, "File could not be opened.\n");
+			fprintf(site_scores_file,"%s\t",forward_name);
+		} else if ( print_all_nodes == 1 && match ==0 ){
+			if (( site_scores_file = fopen("site_scores.txt","w")) == (FILE *) NULL ) fprintf(stderr, "File could not be opened.\n");
+			fprintf(site_scores_file,"Readname\tSite\tScore\n");
+			fprintf(site_scores_file,"%s\t",forward_name);
+		}	
+		assignScores_Arr_paired(leaf_coordinates[match][0],rootArr[leaf_coordinates[match][0]],locQuery, positions, nodeScores, alength, match, print_all_nodes, site_scores_file);
+		if ( print_all_nodes == 1){
+			fclose(site_scores_file);
+		}
 		//clock_gettime(CLOCK_MONOTONIC, &tend);
 		//printf("finished... %.5f\n",((double)tend.tv_sec + 1.0e-9*tend.tv_nsec) - ((double)tstart.tv_sec + 1.0e-9*tstart.tv_nsec));
 	}
@@ -1650,7 +1685,15 @@ void place_paired_with_nw( char *query_1, char *query_2, char **rootSeqs, int nu
 		//clock_gettime(CLOCK_MONOTONIC, &tstart);
 		//printf("assigningscores to 2nd pair...\n");
 		}
-		assignScores_Arr_paired(leaf_coordinates[match][0],rootArr[leaf_coordinates[match][0]],locQuery,positions,nodeScores,alength,match);
+		FILE* site_scores_file;
+		if ( print_all_nodes == 1 ){
+			if (( site_scores_file = fopen("site_scores.txt","a")) == (FILE *) NULL ) fprintf(stderr, "File could not be opened.\n");
+			fprintf(site_scores_file,"%s\t",reverse_name);
+		}
+		assignScores_Arr_paired(leaf_coordinates[match][0],rootArr[leaf_coordinates[match][0]],locQuery,positions,nodeScores,alength,match,print_all_nodes,site_scores_file);
+		if ( print_all_nodes == 1){
+			fclose(site_scores_file);
+		}
 		//clock_gettime(CLOCK_MONOTONIC, &tend);
 		//printf("finished... %.5f\n",((double)tend.tv_sec + 1.0e-9*tend.tv_nsec) - ((double)tstart.tv_sec + 1.0e-9*tstart.tv_nsec));
 		//free(leaf_sequence);
@@ -1677,7 +1720,9 @@ void place_paired_with_nw( char *query_1, char *query_2, char **rootSeqs, int nu
 					minRoot=j;
 					minNode=k;
 				}
-				fprintf(node_scores_file,"%d\t%d\t%lf\n",j,k,nodeScores[i][j][k]);
+				if ( print_all_nodes == 1){
+					fprintf(node_scores_file,"%d\t%d\t%lf\n",j,k,nodeScores[i][j][k]);
+				}
 			}
 		}
 	}
