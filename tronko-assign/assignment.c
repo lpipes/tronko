@@ -21,14 +21,14 @@
 		assignScores_Arr(rootNum, child1, locQuery, positions, scores, alength);
 	}*/
 /*}*/
-void assignScores_Arr_paired( int rootNum, int node, char *locQuery, int *positions, type_of_PP ***scores, int alength, int search_number, int print_all_nodes, FILE* site_scores_file){
+void assignScores_Arr_paired( int rootNum, int node, char *locQuery, int *positions, type_of_PP ***scores, int alength, int search_number, int print_all_nodes, FILE* site_scores_file, char* readname){
 	//if (positions[0]==-1){
 	//	return;
 	//}
 	int child0 = treeArr[rootNum][node].up[0];
 	int child1 = treeArr[rootNum][node].up[1];
 	if (child0 == -1 && child1 == -1){
-		scores[search_number][rootNum][node] += getscore_Arr(alength,node,rootNum,locQuery,positions,print_all_nodes,site_scores_file);
+		scores[search_number][rootNum][node] += getscore_Arr(alength,node,rootNum,locQuery,positions,print_all_nodes,site_scores_file,readname);
 		//scores[search_number][rootNum].nodeNumber = node;
 		//if ( pair == 1 ){
 		//	scores[search_number][rootNum].score1 = getscore_Arr(alength,node,rootNum,locQuery,positions);
@@ -38,7 +38,7 @@ void assignScores_Arr_paired( int rootNum, int node, char *locQuery, int *positi
 		//treeArr[rootNum][node].score += getscore_Arr(alength,node,rootNum,locQuery,positions);
 		//printf("node %d, score %lf, tree %d\n",node,scores[search_number][rootNum][node],rootNum);
 	}else if(child0 != -1 && child1 != -1){
-		scores[search_number][rootNum][node] += getscore_Arr(alength,node,rootNum,locQuery,positions,print_all_nodes,site_scores_file);
+		scores[search_number][rootNum][node] += getscore_Arr(alength,node,rootNum,locQuery,positions,print_all_nodes,site_scores_file,readname);
 		//treeArr[rootNum][node].score += getscore_Arr(alength,node,rootNum,locQuery,positions);
 		//printf("node %d, score %lf, tree %d\n",node,scores[search_number][rootNum][node],rootNum);
 		//scores[search_number][rootNum].nodeNumber = node;
@@ -47,8 +47,8 @@ void assignScores_Arr_paired( int rootNum, int node, char *locQuery, int *positi
 		//}else{
 		//	scores[search_number][rootNum].score2 = getscore_Arr(alength,node,rootNum,locQuery,positions);
 		//}
-		assignScores_Arr_paired(rootNum, child0,locQuery, positions, scores, alength, search_number,print_all_nodes,site_scores_file);
-		assignScores_Arr_paired(rootNum, child1, locQuery, positions,scores,alength, search_number,print_all_nodes,site_scores_file);
+		assignScores_Arr_paired(rootNum, child0,locQuery, positions, scores, alength, search_number,print_all_nodes,site_scores_file,readname);
+		assignScores_Arr_paired(rootNum, child1, locQuery, positions,scores,alength, search_number,print_all_nodes,site_scores_file,readname);
 	}
 	/*if(child1 != -1 ){
 		scores[search_number][rootNum][node] +=  getscore_Arr(alength,node,rootNum,locQuery,positions);
@@ -140,7 +140,7 @@ int checkPolyA(int rootNum, int node, int position){
 	}
 	return isPolyA;
 }
-type_of_PP getscore_Arr(int alength, int node, int rootNum, char *locQuery, int *positions, int print_all_nodes, FILE* site_scores_file){
+type_of_PP getscore_Arr(int alength, int node, int rootNum, char *locQuery, int *positions, int print_all_nodes, FILE* site_scores_file, char* readname){
 	type_of_PP score;
 	int pos, i;
 	i=0;
@@ -154,7 +154,7 @@ type_of_PP getscore_Arr(int alength, int node, int rootNum, char *locQuery, int 
 	for (i=0; i<alength; i++){//We assume that we have already ensured that the sequence only contains a, c, t, and g.  Missing data is not aligned
 		//pos=positions[i];//test if this is faster rather than referencing multiple times.  Compiler optimization may make the latter faster.
 			if ( print_all_nodes == 1){
-				fprintf(site_scores_file,"%d\t",positions[i]);
+				fprintf(site_scores_file,"%s\t%d\t%d\t%d\t",readname,rootNum,node,positions[i]);
 			}
 			if (positions[i]==-1){
 				score=score+log(0.01);

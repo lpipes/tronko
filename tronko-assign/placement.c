@@ -442,14 +442,14 @@ void place_paired( char *query_1, char *query_2, char **rootSeqs, int numberOfTo
 		FILE* site_scores_file;
 		if ( print_all_nodes == 1 && match > 0 && access("site_scores.txt", F_OK ) != -1 ){
 			if (( site_scores_file = fopen("site_scores.txt","a")) == (FILE *) NULL ) fprintf(stderr, "File could not be opened.\n");
-			fprintf(site_scores_file,"%s\t",forward_name);
+			//fprintf(site_scores_file,"%s\t",forward_name);
 		}
 		if ( print_all_nodes == 1 && match > 0 ){
 			if (( site_scores_file = fopen("site_scores.txt","w")) == (FILE *) NULL ) fprintf(stderr, "File could not be opened.\n");
-			fprintf(site_scores_file,"Readname\tSite\tScore\n");
-			fprintf(site_scores_file,"%s\t",forward_name);
+			fprintf(site_scores_file,"Readname\tTree_Number\tNode_Number\tSite\tScore\n");
+			//fprintf(site_scores_file,"%s\t",forward_name);
 		}
-		assignScores_Arr_paired(leaf_coordinates[match][0],rootArr[leaf_coordinates[match][0]],locQuery, positions, nodeScores, alength, match,print_all_nodes,site_scores_file);
+		assignScores_Arr_paired(leaf_coordinates[match][0],rootArr[leaf_coordinates[match][0]],locQuery, positions, nodeScores, alength, match,print_all_nodes,site_scores_file,forward_name);
 		//clock_gettime(CLOCK_MONOTONIC, &tend);
 		if ( print_all_nodes == 1){
 			fclose(site_scores_file);
@@ -843,9 +843,9 @@ void place_paired( char *query_1, char *query_2, char **rootSeqs, int numberOfTo
 		FILE* site_scores_file;
 		if ( print_all_nodes == 1 ){
 			if (( site_scores_file = fopen("site_scores.txt","a")) == (FILE *) NULL ) fprintf(stderr, "File could not be opened.\n");
-			fprintf(site_scores_file,"%s\t",reverse_name);
+			//fprintf(site_scores_file,"%s\t",reverse_name);
 		}
-		assignScores_Arr_paired(leaf_coordinates[match][0],rootArr[leaf_coordinates[match][0]],locQuery,positions,nodeScores,alength,match,print_all_nodes,site_scores_file);
+		assignScores_Arr_paired(leaf_coordinates[match][0],rootArr[leaf_coordinates[match][0]],locQuery,positions,nodeScores,alength,match,print_all_nodes,site_scores_file,reverse_name);
 		//clock_gettime(CLOCK_MONOTONIC, &tend);
 		//printf("finished... %.5f\n",((double)tend.tv_sec + 1.0e-9*tend.tv_nsec) - ((double)tstart.tv_sec + 1.0e-9*tstart.tv_nsec));
 		//free(leaf_sequence);
@@ -1297,13 +1297,13 @@ void place_paired_with_nw( char *query_1, char *query_2, char **rootSeqs, int nu
 		FILE* site_scores_file;
 		if ( print_all_nodes == 1 && match > 0 && access("site_scores.txt", F_OK ) != -1 ){
 			if (( site_scores_file = fopen("site_scores.txt","a")) == (FILE *) NULL ) fprintf(stderr, "File could not be opened.\n");
-			fprintf(site_scores_file,"%s\t",forward_name);
+			//fprintf(site_scores_file,"%s\t",forward_name);
 		} else if ( print_all_nodes == 1 && match ==0 ){
 			if (( site_scores_file = fopen("site_scores.txt","w")) == (FILE *) NULL ) fprintf(stderr, "File could not be opened.\n");
-			fprintf(site_scores_file,"Readname\tSite\tScore\n");
-			fprintf(site_scores_file,"%s\t",forward_name);
+			fprintf(site_scores_file,"Readname\tTree_Number\tNode_Number\tSite\tScore\n");
+			//fprintf(site_scores_file,"%s\t",forward_name);
 		}	
-		assignScores_Arr_paired(leaf_coordinates[match][0],rootArr[leaf_coordinates[match][0]],locQuery, positions, nodeScores, alength, match, print_all_nodes, site_scores_file);
+		assignScores_Arr_paired(leaf_coordinates[match][0],rootArr[leaf_coordinates[match][0]],locQuery, positions, nodeScores, alength, match, print_all_nodes, site_scores_file,forward_name);
 		if ( print_all_nodes == 1){
 			fclose(site_scores_file);
 		}
@@ -1688,9 +1688,9 @@ void place_paired_with_nw( char *query_1, char *query_2, char **rootSeqs, int nu
 		FILE* site_scores_file;
 		if ( print_all_nodes == 1 ){
 			if (( site_scores_file = fopen("site_scores.txt","a")) == (FILE *) NULL ) fprintf(stderr, "File could not be opened.\n");
-			fprintf(site_scores_file,"%s\t",reverse_name);
+			//fprintf(site_scores_file,"%s\t",reverse_name);
 		}
-		assignScores_Arr_paired(leaf_coordinates[match][0],rootArr[leaf_coordinates[match][0]],locQuery,positions,nodeScores,alength,match,print_all_nodes,site_scores_file);
+		assignScores_Arr_paired(leaf_coordinates[match][0],rootArr[leaf_coordinates[match][0]],locQuery,positions,nodeScores,alength,match,print_all_nodes,site_scores_file,reverse_name);
 		if ( print_all_nodes == 1){
 			fclose(site_scores_file);
 		}
