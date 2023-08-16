@@ -1111,15 +1111,15 @@ void place_paired_with_nw( char *query_1, char *query_2, char **rootSeqs, int nu
 			  printf("\n\n");
 			printf("%s\n",forward_name);
 			  printf("query_1\t\t\t\t\t");
-			  for(i=101;i<200;i++){
+			  for(i=100;i<200;i++){
 				  	printf("%c",aln->result_b[i]);
 			  }
 			  printf("\nmatch(%d) root(%d) %s\t\t",match,leaf_coordinates[match][0],treeArr[leaf_coordinates[match][0]][leaf_coordinates[match][1]].name);
-			  for(i=101;i<200;i++){
+			  for(i=100;i<200;i++){
 					printf("%c",aln->result_a[i]);
 			  }
 			  printf("\n\t\t\t\t\t");
-			  for(i=101;i<200;i++){
+			  for(i=100;i<200;i++){
 					  if(aln->result_a[i]==aln->result_b[i] && aln->result_a[i]!='-' && aln->result_b[i]!='-'){
 						  printf("|");
 					  }else if (aln->result_a[i]!='N' && aln->result_b[i]!='-'){
@@ -1131,17 +1131,17 @@ void place_paired_with_nw( char *query_1, char *query_2, char **rootSeqs, int nu
 			  printf("\n\n");
 			printf("%s\n",forward_name);
 			  printf("query_1\t\t\t\t\t");
-			  for(i=201; i<300; i++){
+			  for(i=200; i<300; i++){
 				  if (aln->result_a[i]=='\0'){ break; }
 			  printf("%c",aln->result_b[i]);
 			  }
 			  printf("\nmatch(%d) root(%d) %s\t\t",match,leaf_coordinates[match][0],treeArr[leaf_coordinates[match][0]][leaf_coordinates[match][1]].name);
-			  for(i=201;i<300;i++){
+			  for(i=200;i<300;i++){
 				  if (aln->result_a[i]=='\0'){ break; }
 			  printf("%c",aln->result_a[i]);
 			  }
 			  printf("\n\t\t\t\t\t");
-			  for(i=201;i<300;i++){
+			  for(i=200;i<300;i++){
 				  if (aln->result_a[i]=='\0'){ break; }
 			  if(aln->result_a[i]==aln->result_b[i] && aln->result_a[i]!='-' && aln->result_b[i]!='-'){
 			  printf("|");
@@ -1154,17 +1154,17 @@ void place_paired_with_nw( char *query_1, char *query_2, char **rootSeqs, int nu
 			  printf("\n\n");
 			printf("%s\n",forward_name);
 			  printf("query_1\t\t\t\t\t");
-			  for(i=301; i<400 ; i++){
+			  for(i=300; i<400 ; i++){
 				  if (aln->result_a[i]=='\0'){ break; }
 			  printf("%c",aln->result_b[i]);
 			  }
 			  printf("\nmatch(%d) root(%d) %s\t\t",match,leaf_coordinates[match][0],treeArr[leaf_coordinates[match][0]][leaf_coordinates[match][1]].name);
-			  for(i=301;i<400; i++){
+			  for(i=300;i<400; i++){
 				  if (aln->result_a[i]=='\0'){ break; }
 			  printf("%c",aln->result_a[i]);
 			  }
 			  printf("\n\t\t\t\t\t");
-			  for(i=301;i<400;i++){
+			  for(i=300;i<400;i++){
 				  if (aln->result_a[i]=='\0'){ break; }
 			  if(aln->result_a[i]==aln->result_b[i] && aln->result_a[i]!='-' && aln->result_b[i]!='-'){
 			  printf("|");
