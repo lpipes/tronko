@@ -144,7 +144,32 @@ void assignTaxonomyToLeavesArr(int node,char *tax,struct masterArr *m, int max_n
 	char accessionID[max_nodename];
 	int i;
 	FILE *taxonomy_file;
-	if ( child0 == -1 && child1 == -1 ){
+	for(i=0; i<2*m->numspec-1; i++){
+		if ( i<m->numspec ){
+			m->tree[node].taxIndex[0] = -1;
+			m->tree[node].taxIndex[1] = -1;
+		}else{
+			if (( taxonomy_file = fopen(tax,"r")) == (FILE *) NULL) printf("*** taxonomy file could not be opened.\n");
+			while( fgets(buffer,BUFFER_SIZE,taxonomy_file) != NULL){
+				lineAccession = strtok(buffer,"\t");
+				lineTaxonomy = strtok(NULL,"\n");
+				assert(strlen(lineAccession) <= max_nodename);
+				strncpy(&accessionID[0], lineAccession, max_nodename);
+				if ( strcmp(accessionID,m->tree[node].name)==0 ){
+					m->tree[node].taxIndex[0]=node-m->numspec+1;
+					m->tree[node].taxIndex[1]=0;
+					int j=6;
+					while(j>-1){
+						taxLevelName = strtok_r(lineTaxonomy,";",&lineTaxonomy);
+						strncpy(m->taxonomy[node-m->numspec+1][j], taxLevelName, max_tax_name); 
+						j--;
+					}
+				}
+			}
+			fclose(taxonomy_file);
+		}
+	}
+	/*if ( child0 == -1 && child1 == -1 ){
 		if (( taxonomy_file = fopen(tax,"r")) == (FILE *) NULL) printf("*** taxonomy file could not be opened.\n");
 		while( fgets(buffer,BUFFER_SIZE,taxonomy_file) != NULL){
 			lineAccession = strtok(buffer,"\t");
@@ -173,7 +198,7 @@ void assignTaxonomyToLeavesArr(int node,char *tax,struct masterArr *m, int max_n
 	}
 	if(child1 != -1){
 		assignTaxonomyToLeavesArr(child1,tax,m,max_nodename,max_tax_name);
-	}
+	}*/
 }
 int* getTaxonomyArr(int node, struct masterArr *m){
 	int* taxIndexA = NULL;
