@@ -107,7 +107,7 @@ int specsearchArr(FILE *tre, struct masterArr *m, int max_node_name){
 	if ((ch!=')')&&(ch!='(')&&(ch!=',')&&(ch!=' ')&&(ch!='\t')&&(ch!='\n')&&(ch!=EOF)){
 		ungetc(ch, tre);
 		while ((ch=fgetc(tre))!=':'&&(i<max_node_name)){
-			if ( isalpha(ch) || isdigit(ch) || ch=='.' || ch=='_' || ch=='/' || ch=='-' || ch=='|' || ch=='?' || ch=='*' || ch=='&' || ch=='+' || ch=='#' || ch==''' ){
+			if ( isalpha(ch) || isdigit(ch) || ch=='.' || ch=='_' || ch=='/' || ch=='-' || ch=='|' || ch=='?' || ch=='*' || ch=='&' || ch=='+' || ch=='#' || ch=="'" ){
 				specname[i]=ch;	
 				i++;
 			}
