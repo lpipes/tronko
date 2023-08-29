@@ -133,9 +133,9 @@ void findMaxTaxName(FILE* file, int* specs){
 		specs[1] = max_line;
 	}
 }
-void assignTaxonomyToLeavesArr(int node,char *tax,struct masterArr *m, int max_nodename, int max_tax_name){
-	int child0 = m->tree[node].up[0];
-	int child1 = m->tree[node].up[1];
+void assignTaxonomyToLeavesArr(char *tax,struct masterArr *m, int max_nodename, int max_tax_name){
+	//int child0 = m->tree[node].up[0];
+	//int child1 = m->tree[node].up[1];
 	char buffer[BUFFER_SIZE];
 	char *s;
 	char *lineAccession, *lineTaxonomy, *taxLevelName;
@@ -145,9 +145,9 @@ void assignTaxonomyToLeavesArr(int node,char *tax,struct masterArr *m, int max_n
 	int i;
 	FILE *taxonomy_file;
 	for(i=0; i<2*m->numspec-1; i++){
-		if ( i<m->numspec ){
-			m->tree[node].taxIndex[0] = -1;
-			m->tree[node].taxIndex[1] = -1;
+		if ( i<m->numspec - 1){
+			m->tree[i].taxIndex[0] = -1;
+			m->tree[i].taxIndex[1] = -1;
 		}else{
 			if (( taxonomy_file = fopen(tax,"r")) == (FILE *) NULL) printf("*** taxonomy file could not be opened.\n");
 			while( fgets(buffer,BUFFER_SIZE,taxonomy_file) != NULL){
@@ -155,13 +155,13 @@ void assignTaxonomyToLeavesArr(int node,char *tax,struct masterArr *m, int max_n
 				lineTaxonomy = strtok(NULL,"\n");
 				assert(strlen(lineAccession) <= max_nodename);
 				strncpy(&accessionID[0], lineAccession, max_nodename);
-				if ( strcmp(accessionID,m->tree[node].name)==0 ){
-					m->tree[node].taxIndex[0]=node-m->numspec+1;
-					m->tree[node].taxIndex[1]=0;
+				if ( strcmp(accessionID,m->tree[i].name)==0 ){
+					m->tree[i].taxIndex[0]=i-m->numspec+1;
+					m->tree[i].taxIndex[1]=0;
 					int j=6;
 					while(j>-1){
 						taxLevelName = strtok_r(lineTaxonomy,";",&lineTaxonomy);
-						strncpy(m->taxonomy[node-m->numspec+1][j], taxLevelName, max_tax_name); 
+						strncpy(m->taxonomy[i-m->numspec+1][j], taxLevelName, max_tax_name); 
 						j--;
 					}
 				}
@@ -698,7 +698,7 @@ void createNewRoots(int rootCount, Options opt, int max_nodename, int max_lineTa
 				t->taxonomy[j][k] = (char *)calloc_check(max_lineTaxonomy, sizeof(char));
 			}
 		}
-		assignTaxonomyToLeavesArr(t->root,buf,t,max_nodename,max_lineTaxonomy);
+		assignTaxonomyToLeavesArr(buf,t,max_nodename,max_lineTaxonomy);
 		getTaxonomyArr(t->root,t);
 		hashmap_put(&mastermap, t->index, t);
 		double initialSPscore=-1;
@@ -889,7 +889,7 @@ int main(int argc, char **argv){
 				m->taxonomy[j][k] = (char *)calloc_check(max_lineTaxonomy, sizeof(char));
 			}
 		}
-		assignTaxonomyToLeavesArr(m->root,opt.taxonomy_file,m,max_nodename,max_tax_name);
+		assignTaxonomyToLeavesArr(opt.taxonomy_file,m,max_nodename,max_tax_name);
 		getTaxonomyArr(m->root,m);
 		hashmap_put(&mastermap,m->index,m);
 		/*treeArr = malloc(sizeof(node*));
@@ -1018,7 +1018,7 @@ int main(int argc, char **argv){
 					m->taxonomy[j][k] = (char *)calloc_check(max_lineTaxonomy, sizeof(char));
 				}
 			}
-			assignTaxonomyToLeavesArr(m->root,buffer,m,max_nodename,max_lineTaxonomy);
+			assignTaxonomyToLeavesArr(buffer,m,max_nodename,max_lineTaxonomy);
 			getTaxonomyArr(m->root,m);
 			hashmap_put(&mastermap, m->index, m);
 			if ( opt.use_partitions==1 && m->numspec > opt.min_leaves ){
