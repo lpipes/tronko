@@ -138,7 +138,7 @@ int specsearchArr_UsePartitions(FILE *tre, int whichPartitions, char*** nodeIDsA
 	if ((ch!=')')&&(ch!='(')&&(ch!=',')&&(ch!=' ')&&(ch!='\t')&&(ch!='\n')&&(ch!=EOF)){
 		ungetc(ch, tre);
 		while ((ch=fgetc(tre))!=':'&&(i<30)){
-			if ( isalpha(ch) || isdigit(ch) || ch=='.' || ch=='_'){
+			if ( isalpha(ch) || isdigit(ch) || ch=='.' || ch=='_' || ch=='/' || ch=='-' || ch=='|' || ch=='?' || ch=='*' || ch=='&' || ch=='+' || ch=='#' || ch=="'" ){
 				specname[i]=ch;	
 				i++;
 			}
