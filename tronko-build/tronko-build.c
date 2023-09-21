@@ -822,6 +822,10 @@ int main(int argc, char **argv){
 	printf("pass\n");
 	exit(1);*/
 	hashmap_init(&mastermap,hashmap_hash_string,strcmp);
+	if ( opt.use_partitions==1 && opt.number_of_trees==0 ){
+		printf("Please specify the number of partitions with -n\n");
+		exit(1);
+	}
 	if (opt.number_of_trees==1 && opt.use_partitions==0){
 		printf("Using a single tree... \n");
 		numberOfTrees=1;
