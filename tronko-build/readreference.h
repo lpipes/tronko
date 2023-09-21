@@ -13,6 +13,8 @@
 #include <string.h>
 #include <dirent.h>
 #include <regex.h>
+int compare_strings(const void* a, const void* b);
+int compare_natural(const void *a, const void *b);
 void readFilesInDir(char *directory, int number_of_partitions, partition_files *pf);
 int readInXNumberOfLines(int numberOfLinesToRead, gzFile query_reads, int whichPair);
 int countLinesInFile(FILE *queryFile);
