@@ -130,6 +130,7 @@ typedef struct masterArr{
 	int root;
 	int numbase;
 	char **names;
+	char *filename;
 }masterArr;
 //extern node *treeArr[MAX_NUMBEROFROOTS];
 extern node **treeArr;

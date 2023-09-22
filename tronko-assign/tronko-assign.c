@@ -752,6 +752,7 @@ int main(int argc, char **argv){
 	opt.print_node_info[0] = '\0';
 	opt.results_file[0] = '\0';
 	opt.reference_file[0] = '\0';
+	opt.print_trees_dir[0] = '\0';
 	opt.fastq=0; //default is FASTA
 	opt.unassigned=0; //don't print unassigned sequences
 	opt.print_alignments_to_file=0; //don't print alignments to file
@@ -791,6 +792,18 @@ int main(int argc, char **argv){
 		fclose(tree_info);
 		exit(1);
 	}
+	/*if (opt.print_trees_dir[0] = '\0' ){
+		printf("Printing Newick trees used for assignment...\n");
+		char newickbuffer[3000];
+		for(i=0; i<numberOfTrees; i++){
+			FILE *newick_out;
+			snprintf(buffer,3000,"%s/%s.nwk",opt.print_trees_dir,i);
+			if (NULL==(newick_out=fopen(buffer,"w"))){ puts("Cannot open newick file!\n"); exit(-1); }
+			printNewick(newick_out,i,rootArr[i]);
+			fclose(newick_out);
+		}
+		exit(1);
+	}*/
 	opt.print_leave_seqs=0;
 	if (opt.print_leave_seqs == 1){
 		printf("Printingleavesfile\n");

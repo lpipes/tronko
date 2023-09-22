@@ -553,6 +553,7 @@ void createNewRoots(int rootCount, Options opt, int max_nodename, int max_lineTa
 	free(m->msa);
 	free(m->names);
 	free(m->tree);
+	free(m->filename);
 	hashmap_remove(&mastermap,m->index);
 	free(m);
 	rootCount=partitionCount;
@@ -663,6 +664,10 @@ void createNewRoots(int rootCount, Options opt, int max_nodename, int max_lineTa
 		printf("buffer: %s\n",buf);
 		struct masterArr *t=malloc(sizeof(masterArr));;
 		//itoa(which-1,t->index,10);
+		t->filename = (malloc)(300*sizeof(char));
+		for(i=0; i<300; i++){
+			t->filename[i] = '\0';
+		}
 		sprintf(t->index,"%d",which-1);
 		if (NULL==(partition=fopen(buf,"r"))){ puts("Cannot open partition file 1!"); exit(-1);}
 		t->numspec=setNumspecArr(partition);
@@ -679,6 +684,7 @@ void createNewRoots(int rootCount, Options opt, int max_nodename, int max_lineTa
 		fclose(partition);
 		allocateTreeArrMemory(t,max_nodename);
 		snprintf(buf,BUFFER_SIZE,"%s/RAxML_bestTree.partition%d.reroot",opt.partitions_directory,which);
+		strcpy(t->filename,buf);
 		if (NULL==(partitionTree=fopen(buf,"r"))){ puts("Cannot open partition tree file!"); exit(-1);}
 		comma=0;
 		tip=0;
@@ -823,10 +829,6 @@ int main(int argc, char **argv){
 	printf("pass\n");
 	exit(1);*/
 	hashmap_init(&mastermap,hashmap_hash_string,strcmp);
-	if ( opt.use_partitions==1 && opt.number_of_partitions==0 ){
-		printf("Please specify the number of partitions with -n\n");
-		exit(1);
-	}
 	if (opt.number_of_trees==1 && opt.use_partitions==0){
 		printf("Using a single tree... \n");
 		numberOfTrees=1;
@@ -996,6 +998,10 @@ int main(int argc, char **argv){
 			m->msa=(int**)malloc(m->numspec*sizeof(int*));
 			m->taxonomy=(char***)malloc(m->numspec*sizeof(char**));
 			m->names=(char**)malloc(m->numspec*sizeof(char*));
+			m->filename = (malloc)(300*sizeof(char));
+			for(j=0; j<300; j++){
+				m->filename[j] = '\0';
+			}
 			for(j=0;j<m->numspec;j++){
 				m->names[j]=(char*)malloc(sizeof(char)*(max_nodename+1));
 			}
@@ -1004,6 +1010,7 @@ int main(int argc, char **argv){
 			fclose(partition);
 			allocateTreeArrMemory(m,max_nodename);
 			snprintf(buffer,BUFFER_SIZE,"%s/%s",opt.readdir,pf->tree_files[i]);
+			strcpy(m->filename,buffer);
 			if (( partitionTree = fopen(buffer,"r")) == (FILE *) NULL) printf("*** tree file could not be opened.\n");
 			comma=0;
 			tip=0;
@@ -1047,6 +1054,10 @@ int main(int argc, char **argv){
 	numspecArr = (int*)malloc(numberOfTrees*sizeof(int));
 	rootArr = (int*)malloc(numberOfTrees*sizeof(int));
 	int index=0;
+	char newick_buf[BUFFER_SIZE];
+	snprintf(newick_buf,BUFFER_SIZE,"%s/tree_list.txt",opt.partitions_directory);
+	FILE* list_newick_files = fopen(newick_buf,"w");
+	if ( list_newick_files == NULL ){ printf("Error opening list.txt file!\n"); exit(1); }
 	hashmap_foreach(key,final,&mastermap){
 		treeArr[index] = final->tree;
 		taxonomyArr[index] =  final->taxonomy;
@@ -1056,7 +1067,9 @@ int main(int argc, char **argv){
 		rootArr[index] = final->root;
 		//printtreeArr(index);
 		index++;
+		fprintf(list_newick_files,"%s\n",final->filename);
 	}
+	fclose(list_newick_files);
 	allocatetreememory_for_nucleotide_Arr(numberOfTrees);
 	for(i=0; i<numberOfTrees; i++){
 		estimatenucparameters_Arr(parameters,i);

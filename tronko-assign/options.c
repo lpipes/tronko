@@ -134,9 +134,9 @@ void parse_options(int argc, char **argv, Options *opt){
 					fprintf(stderr, "Could not read score constant\n");
 				break;
 			case 't':
-				success = sscanf(optarg, "%s", opt->tree_file);
+				success = sscanf(optarg, "%s", opt->print_trees_dir);
 				if (!success)
-					fprintf(stderr, "Invalid tree file.\n");
+					fprintf(stderr, "Invalid directory to print Newick trees.\n");
 				break;
 			case 'm':
 				success = sscanf(optarg, "%s", opt->msa_file);

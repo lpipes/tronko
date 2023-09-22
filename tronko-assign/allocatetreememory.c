@@ -87,3 +87,21 @@ void getReverseComplement(char *read, char *reverseComplement, int max_query_len
 	}
 	reverseComplement[length]='\0';
 }
+/*void printNewick(FILE* file, int whichRoot, int idx) {
+    if (idx == -1) return;
+
+    node current = treeArr[whichRoot][idx];
+
+    // If this is a leaf node
+    if (current.up[0] == -1 && current.up[1] == -1) {
+        fprintf(file, "%s", current.name);
+    } else {
+        fprintf(file,"(");
+        printNewick(file,whichRoot, current.up[0]);
+        fprintf(file,",");
+        printNewick(file,whichRoot, current.up[1]);
+        fprintf(file,")");
+    }
+
+    fprintf(file,":%.4f", current.bl); // Assuming 4 decimal places for branch length
+}*/

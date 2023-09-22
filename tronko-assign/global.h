@@ -156,6 +156,7 @@ typedef struct Options{
 	char fasta_file[200];
 	double cinterval;
 	char readdir[2000];
+	char print_trees_dir[2000];
 	int number_of_partitions;
 	int reverse_single_read;
 	int reverse_second_of_paired_read;
