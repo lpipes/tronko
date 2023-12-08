@@ -777,11 +777,20 @@ int main(int argc, char **argv){
 	name_specs[1]=0;
 	name_specs[2]=0;
 	numberOfTrees = readReferenceTree(referenceTree,name_specs);
-	gzclose(referenceTree);
 	int max_nodename = name_specs[0];
 	int max_taxname = name_specs[1];
 	int max_lineTaxonomy = name_specs[2];
 	free(name_specs);
+	char* big_buffer = malloc(BIG_BUFFER);
+	char partialLine[BIG_BUFFER] = "";
+	int bytesRead;
+	ParserState state = {0, 0, 0, 0};
+	while((bytesRead = gzread(referenceTree, big_buffer, BIG_BUFFER - 1)) > 0 ){
+		big_buffer[bytesRead] = '\0';
+		processBuffer(big_buffer, max_nodename, partialLine, &state);
+	}
+	gzclose(referenceTree);
+	free(big_buffer);
 	if ( opt.print_node_info[0] != '\0' ){
 		printf("Printing Accession IDs, Tree numbers, and leaf numbers...\n");
 		FILE* tree_info = fopen(opt.print_node_info,"w");

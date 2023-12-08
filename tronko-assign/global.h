@@ -22,6 +22,7 @@
 #define MAXTAXLENGTHNAME 256
 #define MAXFILENAME 1000
 #define BUFFER_SIZE 1000
+#define BIG_BUFFER 409600
 //extern FILE *infile, *outfile, *treefile;
 //extern int numspec, numbase, root/*, **seq, numundspec[MAXNUMBEROFINDINSPECIES+1]*/;
 extern int *rootArr, *numspecArr, *numbaseArr;
@@ -55,6 +56,13 @@ typedef struct leafMap{
 	int root;
 	int node;
 }leafMap;
+typedef struct ParserState{
+	int treeNumber;
+	int nodeNumber;
+	int i; // position in numbase
+	int isIncompleteLine;
+} ParserState;
+
 typedef struct queryMatPaired{
 	char **query1Mat;
 	char **query2Mat;

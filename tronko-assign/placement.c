@@ -77,6 +77,23 @@ void place_paired( char *query_1, char *query_2, char **rootSeqs, int numberOfTo
 	//attributes.alignment_form.pattern_end_free = 300;
 	//attributes.alignment_form.text_begin_free = 50;
 	//attributes.alignment_form.text_end_free = 50;
+	/* smarco edits */
+	  // Configure alignment attributes
+  //wavefront_aligner_attr_t attributes = wavefront_aligner_attr_default;
+  attributes.distance_metric = gap_affine;
+  attributes.affine_penalties.match = -1;
+  attributes.affine_penalties.mismatch = 4;
+  attributes.affine_penalties.gap_opening = 6;
+  attributes.affine_penalties.gap_extension = 2;
+
+  attributes.alignment_form.span = alignment_endsfree;
+  attributes.alignment_form.pattern_begin_free = 0;
+  attributes.alignment_form.pattern_end_free = 0;
+  //attributes.alignment_form.text_begin_free = strlen(text);
+  //attributes.alignment_form.text_end_free = strlen(text);
+  	/* smarco edits*/
+	
+	
 	for(match=0; match<number_of_matches; match++){
 		if (use_leaf_portion==1){
 			for(i=0; i<max_query_length+max_query_length+2*padding+1;i++){
@@ -106,6 +123,8 @@ void place_paired( char *query_1, char *query_2, char **rootSeqs, int numberOfTo
 			getSequenceInNodeWithoutNs(leaf_coordinates[match][0],leaf_coordinates[match][1],leaf_sequence,positionsInRoot,0,numbaseArr[leaf_coordinates[match][0]]);
 		}
 		int leaf_length = strlen(leaf_sequence);
+  attributes.alignment_form.text_begin_free = query_length;
+  attributes.alignment_form.text_end_free = query_length;
 		if (leaf_length > 0){
 		/*mm_allocator_t* mm_allocator = mm_allocator_new(BUFFER_SIZE_8M);
 		affine_wavefronts_t* affine_wavefronts;
