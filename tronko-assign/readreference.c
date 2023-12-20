@@ -308,107 +308,6 @@ void shiftUp(int iter, int jump, int numberOfLinesToRead){
 		memset(pairedQueryMat->forward_name[i],'\0',MAXREADNAME);
 	}
 }
-void processBuffer(char *buffer, int max_nodename, char *partialLine, ParserState *state) {
-    char *start = buffer;
-    char *end = NULL;
-    char *line = NULL;
-    int nodeNumber = state->nodeNumber;
-    int treeNumber = state->treeNumber;
-    char nodeName[max_nodename+1];
-    int i;
-	//printf("Inside processBuffer, received tree at %p\n", (void *)tree);
-    if (partialLine[0] != '\0') {
-        strcat(partialLine, buffer);
-        start = strstr(partialLine, "\n");
-        if (start) {
-            *start = '\0';
-            start++;
-            line = partialLine;
-        	        if (!state->isIncompleteLine) {
-                int treeNumber, nodeNumber, parent, depth;
-		int up[2], taxIndex[2];
-		sscanf(line, "%d %d %d %d %d %d %d %d %s",&treeNumber, &nodeNumber, &(up[0]), &(up[1]), &parent, &depth, &(taxIndex[0]), &(taxIndex[1]), nodeName);
-
-                treeArr[treeNumber][nodeNumber].up[0] = up[0];
-                treeArr[treeNumber][nodeNumber].up[1] = up[1];
-		if ( up[0] == -1 && up[1] == -1 ){
-			treeArr[treeNumber][nodeNumber].name = (malloc)(max_nodename*sizeof(char));
-			for(i=0; i<max_nodename; i++){
-				treeArr[treeNumber][nodeNumber].name[i] = '\0';
-			}
-			strcpy(treeArr[treeNumber][nodeNumber].name,nodeName);
-		}
-                treeArr[treeNumber][nodeNumber].taxIndex[0] = taxIndex[0];
-		treeArr[treeNumber][nodeNumber].taxIndex[1] = taxIndex[1];
-		treeArr[treeNumber][nodeNumber].down = parent;
-                treeArr[treeNumber][nodeNumber].depth = depth;
-		state->treeNumber = treeNumber;
-                state->nodeNumber = nodeNumber;
-                state->i = 0;
-                state->isIncompleteLine = 1;
-        }else{
-                           sscanf(line, "%lf\t%lf\t%lf\t%lf",
-                   &treeArr[state->treeNumber][state->nodeNumber].posteriornc[state->i][0],
-                   &treeArr[state->treeNumber][state->nodeNumber].posteriornc[state->i][1],
-                   &treeArr[state->treeNumber][state->nodeNumber].posteriornc[state->i][2],
-                   &treeArr[state->treeNumber][state->nodeNumber].posteriornc[state->i][3]);
-            state->i++;
-                if (state->i >= numbaseArr[state->treeNumber]) {
-                        state->isIncompleteLine = 0;
-                        state->i=0;
-                }
-        }
-	} else {
-            // If '\n' is still not found, the line continues in the next chunk
-            return;
-        }
-    }
-    
-    while (start && (end = strstr(start, "\n"))) {
-        *end = '\0';
-        line = start;
-        start = end + 1;
-
-	if (!state->isIncompleteLine) {
-        	int treeNumber, nodeNumber, parent, depth;
-		int up[2], taxIndex[2];
-		sscanf(line, "%d %d %d %d %d %d %d %d %s",&treeNumber, &nodeNumber, &(up[0]), &(up[1]), &parent, &depth, &(taxIndex[0]), &(taxIndex[1]), nodeName);
-        	
-        	treeArr[treeNumber][nodeNumber].up[0] = up[0];
-        	treeArr[treeNumber][nodeNumber].up[1] = up[1];
-        	treeArr[treeNumber][nodeNumber].down = parent;
-        	treeArr[treeNumber][nodeNumber].depth = depth;
-		if ( up[0] == -1 && up[1] == -1 ){
-			treeArr[treeNumber][nodeNumber].name=(malloc)(max_nodename*sizeof(char));
-			for(i=0; i<max_nodename; i++){
-				treeArr[treeNumber][nodeNumber].name[i] = '\0';
-			}
-			strcpy(treeArr[treeNumber][nodeNumber].name,nodeName);
-		}
-                treeArr[treeNumber][nodeNumber].taxIndex[0] = taxIndex[0];
-		treeArr[treeNumber][nodeNumber].taxIndex[1] = taxIndex[1];
-		state->treeNumber = treeNumber;
-		state->nodeNumber = nodeNumber;
-		state->i = 0;
-		state->isIncompleteLine = 1;
-	}else{
-		           sscanf(line, "%lf\t%lf\t%lf\t%lf",
-                   &treeArr[state->treeNumber][state->nodeNumber].posteriornc[state->i][0],
-                   &treeArr[state->treeNumber][state->nodeNumber].posteriornc[state->i][1],
-                   &treeArr[state->treeNumber][state->nodeNumber].posteriornc[state->i][2],
-                   &treeArr[state->treeNumber][state->nodeNumber].posteriornc[state->i][3]);
-            state->i++;
-		if (state->i >= numbaseArr[state->treeNumber]) {
-			state->isIncompleteLine = 0;
-			state->i=0;
-		}
-	}
-    }
-
-    if (start) {
-        strcpy(partialLine, start);
-    }
-}
 int readReferenceTree( gzFile referenceTree, int* name_specs){
 	char buffer[BUFFER_SIZE];
 	char acc_name[30];
@@ -417,7 +316,7 @@ int readReferenceTree( gzFile referenceTree, int* name_specs){
 	int max_lineTaxonomy, max_tax_name, max_nodename, treeNumber, nodeNumber, down, depth, success, i, j, k, firstIter, numberOfTrees;
 	firstIter = 1;
 	char* refTreeFlag = buffer;
-	while (refTreeFlag != NULL && firstIter==1){
+	while (refTreeFlag != NULL ){
 		if ( firstIter == 1 ){
 			refTreeFlag = gzgets(referenceTree,buffer,BUFFER_SIZE);
 			if(refTreeFlag == NULL) {
@@ -496,8 +395,7 @@ int readReferenceTree( gzFile referenceTree, int* name_specs){
 			//allocatetreememory_for_nucleotide_Arr(numberOfTrees);
 			firstIter=0;
 		}
-	}
-		/*refTreeFlag = gzgets(referenceTree,buffer,BUFFER_SIZE);
+		refTreeFlag = gzgets(referenceTree,buffer,BUFFER_SIZE);
 		if (refTreeFlag == NULL){
 			break;
 		}
@@ -530,7 +428,7 @@ int readReferenceTree( gzFile referenceTree, int* name_specs){
 				}
 			}
 		}
-	}*/
+	}
 	return numberOfTrees;
 }
 int setNumbase_setNumspec(int numberOfPartitions, int* specs){
