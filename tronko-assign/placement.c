@@ -1083,7 +1083,7 @@ void place_paired_with_nw( char *query_1, char *query_2, char **rootSeqs, int nu
 			if ( access(alignmentFileName, F_OK ) != -1 ){
 				printToFile2(treeArr[leaf_coordinates[match][0]][leaf_coordinates[match][1]].name, alignments_dir, aln, forward_name, query_length, positionsInRoot);
 			}else{
-				createNewFile2(treeArr[leaf_coordinates[match][0]][leaf_coordinates[match][1]].name, alignments_dir, aln, forward_name, query_length);
+				createNewFile2(treeArr[leaf_coordinates[match][0]][leaf_coordinates[match][1]].name, alignments_dir, aln, forward_name, query_length, positionsInRoot);
 			}
 		}
 		if (print_alignments==1){
@@ -1472,7 +1472,7 @@ void place_paired_with_nw( char *query_1, char *query_2, char **rootSeqs, int nu
 			if ( access(alignmentFileName, F_OK ) != -1 ){
 				printToFile2(treeArr[leaf_coordinates[match][0]][leaf_coordinates[match][1]].name, alignments_dir, aln, reverse_name, query_length, positionsInRoot);
 			}else{
-				createNewFile2(treeArr[leaf_coordinates[match][0]][leaf_coordinates[match][1]].name, alignments_dir, aln, reverse_name, query_length);
+				createNewFile2(treeArr[leaf_coordinates[match][0]][leaf_coordinates[match][1]].name, alignments_dir, aln, reverse_name, query_length, positionsInRoot);
 			}
 		}
 		if (print_alignments==1){

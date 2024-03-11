@@ -51,7 +51,7 @@ void printToFile (char *referenceName, char *alignments_directory, alignment_t *
 	fprintf(alignmentFile,"\n");
 	fclose(alignmentFile);
 }
-void createNewFile2( char *referenceName, char *alignments_directory, alignment_t *aln, char *readname, int length_of_read){
+void createNewFile2( char *referenceName, char *alignments_directory, alignment_t *aln, char *readname, int length_of_read, int* positionsInRoot){
 	FILE *alignmentFile;
 	char fileName[1000];
 	snprintf(fileName,1000,"%s/%s.fasta",alignments_directory, referenceName);	
@@ -79,9 +79,9 @@ void createNewFile2( char *referenceName, char *alignments_directory, alignment_
 		if ( aln->result_b[counter]!='-'){
 			if (aln->result_a[counter]!='-'){
 				if ( iter != 0 ){
-					fprintf(alignmentFile,";%d",counter-offset);
+					fprintf(alignmentFile,";%d",positionsInRoot[counter-offset]);
 				}else{
-					fprintf(alignmentFile,"%d",counter-offset);
+					fprintf(alignmentFile,"%d",positionsInRoot[counter-offset]);
 					iter=1;
 				}
 			}else{
