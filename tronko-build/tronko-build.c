@@ -566,18 +566,20 @@ void createNewRoots(int rootCount, Options opt, int max_nodename, int max_lineTa
 			int ret = 1;
 			char buf3[BUFFER_SIZE];	
 			char buf2[BUFFER_SIZE];
+			char famsa_threads[BUFFER_SIZE];
 			snprintf(buf2,BUFFER_SIZE,"%s/partition%d.fasta",opt.partitions_directory,which);
 			//printf("buf2 is %s\n",buf2);
 			snprintf(buf3,BUFFER_SIZE,"%s/partition%d_MSA.fasta",opt.partitions_directory,which);
 			//printf("buf3 is %s\n",buf3);
+			snprintf(famsa_threads,BUFFER_SIZE,"-t %d",opt.famsa_threads);
 			pid=fork();
 			if (pid==-1){
 			//pid==-1 means error occured
 				printf("can't fork, error occured\n");
 			}else if (pid==0){
 				//printf("child process, pid = %u\n",getpid());
-				char *arguments[] = {"famsa",buf2,buf3,NULL};
-				printf("ARGUMENTS: %s %s %s\n",arguments[0],arguments[1],arguments[2]);
+				char *arguments[] = {"famsa",famsa_threads,buf2,buf3,NULL};
+				printf("ARGUMENTS: %s %s %s %s\n",arguments[0],arguments[1],arguments[2],arguments[3]);
 				execvp("famsa",arguments);
 				exit(0);
 			}else{
@@ -809,6 +811,7 @@ int main(int argc, char **argv){
 	opt.restart = 0;
 	opt.number_of_partitions = 0;
 	opt.number_of_trees = 0;
+	opt.famsa_threads = 1;
 	int i, j, k, numberOfTrees;
 	for(i=0; i<200; i++){
 		opt.partitions_directory[i] = '\0';

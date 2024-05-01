@@ -119,6 +119,7 @@ typedef struct Options{
 	int restart;
 	char rmrefdir[2000];
 	int missing_data;
+	int famsa_threads;
 }Options;
 
 typedef struct masterArr{

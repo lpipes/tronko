@@ -17,6 +17,7 @@ static struct Options long_options[]=
 	{"use-spscore", no_argument, 0, 's'},
 	{"use-minleaves", no_argument, 0, 'v'},
 	{"no-change-missingdata", no_argument, 0, 'g'},
+	{"famsa-threads", required_argument, 0, 'c'},
 };
 
 char usage[] = "\ntronko-build [OPTIONS] -d [OUTPUT DIRECTORY]\n\
@@ -36,6 +37,7 @@ char usage[] = "\ntronko-build [OPTIONS] -d [OUTPUT DIRECTORY]\n\
 	-v, compatible only with -y, partition using minimum number of leaf nodes [can't use with -s, use with -f]\n\
 	-f [INT], don't partition less than the minimum number of leaf nodes [can't use with -s, use with -v, use only with -y]\n\
 	-g, don't flag missing data\n\
+	-c, [INT] Number of FAMSA threads to use (0 means use all threads) [default: 1]\n\
 	\n";
 
 void print_help_statement(){
@@ -138,9 +140,9 @@ void parse_options(int argc, char **argv, Options *opt){
 					fprintf(stderr, "Invalid fasta file.\n");
 				break;
 			case 'c':
-				success = sscanf(optarg, "%lf", &(opt->cinterval));
+				success = sscanf(optarg, "%d", &(opt->famsa_threads));
 				if (!success)
-					fprintf(stderr, "Invalid interval\n");
+					fprintf(stderr, "Invalid int\n");
 				break;
 			case 'e':
 				success = sscanf(optarg, "%s", opt->readdir);
