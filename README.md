@@ -14,7 +14,7 @@ Alignment-based and composition-based assignment methods calculate the lowest co
 	tronko-build [OPTIONS] -d [OUTPUT DIRECTORY]
 	
 		-h, usage:
-		-d [DIRECTORY], REQUIRED, output directory
+		-d [DIRECTORY], REQUIRED, full path to output directory
 		-y, use a partition directory (you want to partition or you have multiple clusters)
 		-l, use only single tree (do not partition)
 		-t [FILE], compatible only with -l, rooted phylogenetic tree [FILE: Newick]
@@ -116,7 +116,7 @@ tronko-assign -r -f [tronko-build REFERENCE DB FILE] -s -g [READS FASTA] -a [REF
 
 ## `tronko-build` Simple Usage (using 1 phylogenetic tree)
 ```
-tronko-build -l -t [Rooted Newick Tree] -m [Multiple Sequence Alignment FASTA] -x [TAXONOMY FILE] -d [OUTPUT DIRECTORY] 
+tronko-build -l -t [Rooted Newick Tree] -m [Multiple Sequence Alignment FASTA] -x [TAXONOMY FILE] -d [FULL PATH TO OUTPUT DIRECTORY] 
 ```
 The taxonomy file is a `.txt` file that has the following format:
 ```
@@ -137,7 +137,7 @@ An example dataset for multiple trees is provided in `tronko-build/example_datas
 tronko-build -y -e tronko-build/example_datasets/multiple_trees/one_MSA -n 1 -d [FULL PATH TO OUTPUT DIRECTORY] -s
 ```
 
-An example dataset to not partition multiple tree is provided in `tronko-build/example_datasets/multiple_trees/multiple_MSA`. The dataset include 99 COI sequences from different species. To build the reference database and not partition the database, set the `-f` parameter higher than the number of sequences in the dataset. Run `tronko-build` with the following command:
+An example dataset to not partition multiple tree is provided in `tronko-build/example_datasets/multiple_trees/multiple_MSA`. The dataset include 99 COI sequences from different species. To build the reference database and not partition the database, set the `-f` parameter higher than the number of sequences in the dataset. Run `tronko-build` with the following command [Make sure `-d` is supplied with the full path to the output directory]:
 ```
 tronko-build -y -e tronko-build/example_datasets/multiple_trees/multiple_MSA -n 5 -d outdir_multiple_MSA -v -f 500
 ```

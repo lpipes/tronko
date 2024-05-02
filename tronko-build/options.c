@@ -23,7 +23,7 @@ static struct Options long_options[]=
 char usage[] = "\ntronko-build [OPTIONS] -d [OUTPUT DIRECTORY]\n\
 	\n\
 	-h, usage:\n\
-	-d [DIRECTORY], REQUIRED, output directory\n\
+	-d [DIRECTORY], REQUIRED, full path to output directory\n\
 	-y, use a partition directory (you want to partition or you have multiple clusters)\n\
 	-l, use only single tree (do not partition)\n\
 	-t [FILE], compatible only with -l, rooted phylogenetic tree [FILE: Newick]\n\

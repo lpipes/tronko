@@ -571,15 +571,17 @@ void createNewRoots(int rootCount, Options opt, int max_nodename, int max_lineTa
 			//printf("buf2 is %s\n",buf2);
 			snprintf(buf3,BUFFER_SIZE,"%s/partition%d_MSA.fasta",opt.partitions_directory,which);
 			//printf("buf3 is %s\n",buf3);
-			snprintf(famsa_threads,BUFFER_SIZE,"-t %d",opt.famsa_threads);
+			char dasht[BUFFER_SIZE];
+			snprintf(dasht,BUFFER_SIZE,"-t");
+			snprintf(famsa_threads,BUFFER_SIZE,"%d",opt.famsa_threads);
 			pid=fork();
 			if (pid==-1){
 			//pid==-1 means error occured
 				printf("can't fork, error occured\n");
 			}else if (pid==0){
 				//printf("child process, pid = %u\n",getpid());
-				char *arguments[] = {"famsa",famsa_threads,buf2,buf3,NULL};
-				printf("ARGUMENTS: %s %s %s %s\n",arguments[0],arguments[1],arguments[2],arguments[3]);
+				char *arguments[] = {"famsa",dasht,famsa_threads,buf2,buf3,NULL};
+				printf("ARGUMENTS: %s %s %s %s\n",arguments[0],arguments[1],arguments[2],arguments[3],arguments[4]);
 				execvp("famsa",arguments);
 				exit(0);
 			}else{
@@ -627,7 +629,7 @@ void createNewRoots(int rootCount, Options opt, int max_nodename, int max_lineTa
 				//close(pipefd[0]);
 				//dup2(pipefd[1], STDOUT_FILENO);
 				int fd;
-				char *arguments[] = {"nw_reroot",buf4,NULL};
+				char *arguments[] = {"/space/s1/lenore/software/newick-utils-1.6/src/nw_reroot",buf4,NULL};
 				fd = open(buf5, O_WRONLY | O_CREAT, 0777 );
 				if (fd == -1 ){
 					perror(buf5);
