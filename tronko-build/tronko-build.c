@@ -629,7 +629,7 @@ void createNewRoots(int rootCount, Options opt, int max_nodename, int max_lineTa
 				//close(pipefd[0]);
 				//dup2(pipefd[1], STDOUT_FILENO);
 				int fd;
-				char *arguments[] = {"/space/s1/lenore/software/newick-utils-1.6/src/nw_reroot",buf4,NULL};
+				char *arguments[] = {"nw_reroot",buf4,NULL};
 				fd = open(buf5, O_WRONLY | O_CREAT, 0777 );
 				if (fd == -1 ){
 					perror(buf5);
