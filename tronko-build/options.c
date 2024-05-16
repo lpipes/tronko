@@ -18,6 +18,8 @@ static struct Options long_options[]=
 	{"use-minleaves", no_argument, 0, 'v'},
 	{"no-change-missingdata", no_argument, 0, 'g'},
 	{"famsa-threads", required_argument, 0, 'c'},
+	{"two-step-build", no_argument, 0, 'p'},
+	{"remove-unused-trees", no_argument, 0, 'r'},
 };
 
 char usage[] = "\ntronko-build [OPTIONS] -d [OUTPUT DIRECTORY]\n\
@@ -38,6 +40,8 @@ char usage[] = "\ntronko-build [OPTIONS] -d [OUTPUT DIRECTORY]\n\
 	-f [INT], don't partition less than the minimum number of leaf nodes [can't use with -s, use with -v, use only with -y]\n\
 	-g, don't flag missing data\n\
 	-c, [INT] Number of FAMSA threads to use (0 means use all threads) [default: 1]\n\
+	-p, break the db build into two steps\n\
+	-r, remove unused trees [can only be used with -p]\n\
 	\n";
 
 void print_help_statement(){
@@ -60,8 +64,8 @@ void parse_options(int argc, char **argv, Options *opt){
 				print_help_statement();
 				exit(0);
 				break;
-			case 'r': //--reference
-				opt->reference_mode = 1;
+			case 'r': 
+				opt->remove_unused = 1;
 				break;
 			case 'l': //--single-tree
 				opt->number_of_trees = 1;
@@ -76,6 +80,9 @@ void parse_options(int argc, char **argv, Options *opt){
 				success = sscanf(optarg, "%d", &(opt->min_leaves));
 				if (!success)
 					fprintf(stderr, "Could not read min leaves\n");
+				break;
+			case 'p':
+				opt->two_step = 1;
 				break;
 			case 'y':
 				opt->use_partitions = 1;

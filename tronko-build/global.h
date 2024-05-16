@@ -100,6 +100,8 @@ typedef struct Options{
 	char tree_file[200];
 	char taxonomy_file[200];
 	int number_of_trees;
+	int two_step;
+	int remove_unused;
 	int reference_mode;
 	int use_partitions;
 	char reference_file[200];

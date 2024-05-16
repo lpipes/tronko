@@ -811,9 +811,11 @@ int main(int argc, char **argv){
 	opt.sp_score = 0.05;
 	opt.missing_data=1;
 	opt.restart = 0;
+	opt.two_step = 0;
 	opt.number_of_partitions = 0;
 	opt.number_of_trees = 0;
 	opt.famsa_threads = 1;
+	opt.remove_unused = 0;
 	int i, j, k, numberOfTrees;
 	for(i=0; i<200; i++){
 		opt.partitions_directory[i] = '\0';
@@ -1045,6 +1047,86 @@ int main(int argc, char **argv){
 		}
 	}
 	free(SPscoreArr);
+		if ( opt.two_step == 1 ){
+			printf("Partitioning has finished and you've requested a two-step build ('-p') exiting...\n");
+			int numberOfTrees=0;
+			int key;
+			struct masterArr* final;
+			if ( opt.remove_unused == 1 ){
+				struct dirent *de;
+				DIR *dr = opendir(opt.partitions_directory);
+				regex_t regex1;
+				char msgbuf[100];
+				int reti = regcomp(&regex1, "_MSA\\.fasta$",0);
+				if (reti){
+					fprintf(stderr, "Could not compile regex\n");
+					exit(-1);
+				}
+				if (dr == NULL){
+					printf("Could not open directory for reads\n");
+					exit(-1);
+				}
+				while ((de = readdir(dr)) != NULL){
+					reti = regexec(&regex1, de->d_name, 0, NULL, 0);
+					if (!reti) {
+						int index;
+						char *tempfilename = (char*)malloc(100*sizeof(char));
+						for(index=0; index<100; index++){
+							tempfilename[index]='\0';
+						}
+						strcpy(tempfilename,de->d_name);
+						for(index=strlen(tempfilename)-10; index<strlen(tempfilename); index++){
+							tempfilename[index]='\0';
+						}
+						char* tempfilename2 = (char*)malloc(100*sizeof(char));
+						for(index=0; index<100; index++){
+							tempfilename2[index]='\0';
+						}
+						int index2=0;
+						for(index=9; index<strlen(tempfilename); index++){
+							tempfilename2[index2]=tempfilename[index];
+							index2++;
+						}
+						char partition_buffer[BUFFER_SIZE];
+						snprintf(partition_buffer,BUFFER_SIZE,"%s/RAxML_bestTree.%s.reroot",opt.partitions_directory,tempfilename);
+						printf("%s\n",partition_buffer);
+						int found = 0;
+						hashmap_foreach(key,final,&mastermap){
+							if ( strcmp(partition_buffer,final->filename) == 0 ){
+								found = 1;
+							}
+						}
+						if ( found == 0 ){
+							printf("removing %s...\n",tempfilename);
+							char partition_buffer2[BUFFER_SIZE];
+							snprintf(partition_buffer2,BUFFER_SIZE,"rm %s/*%s*",opt.partitions_directory,tempfilename);
+							int status=0;
+							status=system(partition_buffer2);	
+						}
+						free(tempfilename);
+						free(tempfilename2);
+					} else if ( reti != REG_NOMATCH){
+						regerror(reti, &regex1, msgbuf, sizeof(msgbuf));
+						fprintf(stderr, "Regex match failed: %s\n", msgbuf);
+						exit(1);
+					}
+				}
+				closedir(dr);
+			}
+			int index=0;
+			char newick_buf[BUFFER_SIZE];
+			snprintf(newick_buf,BUFFER_SIZE,"%s/tree_list.txt",opt.partitions_directory);
+			FILE* list_newick_files = fopen(newick_buf,"w");
+			if ( list_newick_files == NULL ){ printf("Error opening tree_list.txt file!\n"); exit(1); }
+			hashmap_foreach(key,final,&mastermap){
+				fprintf(list_newick_files,"%s\n",final->filename);
+			}
+			fclose(list_newick_files);
+			exit(1);
+		}
+		printf("Using %d trees... \n",opt.number_of_partitions);
+		//treeArr = malloc(sizeof(node *)*opt.number_of_partitions);
+		SPscoreArr = malloc(sizeof(int)*MAX_NUMBEROFROOTS);
 	numberOfTrees=0;
 	int key;
 	struct masterArr* final;
