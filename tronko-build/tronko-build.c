@@ -1120,6 +1120,62 @@ int main(int argc, char **argv){
 			if ( list_newick_files == NULL ){ printf("Error opening tree_list.txt file!\n"); exit(1); }
 			hashmap_foreach(key,final,&mastermap){
 				fprintf(list_newick_files,"%s\n",final->filename);
+				char directory[BUFFER_SIZE]; // Adjust size as needed
+    				char *last_slash;
+				char *filename;
+				char *start_substring;
+				char *end_substring;
+				char substring[256];
+				filename = strrchr(final->filename, '/');
+				if (filename != NULL) {
+					filename++; // Move past the last '/'
+				} else {
+					filename = final->filename; // No '/' found, use the whole path as filename
+				}
+				// Find the start of the substring
+				start_substring = strstr(filename, "RAxML_bestTree.");
+				if (start_substring != NULL) {
+					start_substring += strlen("RAxML_bestTree."); // Move past "RAxML_bestTree."
+					// Find the end of the substring
+					end_substring = strstr(start_substring, ".reroot");
+					if (end_substring != NULL) {
+						size_t length = end_substring - start_substring;
+						strncpy(substring, start_substring, length);
+						substring[length] = '\0'; // Null-terminate the string
+					} else {
+						// ".reroot" not found, handle accordingly
+						strcpy(substring, "");
+					}
+				} else {
+					// "RAxML_bestTree." not found, handle accordingly
+					strcpy(substring, "");
+				}
+				//printf("Filename: %s\n", filename);
+				//printf("Substring: %s\n", substring);
+    				// Find the last occurrence of '/'
+    				last_slash = strrchr(final->filename, '/');
+    				if (last_slash != NULL) {
+        				// Calculate the length of the directory part
+        				size_t directory_length = last_slash - final->filename;
+        				// Copy the directory part to a new string
+        				strncpy(directory, final->filename, directory_length);
+        				directory[directory_length] = '\0'; // Null-terminate the string
+					if ( strcmp(directory,opt.readdir)==0 ){
+						char command[BUFFER_SIZE];
+						snprintf(command,BUFFER_SIZE,"cp %s/RAxML_bestTree.%s.reroot %s",opt.readdir,substring,opt.partitions_directory);
+						int status=0;
+						printf("copying %s/RAxML_bestTree.%s.reroot to %s...\n",opt.readdir,substring,opt.partitions_directory);
+						status=system(command);
+						snprintf(command,BUFFER_SIZE,"cp %s/%s_MSA.fasta %s",opt.readdir,substring,opt.partitions_directory);
+						status=0;
+						printf("copying %s/%s_MSA.fasta to %s...\n",opt.readdir,substring,opt.partitions_directory);
+						status=system(command);
+						snprintf(command,BUFFER_SIZE,"cp %s/%s_taxonomy.txt %s",opt.readdir,substring,opt.partitions_directory);
+						status=0;
+						printf("copying %s/%s_taxonomy.txt to %s...\n",opt.readdir,substring,opt.partitions_directory);
+						status=system(command);
+					}
+    				}	
 			}
 			fclose(list_newick_files);
 			exit(1);

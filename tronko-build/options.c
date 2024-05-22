@@ -41,7 +41,7 @@ char usage[] = "\ntronko-build [OPTIONS] -d [OUTPUT DIRECTORY]\n\
 	-g, don't flag missing data\n\
 	-c, [INT] Number of FAMSA threads to use (0 means use all threads) [default: 1]\n\
 	-p, break the db build into two steps\n\
-	-r, remove unused trees [can only be used with -p]\n\
+	-r, remove unused trees and copy trees from initial partition directory [can only be used with -p]\n\
 	\n";
 
 void print_help_statement(){

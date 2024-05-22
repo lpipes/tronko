@@ -10,7 +10,6 @@ Alignment-based and composition-based assignment methods calculate the lowest co
 # tronko-build
 `tronko-build` is for building custom reference databases to be used with `tronko-assign`.
 
-
 	tronko-build [OPTIONS] -d [OUTPUT DIRECTORY]
 	
 		-h, usage:
@@ -30,8 +29,7 @@ Alignment-based and composition-based assignment methods calculate the lowest co
 		-g, don't flag missing data
 		-c, [INT] Number of FAMSA threads to use (0 means use all threads) [default: 1]
 		-p, break the db build into two steps
-		-r, remove unused trees [can only be used with -p]
-	
+		-r, remove unused trees and copy trees from initial partition directory [can only be used with -p]
 
 # tronko-assign
 `tronko-assign` is for species assignment of queries. It requires a `tronko-build` database.
