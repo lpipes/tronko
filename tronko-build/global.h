@@ -120,6 +120,7 @@ typedef struct Options{
 	int number_of_partitions;
 	int restart;
 	char rmrefdir[2000];
+	char prefix[2000];
 	int missing_data;
 	int famsa_threads;
 }Options;

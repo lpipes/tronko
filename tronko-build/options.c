@@ -20,6 +20,7 @@ static struct Options long_options[]=
 	{"famsa-threads", required_argument, 0, 'c'},
 	{"two-step-build", no_argument, 0, 'p'},
 	{"remove-unused-trees", no_argument, 0, 'r'},
+	{"prefix", required_argument, 0, 'i'},
 };
 
 char usage[] = "\ntronko-build [OPTIONS] -d [OUTPUT DIRECTORY]\n\
@@ -42,6 +43,7 @@ char usage[] = "\ntronko-build [OPTIONS] -d [OUTPUT DIRECTORY]\n\
 	-c, [INT] Number of FAMSA threads to use (0 means use all threads) [default: 1]\n\
 	-p, break the db build into two steps\n\
 	-r, remove unused trees and copy trees from initial partition directory [can only be used with -p]\n\
+	-i, [STRING] set the prefix for output partitions in -d\n\
 	\n";
 
 void print_help_statement(){
@@ -57,7 +59,7 @@ void parse_options(int argc, char **argv, Options *opt){
 		exit(0);
 	}
 	while(1){
-		c=getopt_long(argc,argv,"hspvlgryu:t:m:d:o:x:1:2:a:c:e:n:b:D:f:",long_options, &option_index);
+		c=getopt_long(argc,argv,"hspvlgryu:t:m:d:o:x:1:2:i:a:c:e:n:b:D:f:",long_options, &option_index);
 		if (c==-1) break;
 		switch(c){
 			case 'h':
@@ -96,6 +98,11 @@ void parse_options(int argc, char **argv, Options *opt){
 				success = sscanf(optarg, "%s", opt->tree_file);
 				if (!success)
 					fprintf(stderr, "Invalid tree file.\n");
+				break;
+			case 'i':
+				success = sscanf(optarg, "%s", opt->prefix);
+				if ( !success)
+					fprintf(stderr, "Invalid prefix.\n");
 				break;
 			case 'm':
 				success = sscanf(optarg, "%s", opt->msa_file);

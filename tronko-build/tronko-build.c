@@ -377,9 +377,17 @@ void printPartitionsToFileArr(int *partition1,int partition1size, int *partition
 	if ( stat(opt.partitions_directory, &st) == -1){
 		mkdir(opt.partitions_directory, 0700);
 	}
-	snprintf(buf_fasta,BUFFER_SIZE,"%s/partition%d.fasta",opt.partitions_directory,which);
+	if ( opt.prefix[0] == '\0' ){
+		snprintf(buf_fasta,BUFFER_SIZE,"%s/partition%d.fasta",opt.partitions_directory,which);
+	}else{
+		snprintf(buf_fasta,BUFFER_SIZE,"%s/%spartition%d.fasta",opt.partitions_directory,opt.prefix,which);
+	}
 	FILE *p1=fopen(buf_fasta,"w");
-	snprintf(buf_tax,BUFFER_SIZE,"%s/partition%d_taxonomy.txt",opt.partitions_directory,which);				
+	if ( opt.prefix[0] == '\0' ){
+		snprintf(buf_tax,BUFFER_SIZE,"%s/partition%d_taxonomy.txt",opt.partitions_directory,which);				
+	}else{
+		snprintf(buf_tax,BUFFER_SIZE,"%s/%spartition%d_taxonomy.txt",opt.partitions_directory,opt.prefix,which);
+	}
 	FILE *p1_tax=fopen(buf_tax,"w");
 	seqWithoutDash = (char *)malloc((m->numbase+1)*sizeof(char));
 	for(i=0; i<m->numbase+1; i++){
@@ -398,9 +406,17 @@ void printPartitionsToFileArr(int *partition1,int partition1size, int *partition
 	fclose(p1);
 	fclose(p1_tax);
 	which = partitionCount+1;
-	snprintf(buf_fasta,BUFFER_SIZE,"%s/partition%d.fasta",opt.partitions_directory,which);				
+	if ( opt.prefix[0] == '\0' ){
+		snprintf(buf_fasta,BUFFER_SIZE,"%s/partition%d.fasta",opt.partitions_directory,which);				
+	}else{
+		snprintf(buf_fasta,BUFFER_SIZE,"%s/%spartition%d.fasta",opt.partitions_directory,opt.prefix,which);
+	}
 	FILE *p2=fopen(buf_fasta,"w");
-	snprintf(buf_tax,BUFFER_SIZE,"%s/partition%d_taxonomy.txt",opt.partitions_directory,which);				
+	if ( opt.prefix[0] == '\0' ){
+		snprintf(buf_tax,BUFFER_SIZE,"%s/partition%d_taxonomy.txt",opt.partitions_directory,which);				
+	}else{
+		snprintf(buf_tax,BUFFER_SIZE,"%s/%spartition%d_taxonomy.txt",opt.partitions_directory,opt.prefix,which);
+	}
 	FILE *p2_tax=fopen(buf_tax,"w");
 	for(i=0;i<partition2size;i++){
 		fprintf(p2,">%s\n",m->names[partition2[i]-m->numspec+1]);
@@ -414,9 +430,17 @@ void printPartitionsToFileArr(int *partition1,int partition1size, int *partition
 	fclose(p2);
 	fclose(p2_tax);
 	which=partitionCount+2; 
-	snprintf(buf_fasta,BUFFER_SIZE,"%s/partition%d.fasta",opt.partitions_directory,which);				
+	if ( opt.prefix[0] == '\0' ){
+		snprintf(buf_fasta,BUFFER_SIZE,"%s/partition%d.fasta",opt.partitions_directory,which);				
+	}else{
+		 snprintf(buf_fasta,BUFFER_SIZE,"%s/%spartition%d.fasta",opt.partitions_directory,opt.prefix,which);
+	}
 	FILE *p3=fopen(buf_fasta,"w");
-	snprintf(buf_tax,BUFFER_SIZE,"%s/partition%d_taxonomy.txt",opt.partitions_directory,which);				
+	if ( opt.prefix[0] == '\0' ){
+		snprintf(buf_tax,BUFFER_SIZE,"%s/partition%d_taxonomy.txt",opt.partitions_directory,which);				
+	}else{
+		snprintf(buf_tax,BUFFER_SIZE,"%s/%spartition%d_taxonomy.txt",opt.partitions_directory,opt.prefix,which);
+	}
 	FILE *p3_tax=fopen(buf_tax,"w");
 	for(i=0;i<partition3size;i++){
 		fprintf(p3,">%s\n",m->names[partition3[i]-m->numspec+1]);
@@ -567,10 +591,13 @@ void createNewRoots(int rootCount, Options opt, int max_nodename, int max_lineTa
 			char buf3[BUFFER_SIZE];	
 			char buf2[BUFFER_SIZE];
 			char famsa_threads[BUFFER_SIZE];
-			snprintf(buf2,BUFFER_SIZE,"%s/partition%d.fasta",opt.partitions_directory,which);
-			//printf("buf2 is %s\n",buf2);
-			snprintf(buf3,BUFFER_SIZE,"%s/partition%d_MSA.fasta",opt.partitions_directory,which);
-			//printf("buf3 is %s\n",buf3);
+			if ( opt.prefix[0] == '\0' ){
+				snprintf(buf2,BUFFER_SIZE,"%s/partition%d.fasta",opt.partitions_directory,which);
+				snprintf(buf3,BUFFER_SIZE,"%s/partition%d_MSA.fasta",opt.partitions_directory,which);
+			}else{
+				snprintf(buf2,BUFFER_SIZE,"%s/%spartition%d.fasta",opt.partitions_directory,opt.prefix,which);
+				snprintf(buf3,BUFFER_SIZE,"%s/%spartition%d_MSA.fasta",opt.partitions_directory,opt.prefix,which);
+			}
 			char dasht[BUFFER_SIZE];
 			snprintf(dasht,BUFFER_SIZE,"-t");
 			snprintf(famsa_threads,BUFFER_SIZE,"%d",opt.famsa_threads);
@@ -598,16 +625,33 @@ void createNewRoots(int rootCount, Options opt, int max_nodename, int max_lineTa
 						printf("waitpid() failed\n");
 					}*/
 			}
-			snprintf(buf,BUFFER_SIZE,"sed -i ':a; $!N; /^>/!s/\\n\\([^>]\\)/\\1/; ta; P; D' %s/partition%d_MSA.fasta",opt.partitions_directory,which);
+			if ( opt.prefix[0] == '\0' ){
+				snprintf(buf,BUFFER_SIZE,"sed -i ':a; $!N; /^>/!s/\\n\\([^>]\\)/\\1/; ta; P; D' %s/partition%d_MSA.fasta",opt.partitions_directory,which);
+			}else{
+				snprintf(buf,BUFFER_SIZE,"sed -i ':a; $!N; /^>/!s/\\n\\([^>]\\)/\\1/; ta; P; D' %s/%spartition%d_MSA.fasta",opt.partitions_directory,opt.prefix,which);
+			}
 			status = system(buf);
-			snprintf(buf,BUFFER_SIZE,"fasta2phyml.pl %s/partition%d_MSA.fasta",opt.partitions_directory,which);
+			if (opt.prefix[0] == '\0' ){
+				snprintf(buf,BUFFER_SIZE,"fasta2phyml.pl %s/partition%d_MSA.fasta",opt.partitions_directory,which);
+			}else{
+				snprintf(buf,BUFFER_SIZE,"fasta2phyml.pl %s/%spartition%d_MSA.fasta",opt.partitions_directory,opt.prefix,which);
+			}
 			status = system(buf);
-			snprintf(buf,BUFFER_SIZE,"raxmlHPC-PTHREADS --silent -m GTRGAMMA -w %s/ -n partition%d -p 1234 -T 8 -s %s/partition%d_MSA.phymlAln",opt.partitions_directory,which,opt.partitions_directory,which);
+			if (opt.prefix[0] == '\0' ){
+				snprintf(buf,BUFFER_SIZE,"raxmlHPC-PTHREADS --silent -m GTRGAMMA -w %s/ -n partition%d -p 1234 -T 8 -s %s/partition%d_MSA.phymlAln",opt.partitions_directory,which,opt.partitions_directory,which);
+			}else{
+				snprintf(buf,BUFFER_SIZE,"raxmlHPC-PTHREADS --silent -m GTRGAMMA -w %s/ -n %spartition%d -p 1234 -T 8 -s %s/%spartition%d_MSA.phymlAln",opt.partitions_directory,opt.prefix,which,opt.partitions_directory,opt.prefix,which);
+			}
 			status = system(buf);
 			char buf4[BUFFER_SIZE];
 			char buf5[BUFFER_SIZE];
-			snprintf(buf4,BUFFER_SIZE,"%s/RAxML_bestTree.partition%d",opt.partitions_directory,which);
-			snprintf(buf5,BUFFER_SIZE,"%s/RAxML_bestTree.partition%d.reroot",opt.partitions_directory,which);
+			if ( opt.prefix[0] == '\0' ){
+				snprintf(buf4,BUFFER_SIZE,"%s/RAxML_bestTree.partition%d",opt.partitions_directory,which);
+				snprintf(buf5,BUFFER_SIZE,"%s/RAxML_bestTree.partition%d.reroot",opt.partitions_directory,which);
+			}else{
+				snprintf(buf4,BUFFER_SIZE,"%s/RAxML_bestTree.%spartition%d",opt.partitions_directory,opt.prefix,which);
+				snprintf(buf5,BUFFER_SIZE,"%s/RAxML_bestTree.%spartition%d.reroot",opt.partitions_directory,opt.prefix,which);
+			}
 			pid=0;
 			//int pipefd[2];
 			//pipe(pipefd);
@@ -664,7 +708,11 @@ void createNewRoots(int rootCount, Options opt, int max_nodename, int max_lineTa
 				fclose(reroot_file);
 			}*/
 		}
-		snprintf(buf,BUFFER_SIZE,"%s/partition%d_MSA.fasta",opt.partitions_directory,which);
+		if ( opt.prefix[0] == '\0' ){
+			snprintf(buf,BUFFER_SIZE,"%s/partition%d_MSA.fasta",opt.partitions_directory,which);
+		}else{
+			snprintf(buf,BUFFER_SIZE,"%s/%spartition%d_MSA.fasta",opt.partitions_directory,opt.prefix,which);
+		}
 		printf("buffer: %s\n",buf);
 		struct masterArr *t=malloc(sizeof(masterArr));;
 		//itoa(which-1,t->index,10);
@@ -687,7 +735,11 @@ void createNewRoots(int rootCount, Options opt, int max_nodename, int max_lineTa
 		readSeqArr(partition,max_nodename,t);
 		fclose(partition);
 		allocateTreeArrMemory(t,max_nodename);
-		snprintf(buf,BUFFER_SIZE,"%s/RAxML_bestTree.partition%d.reroot",opt.partitions_directory,which);
+		if ( opt.prefix[0] == '\0' ){
+			snprintf(buf,BUFFER_SIZE,"%s/RAxML_bestTree.partition%d.reroot",opt.partitions_directory,which);
+		}else{
+			snprintf(buf,BUFFER_SIZE,"%s/RAxML_bestTree.%spartition%d.reroot",opt.partitions_directory,opt.prefix,which);
+		}
 		strcpy(t->filename,buf);
 		if (NULL==(partitionTree=fopen(buf,"r"))){ puts("Cannot open partition tree file!"); exit(-1);}
 		comma=0;
@@ -700,7 +752,11 @@ void createNewRoots(int rootCount, Options opt, int max_nodename, int max_lineTa
 		int child1 = t->tree[t->root].up[1];
 		t->tree[t->root].depth = 0;
 		assignDepthArr(child0,child1,1,t);
-		snprintf(buf,BUFFER_SIZE,"%s/partition%d_taxonomy.txt",opt.partitions_directory,which);
+		if ( opt.prefix[0] == '\0' ){
+			snprintf(buf,BUFFER_SIZE,"%s/partition%d_taxonomy.txt",opt.partitions_directory,which);
+		}else{
+			snprintf(buf,BUFFER_SIZE,"%s/%spartition%d_taxonomy.txt",opt.partitions_directory,opt.prefix,which);
+		}
 		printf("buffer: %s\n",buf);
 		for(j=0; j<t->numspec; j++){
 			t->taxonomy[j] = (char **)calloc_check(7, sizeof(char *));
@@ -820,6 +876,9 @@ int main(int argc, char **argv){
 	for(i=0; i<200; i++){
 		opt.partitions_directory[i] = '\0';
 		opt.readdir[i] = '\0';
+	}
+	for(i=0; i<2000; i++){
+		opt.prefix[i] = '\0';
 	}
 	parse_options(argc, argv, &opt);
 	if ( opt.partitions_directory[0] == '\0' ){
