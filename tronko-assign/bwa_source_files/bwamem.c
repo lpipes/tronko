@@ -15,6 +15,7 @@
 #include "kvec.h"
 #include "ksort.h"
 #include "utils.h"
+#include "../global.h"
 
 #ifdef USE_MALLOC_WRAPPERS
 #  include "malloc_wrap.h"
@@ -822,8 +823,38 @@ static inline void add_cigar(const mem_opt_t *opt, mem_aln_t *p, kstring_t *str,
 		}
 	} else kputc('*', str); // having a coordinate but unaligned (e.g. when copy_mate is true)
 }
+// Function to return the complement of a nucleotide
+char complement(char base) {
+    switch (base) {
+        case 'A': return 'T';
+        case 'T': return 'A';
+        case 'C': return 'G';
+        case 'G': return 'C';
+        case 'a': return 't';
+        case 't': return 'a';
+        case 'c': return 'g';
+        case 'g': return 'c';
+        default: return base; // In case of ambiguous nucleotides, return the base as is
+    }
+}
+// Function to compute the reverse complement of a DNA sequence
+void reverse_complement(char* seq) {
+    int len = strlen(seq);
+    
+    // Reverse the sequence in place and complement it at the same time
+    for (int i = 0; i < len / 2; i++) {
+        // Swap and complement characters at the two ends
+        char temp = seq[i];
+        seq[i] = complement(seq[len - 1 - i]);
+        seq[len - 1 - i] = complement(temp);
+    }
 
-void mem_aln2sam(const mem_opt_t *opt, const bntseq_t *bns, kstring_t *str, bseq1_t *s, int n, const mem_aln_t *list, int which, const mem_aln_t *m_, int concordant)
+    // If the sequence has an odd number of characters, complement the middle character
+    if (len % 2 == 1) {
+        seq[len / 2] = complement(seq[len / 2]);
+    }
+}
+void mem_aln2sam(const mem_opt_t *opt, const bntseq_t *bns, kstring_t *str, bseq1_t *s, int n, const mem_aln_t *list, int which, const mem_aln_t *m_, int concordant, int seq_index, int startline, int paired)
 {
 	int i, l_name;
 	mem_aln_t ptmp = list[which], *p = &ptmp, mtmp, *m = 0; // make a copy of the alignment to convert
@@ -841,8 +872,47 @@ void mem_aln2sam(const mem_opt_t *opt, const bntseq_t *bns, kstring_t *str, bseq
 	if (m && m->rid < 0 && p->rid >= 0) // copy alignment to mate
 		m->rid = p->rid, m->pos = p->pos, m->is_rev = p->is_rev, m->n_cigar = 0;
 	p->flag |= p->is_rev? 0x10 : 0; // is on the reverse strand
+	if ( p->is_rev == 1 && paired == 0){
+		char* seq_copy;
+		seq_copy = (char*)malloc((strlen(singleQueryMat->queryMat[startline+seq_index])+1)*sizeof(char));
+		memset(seq_copy,'\0',strlen(singleQueryMat->queryMat[startline+seq_index])+1);
+		pthread_mutex_t lock;
+		pthread_mutex_init(&lock, NULL);
+		pthread_mutex_lock(&lock);
+		strcpy(seq_copy,singleQueryMat->queryMat[startline+seq_index]);
+		reverse_complement(seq_copy);
+		strcpy(singleQueryMat->queryMat[startline+seq_index],seq_copy);
+		free(seq_copy);
+		pthread_mutex_unlock(&lock);
+	}
+	if ( p->is_rev ==1 && paired ==1 && s->id%2==0 ){
+		char* seq_copy;
+		seq_copy = (char*)malloc((strlen(pairedQueryMat->query1Mat[startline+seq_index])+1)*sizeof(char));
+		memset(seq_copy,'\0',strlen(pairedQueryMat->query1Mat[startline+seq_index])+1);
+		pthread_mutex_t lock;
+		pthread_mutex_init(&lock, NULL);
+		pthread_mutex_lock(&lock);
+		strcpy(seq_copy,pairedQueryMat->query1Mat[startline+seq_index]);
+		reverse_complement(seq_copy);
+		strcpy(pairedQueryMat->query1Mat[startline+seq_index],seq_copy);
+		free(seq_copy);
+		pthread_mutex_unlock(&lock);
+	}
 	p->flag |= m && m->is_rev? 0x20 : 0; // is mate on the reverse strand
-
+	if ( paired==1){
+		if ( m->is_rev == 1 && s->id%2==0 ){
+			char* seq_copy = (char*)malloc((strlen(pairedQueryMat->query2Mat[startline+seq_index])+1)*sizeof(char));
+			memset(seq_copy,'\0',strlen(pairedQueryMat->query2Mat[startline+seq_index])+1);
+			pthread_mutex_t lock;
+			pthread_mutex_init(&lock, NULL);
+			pthread_mutex_lock(&lock);
+			strcpy(seq_copy,pairedQueryMat->query2Mat[startline+seq_index]);
+			reverse_complement(seq_copy);
+			strcpy(pairedQueryMat->query2Mat[startline+seq_index],seq_copy);
+			free(seq_copy);
+			pthread_mutex_unlock(&lock);
+		}
+	}
 	// print up to CIGAR
 	l_name = strlen(s->name);
 	ks_resize(str, str->l + s->l_seq + l_name + (s->qual? s->l_seq : 0) + 20);
@@ -1008,7 +1078,7 @@ void mem_reorder_primary5(int T, mem_alnreg_v *a)
 }
 
 // TODO (future plan): group hits into a uint64_t[] array. This will be cleaner and more flexible
-void mem_reg2sam(const mem_opt_t *opt, const bntseq_t *bns, const uint8_t *pac, bseq1_t *s, mem_alnreg_v *a, int extra_flag, const mem_aln_t *m, int concordant)
+void mem_reg2sam(const mem_opt_t *opt, const bntseq_t *bns, const uint8_t *pac, bseq1_t *s, mem_alnreg_v *a, int extra_flag, const mem_aln_t *m, int concordant, int seq_index, int startline, int paired)
 {
 	extern char **mem_gen_alt(const mem_opt_t *opt, const bntseq_t *bns, const uint8_t *pac, mem_alnreg_v *a, int l_query, const char *query);
 	kstring_t str;
@@ -1042,10 +1112,10 @@ void mem_reg2sam(const mem_opt_t *opt, const bntseq_t *bns, const uint8_t *pac, 
 		mem_aln_t t;
 		t = mem_reg2aln(opt, bns, pac, s->l_seq, s->seq, 0);
 		t.flag |= extra_flag;
-		mem_aln2sam(opt, bns, &str, s, 1, &t, 0, m, concordant);
+		mem_aln2sam(opt, bns, &str, s, 1, &t, 0, m, concordant, seq_index, startline, paired);
 	} else {
 		for (k = 0; k < aa.n; ++k)
-			mem_aln2sam(opt, bns, &str, s, aa.n, aa.a, k, m, concordant);
+			mem_aln2sam(opt, bns, &str, s, aa.n, aa.a, k, m, concordant, seq_index, startline, paired);
 		for (k = 0; k < aa.n; ++k) free(aa.a[k].cigar);
 		free(aa.a);
 	}
@@ -1177,6 +1247,7 @@ typedef struct {
 	mem_alnreg_v *regs;
 	int64_t n_processed;
 	int concordant;
+	int startline;
 } worker_t;
 
 static void worker1(void *data, int i, int tid)
@@ -1198,23 +1269,25 @@ static void worker1(void *data, int i, int tid)
 
 static void worker2(void *data, int i, int tid)
 {
-	extern int mem_sam_pe(const mem_opt_t *opt, const bntseq_t *bns, const uint8_t *pac, const mem_pestat_t pes[4], uint64_t id, bseq1_t s[2], mem_alnreg_v a[2], int concordant);
+	extern int mem_sam_pe(const mem_opt_t *opt, const bntseq_t *bns, const uint8_t *pac, const mem_pestat_t pes[4], uint64_t id, bseq1_t s[2], mem_alnreg_v a[2], int concordant, int seq_index, int startline);
 	extern void mem_reg2ovlp(const mem_opt_t *opt, const bntseq_t *bns, const uint8_t *pac, bseq1_t *s, mem_alnreg_v *a);
 	worker_t *w = (worker_t*)data;
+	int paired=0;
 	if (!(w->opt->flag&MEM_F_PE)) {
 		if (bwa_verbose >= 4) printf("=====> Finalizing read '%s' <=====\n", w->seqs[i].name);
 		mem_mark_primary_se(w->opt, w->regs[i].n, w->regs[i].a, w->n_processed + i);
 		if (w->opt->flag & MEM_F_PRIMARY5) mem_reorder_primary5(w->opt->T, &w->regs[i]);
-		mem_reg2sam(w->opt, w->bns, w->pac, &w->seqs[i], &w->regs[i], 0, 0, w->concordant);
+		printf("Is this the index? %d\n",i);
+		mem_reg2sam(w->opt, w->bns, w->pac, &w->seqs[i], &w->regs[i], 0, 0, w->concordant, i, w->startline, paired);
 		free(w->regs[i].a);
 	} else {
 		if (bwa_verbose >= 4) printf("=====> Finalizing read pair '%s' <=====\n", w->seqs[i<<1|0].name);
-		mem_sam_pe(w->opt, w->bns, w->pac, w->pes, (w->n_processed>>1) + i, &w->seqs[i<<1], &w->regs[i<<1], w->concordant);
+		mem_sam_pe(w->opt, w->bns, w->pac, w->pes, (w->n_processed>>1) + i, &w->seqs[i<<1], &w->regs[i<<1], w->concordant, i, w->startline);
 		free(w->regs[i<<1|0].a); free(w->regs[i<<1|1].a);
 	}
 }
 
-void mem_process_seqs(const mem_opt_t *opt, const bwt_t *bwt, const bntseq_t *bns, const uint8_t *pac, int64_t n_processed, int n, bseq1_t *seqs, const mem_pestat_t *pes0, int concordant)
+void mem_process_seqs(const mem_opt_t *opt, const bwt_t *bwt, const bntseq_t *bns, const uint8_t *pac, int64_t n_processed, int n, bseq1_t *seqs, const mem_pestat_t *pes0, int concordant, int startline)
 {
 	extern void kt_for(int n_threads, void (*func)(void*,int,int), void *data, int n);
 	worker_t w;
@@ -1230,6 +1303,7 @@ void mem_process_seqs(const mem_opt_t *opt, const bwt_t *bwt, const bntseq_t *bn
 	w.pes = &pes[0];
 	w.aux = malloc(opt->n_threads * sizeof(smem_aux_t));
 	w.concordant=concordant;
+	w.startline = startline;
 	for (i = 0; i < opt->n_threads; ++i)
 		w.aux[i] = smem_aux_init();
 	kt_for(opt->n_threads, worker1, &w, (opt->flag&MEM_F_PE)? n>>1 : n); // find mapping positions

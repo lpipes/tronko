@@ -53,24 +53,6 @@ typedef struct {
 	bseq1_t *seqs;
 } ktp_data_t;
 
-int dec2bin(int n){
-	int binaryNum[32];
-	int i=0;
-	while(n>0){
-		binaryNum[i] = n%2;
-		n = n/2;
-		i++;
-	}
-	int j=i;
-	//}else if (binaryNum[3]==1){ //mate unpaired
-	if (binaryNum[3]==1){
-		return 2;
-	}else{
-		//if binaryNum[6] == 1, first in pair, if binaryNum[6] == 0 second in pair
-		return binaryNum[6];
-	}
-}
-
 static void *process(void *shared, int step, void *_data)
 {
 	ktp_aux_t *aux = (ktp_aux_t*)shared;
@@ -106,18 +88,18 @@ static void *process(void *shared, int step, void *_data)
 				fprintf(stderr, "[M::%s] %d single-end sequences; %d paired-end sequences\n", __func__, n_sep[0], n_sep[1]);
 			if (n_sep[0]) {
 				tmp_opt.flag &= ~MEM_F_PE;
-				mem_process_seqs(&tmp_opt, idx->bwt, idx->bns, idx->pac, aux->n_processed, n_sep[0], sep[0], 0, aux->concordant);
+				mem_process_seqs(&tmp_opt, idx->bwt, idx->bns, idx->pac, aux->n_processed, n_sep[0], sep[0], 0, aux->concordant, aux->startline);
 				for (i = 0; i < n_sep[0]; ++i)
 					data->seqs[sep[0][i].id].sam = sep[0][i].sam;
 			}
 			if (n_sep[1]) {
 				tmp_opt.flag |= MEM_F_PE;
-				mem_process_seqs(&tmp_opt, idx->bwt, idx->bns, idx->pac, aux->n_processed + n_sep[0], n_sep[1], sep[1], aux->pes0, aux->concordant);
+				mem_process_seqs(&tmp_opt, idx->bwt, idx->bns, idx->pac, aux->n_processed + n_sep[0], n_sep[1], sep[1], aux->pes0, aux->concordant, aux->startline);
 				for (i = 0; i < n_sep[1]; ++i)
 					data->seqs[sep[1][i].id].sam = sep[1][i].sam;
 			}
 			free(sep[0]); free(sep[1]);
-		} else mem_process_seqs(opt, idx->bwt, idx->bns, idx->pac, aux->n_processed, data->n_seqs, data->seqs, aux->pes0, aux->concordant);
+		} else mem_process_seqs(opt, idx->bwt, idx->bns, idx->pac, aux->n_processed, data->n_seqs, data->seqs, aux->pes0, aux->concordant,aux->startline);
 		aux->n_processed += data->n_seqs;
 		return data;
 	} else if (step == 2) {
@@ -191,11 +173,13 @@ static void *process(void *shared, int step, void *_data)
 				int start_position;
 				char *rest = data->seqs[i].sam;
 				int decimal=0;
+				int decimal_general=0;
 				while(token=strtok_r(rest,"\n",&rest)){
 					success = sscanf(token, "%s %d %s %d %*d %s %s %*d %*d %*s %*s %*s %*s %*s %*s %*[^.,;]",readname,&decimal,read1,&start_position,cigar,read2);
+					/*decimal_general = dec2bin(decimal);
 					if (aux->paired==1){
 						decimal = dec2bin(decimal);
-					}
+					}*/
 					//if decimal==1, first in pair if decimal==0, second in pair
 				//if ( j > 0 && strcmp(readname,aux->results[j-1].readname)==0 ){
 				int whichMat=0;
