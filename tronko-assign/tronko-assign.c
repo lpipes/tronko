@@ -769,6 +769,10 @@ int main(int argc, char **argv){
 		printf("Cannot find reference_tree.txt file. Exiting...\n");
 		exit(-1);
 	}
+	if ( opt.fastq == 1 && opt.number_of_lines_to_read%4 != 0 ){
+		printf("You chose FASTQ for your queries but the number of lines to read are not divisible by 4. Change -L to be divisible by 4. Exiting...\n");
+	       exit(-1);	
+	}
 	gzFile referenceTree = Z_NULL;
 	referenceTree = gzopen(opt.reference_file,"r");
 	assert(Z_NULL!=referenceTree);
