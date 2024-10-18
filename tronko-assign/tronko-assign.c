@@ -773,6 +773,10 @@ int main(int argc, char **argv){
 		printf("You chose FASTQ for your queries but the number of lines to read are not divisible by 4. Change -L to be divisible by 4. Exiting...\n");
 	       exit(-1);	
 	}
+	if ( opt.fastq == 0 && opt.number_of_lines_to_read%2 != 0 ){
+		printf("You chose FASTA for your queries but the number of lines to read are not divisible by 2. Change -L to be divisible by 2. Exiting...\n");
+		exit(-1);
+	}
 	gzFile referenceTree = Z_NULL;
 	referenceTree = gzopen(opt.reference_file,"r");
 	assert(Z_NULL!=referenceTree);
