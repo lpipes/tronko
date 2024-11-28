@@ -68,6 +68,7 @@ void freeTreeMemory(int whichPartition){
 		free(treeArr[whichPartition][i].posterior);
 		free(treeArr[whichPartition][i].likenc);
 		free(treeArr[whichPartition][i].posteriornc);
+		free(treeArr[whichPartition][i].name);
 	}
 	free(treeArr[whichPartition]);
 }

@@ -619,6 +619,7 @@ double findmax_Arr(double newinvecter[], double lowbound[], double upbound[], in
 	{
 
 	double gtol, fret;
+	fret = fun(newinvecter, whichRoot);
 	int i, iter;
 	
 	oldf0 = 0.0;

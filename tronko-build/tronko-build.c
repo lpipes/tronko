@@ -331,6 +331,24 @@ void readSeqArr(FILE *partitionsFile, int maxname, struct masterArr *master){
 	}
 	if (master->numspec < 3) {printf("This is for more than two seq.s only!\n"); exit(-1);}
 }
+char* readNewickFile( FILE *file){
+	fseek(file, 0, SEEK_END);        // Move to the end of the file
+	long fileSize = ftell(file);     // Get the size of the file
+	fseek(file, 0, SEEK_SET);        // Move back to the beginning
+	char *buffer = malloc(fileSize + 1); // +1 for null terminator
+	if (buffer == NULL) {
+		fprintf(stderr, "Error: Memory allocation failed while reading Newick file.\n");
+		exit(EXIT_FAILURE);
+	}
+	size_t bytesRead = fread(buffer, 1, fileSize, file);
+	if (bytesRead != fileSize) {
+		fprintf(stderr, "Error: Could not read the entire Newick file.\n");
+		free(buffer);
+		exit(EXIT_FAILURE);
+	}
+	buffer[bytesRead] = '\0';
+	return buffer;
+}
 int *findLeavesOfMinVarArr(int node, int *leafNodeList, int size, struct masterArr *m){
 	int child0 = m->tree[node].up[0];
 	int child1 = m->tree[node].up[1];
@@ -491,6 +509,43 @@ double calculateSPArr(struct masterArr *m){
 	printf("SPscore: %lf\n",SPscore);
 	return SPscore;
 }
+void writeNewick(FILE* file, masterArr* m, int nodeIndex) {
+	node* current = &m->tree[nodeIndex];
+	if (current->up[0] == -1) {
+		// Leaf node
+		if (current->name != NULL) {
+			fprintf(file, "%s", current->name);
+		}else{
+			fprintf(file, "UnnamedLeaf");
+		}
+	}else{
+		// Internal node
+		fprintf(file, "(");
+		for (int i = 0; i < current->nd; i++) {
+			if ( i>0 ){
+				fprintf(file, ",");
+			}
+			writeNewick(file, m, current->up[i]);
+		}
+		fprintf(file, ")");
+
+		// Optional: Output the internal node's name if it has one
+		//if (current->name != NULL) {
+		//	fprintf(file, "%s", current->name);
+		//}
+	}
+		fprintf(file, ":%f", current->bl);
+}
+void exportTreeToNewick(struct masterArr* m, const char* filename){
+	FILE* file = fopen(filename, "w");
+	if ( file == NULL ){
+		fprintf(stderr, "Error: Cannot open file %s for writing.\n", filename);
+		exit(EXIT_FAILURE);
+	}
+	writeNewick(file, m, m->root);
+	fprintf(file, ";\n"); // Newick format ends with a semicolon
+	fclose(file);
+}
 void findMinVarianceArr(int node, int size, struct masterArr *m){
 	int child0 = m->tree[node].up[0];
 	int child1 = m->tree[node].up[1];
@@ -638,9 +693,17 @@ void createNewRoots(int rootCount, Options opt, int max_nodename, int max_lineTa
 			}
 			status = system(buf);
 			if (opt.prefix[0] == '\0' ){
-				snprintf(buf,BUFFER_SIZE,"raxmlHPC-PTHREADS --silent -m GTRGAMMA -w %s/ -n partition%d -p 1234 -T 8 -s %s/partition%d_MSA.phymlAln",opt.partitions_directory,which,opt.partitions_directory,which);
+				if ( opt.fasttree==0 ){
+					snprintf(buf,BUFFER_SIZE,"raxmlHPC-PTHREADS --silent -m GTRGAMMA -w %s/ -n partition%d -p 1234 -T 8 -s %s/partition%d_MSA.phymlAln",opt.partitions_directory,which,opt.partitions_directory,which);
+				}else{
+					snprintf(buf,BUFFER_SIZE,"FastTree -gtr -gamma -nt %s/partition%d_MSA.fasta > %s/RAxML_bestTree.partition%d.reroot",opt.partitions_directory,which,opt.partitions_directory,which); 
+				}
 			}else{
-				snprintf(buf,BUFFER_SIZE,"raxmlHPC-PTHREADS --silent -m GTRGAMMA -w %s/ -n %spartition%d -p 1234 -T 8 -s %s/%spartition%d_MSA.phymlAln",opt.partitions_directory,opt.prefix,which,opt.partitions_directory,opt.prefix,which);
+				if ( opt.fasttree==0 ){
+					snprintf(buf,BUFFER_SIZE,"raxmlHPC-PTHREADS --silent -m GTRGAMMA -w %s/ -n %spartition%d -p 1234 -T 8 -s %s/%spartition%d_MSA.phymlAln",opt.partitions_directory,opt.prefix,which,opt.partitions_directory,opt.prefix,which);
+				}else{
+					snprintf(buf,BUFFER_SIZE,"FastTree -gtr -gamma -nt %s/partition%d_MSA.fasta > %s/RAxML_bestTree.partition%d.reroot",opt.partitions_directory,which,opt.partitions_directory,which); 
+				}
 			}
 			status = system(buf);
 			char buf4[BUFFER_SIZE];
@@ -734,19 +797,58 @@ void createNewRoots(int rootCount, Options opt, int max_nodename, int max_lineTa
 		if (NULL==(partition=fopen(buf,"r"))){ puts("Cannot open partition file 2!"); exit(-1);}
 		readSeqArr(partition,max_nodename,t);
 		fclose(partition);
-		allocateTreeArrMemory(t,max_nodename);
 		if ( opt.prefix[0] == '\0' ){
 			snprintf(buf,BUFFER_SIZE,"%s/RAxML_bestTree.partition%d.reroot",opt.partitions_directory,which);
 		}else{
 			snprintf(buf,BUFFER_SIZE,"%s/RAxML_bestTree.%spartition%d.reroot",opt.partitions_directory,opt.prefix,which);
 		}
 		strcpy(t->filename,buf);
-		if (NULL==(partitionTree=fopen(buf,"r"))){ puts("Cannot open partition tree file!"); exit(-1);}
-		comma=0;
-		tip=0;
-		t->root=getcladeArr(partitionTree,t,max_nodename)-1;
-		fclose(partitionTree);
-		t->tree[t->root].down = -1;
+		if ( opt.fasttree == 0 ){
+			allocateTreeArrMemory(t,max_nodename);
+			if (NULL==(partitionTree=fopen(buf,"r"))){ puts("Cannot open partition tree file!"); exit(-1);}
+			comma=0;
+			tip=0;
+			t->root=getcladeArr(partitionTree,t,max_nodename)-1;
+			fclose(partitionTree);
+			t->tree[t->root].down = -1;
+		}
+		if ( opt.fasttree == 1 ){
+			t->numspec = 0;
+			t->numNodes = 0;
+			//const char* newick = "((A,B,C),(D,E));";
+			FILE *fasttreefile = fopen(buf,"r");
+			if (fasttreefile == NULL ){
+				fprintf(stderr, "Error: Could not open Newick file %s.\n", buf);
+				exit(EXIT_FAILURE);
+			}
+			char* newick = readNewickFile(fasttreefile);
+			fclose(fasttreefile);
+			srand(time(NULL)); // Seed random number generator
+			parseNewick(t, newick, max_nodename);
+			free(newick);
+			makeBinary(t,max_nodename);
+			exportTreeToNewick(t,buf);
+			int idx;
+			for(idx=0; idx<2*t->numspec-1; idx++){
+				node* newNode = &t->tree[idx];
+				newNode->up[0] = -1;
+				newNode->up[1] = -1;
+				newNode->down = -1;
+				newNode->nd = 0;
+				newNode->depth = 0;
+				newNode->bl = 0.0;
+			}
+			for(idx=0; idx<2*t->numspec-1; idx++){
+				//t->tree[idx].name = malloc((max_nodename+1)*sizeof(char));
+				memset(t->tree[idx].name, '\0', max_nodename+1);
+			}
+			if (NULL==(partitionTree=fopen(buf,"r"))){ puts("Cannot open partition tree file!"); exit(-1);}
+			comma=0;
+			tip=0;
+			t->root=getcladeArr(partitionTree,t,max_nodename)-1;
+			fclose(partitionTree);
+			t->tree[t->root].down = -1;
+		}
 		get_number_descendantsArr(t->root,t);
 		int child0 = t->tree[t->root].up[0];
 		int child1 = t->tree[t->root].up[1];
@@ -858,6 +960,217 @@ void populate(int* nodes, char** taxnames, int node){
 		printf("%s\n",seq);
 	}
 }*/
+int createNode( struct masterArr* m, int max_nodename){
+	int newIndex = m->numNodes++;
+	node* newTree = realloc(m->tree, m->numNodes * sizeof(node));
+	if ( newTree == NULL ){
+		fprintf(stderr, "Error: Memory allocation failed in createNode().\n");
+		exit(EXIT_FAILURE);
+	}
+	m->tree = newTree;
+	node* newNode = &m->tree[newIndex];
+	//newNode->up[0] = -1;
+	//newNode->up[1] = -1;
+	int i;
+	for(i=0; i<1000; i++){
+		newNode->up[i] = -1;
+	}
+	newNode->down = -2;
+	newNode->nd = 0;
+	newNode->depth = 0;
+	newNode->bl = 0.0;
+	newNode->name = malloc((max_nodename+1)*sizeof(char));
+	memset(newNode->name, '\0', max_nodename+1);  // name is 20 bytes
+	newNode->like = malloc(STATESPACE*(sizeof(double)));
+	newNode->posterior = malloc(STATESPACE*(sizeof(double)));
+	newNode->likenc = NULL;
+	newNode->posteriornc = NULL;
+	return newIndex;
+}
+int addChild( struct masterArr* m, int parentIndex, int childIndex){
+	node* parent = &m->tree[parentIndex];
+	node* child = &m->tree[childIndex];
+	parent->up[parent->nd] = childIndex;
+	parent->nd++;
+	child->down = parentIndex;
+}
+void parseNewick( struct masterArr* m, const char* newick, int max_nodename ){
+	int current = -1;
+	int tipIndex = 0;
+	int parent = -1;
+	const char* p = newick;
+	while( *p ){
+		if ( *p == '(' ){
+			int newIndex = createNode(m,max_nodename);
+			if ( current != -1 ){
+				addChild(m, current, newIndex);
+			}else{
+				m->root = newIndex;
+			}
+			current = newIndex;
+			p++;
+		}else if ( *p == ')' ){
+			// Close current internal node and move up
+			if ( current == -1 ){
+				fprintf(stderr, "Error: Mismatched parentheses in Newick string.\n");
+				exit(EXIT_FAILURE);
+			}
+			p++;
+			// After ')', there may be a node label or branch length
+			const char* start = p;
+			// Parse node label if present
+			if (*p && strchr("():,;", *p) == NULL && *p != ':') {
+				// Read node label
+				while (*p && strchr("():,;", *p) == NULL && *p != ':') {
+					p++;
+				}
+				size_t len = p - start;
+				if ( len > 0 ){
+					//m->tree[current].name = malloc(len + 1);
+					strncpy(m->tree[current].name, start, len);
+					m->tree[current].name[len] = '\0';
+				}
+			}
+			// Check for branch length
+			if (*p == ':') {
+				p++;
+				m->tree[current].bl = strtod(p, (char**)&p);
+			}
+			// Check if we're at the root (no parent)
+			if ( current == m->root ){
+				// At root, no parent to move up to; simply continue
+				current = -1;
+			}else{
+				// Otherwise, move up to the parent node
+				current = m->tree[current].down;
+			}
+		}else if ( *p == ':' ){
+			p++;
+			m->tree[current].bl = strtod(p, (char**)&p);
+		}else if ( *p == ','){
+			// Move to sibling processing
+			p++;
+		} else if ( *p == ';' ){
+			break;
+		}else{
+			//Parse node name
+			const char* start = p;
+			while (*p && strchr("():,;", *p) == NULL) {
+				p++;
+			}
+			size_t len = p - start;
+			if ( len > 0 ){
+				int newIndex = createNode(m,max_nodename);
+				//m->tree[newIndex].name = malloc( len + 1);
+				strncpy(m->tree[newIndex].name, start, len);
+				m->tree[newIndex].name[len] = '\0';
+				m->tree[newIndex].nd = 0;
+				m->tree[newIndex].depth = 1;
+				m->numspec++;
+
+				// Link to the current node
+				addChild(m, current, newIndex);
+				current = newIndex;
+			}
+			// Check for branch length
+			if (*p == ':') {
+				p++;
+				m->tree[current].bl = strtod(p, (char**)&p);
+			}
+			// Move back up to parent
+			current = m->tree[current].down;
+		}
+	}
+	// Ensure we finish at the root
+	if ( current != -1 ){
+		fprintf(stderr, "Error: Unmatched opening parenthesis in Newick string.\n");
+		exit(EXIT_FAILURE);
+	}
+}
+void resolvePolytomy(struct masterArr* m, int nodeIndex, int max_nodename){
+	while( m->tree[nodeIndex].nd > 2 ){
+		node* current = &m->tree[nodeIndex];
+		// Create a new internal node
+		int newNodeIndex = createNode(m,max_nodename);
+		current = &m->tree[nodeIndex];
+		node* newNode = &m->tree[newNodeIndex];
+		int nd = current->nd;
+		//Randomly select two distinct children to combine
+		int idx1 = rand() % nd;
+		int idx2;
+		do {
+			idx2 = rand() % nd;
+		}while(idx2 == idx1);
+
+		//Get the child indices
+		int childIndex1 = current->up[idx1];
+		int childIndex2 = current->up[idx2];
+
+		//Ensure idx1 and idx2 are in order to remove them correctly
+		if ( idx1 > idx2 ){
+			int tempIdx = idx1;
+			idx1 = idx2;
+			idx2 = tempIdx;
+
+			int tempChild = childIndex1;
+			childIndex1 = childIndex2;
+			childIndex2 = tempChild;
+		}
+
+		// Remove the moved child from the current node's `up[]` array
+		for (int i = idx1; i < current->nd - 1; i++) {
+			current->up[i] = current->up[i + 1];
+		}
+		current->nd--;  // Decrement the number of descendants for the parent
+	
+		//Adjust idx2 since the array has shifted
+		idx2--;
+		for (int i = idx2; i < current->nd - 1; i++) {
+			current->up[i] = current->up[i + 1];
+		}
+		current->nd--;
+
+		// Clear the now unused slots
+		current->up[current->nd] = -1;
+		current->up[current->nd + 1] = -1;
+
+		// Set the new internal node's children and parent relationships
+		newNode->up[0] = childIndex1;
+		newNode->up[1] = childIndex2;
+		newNode->nd = 2;
+		newNode->down = nodeIndex;
+
+		// Update the moved children's parent relationships
+		m->tree[childIndex1].down = newNodeIndex;
+		m->tree[childIndex2].down = newNodeIndex;
+
+		// Add the new internal node as a child of the current node
+		current->up[current->nd] = newNodeIndex;
+		current->nd++;  // Increment the number of descendants for the parent
+
+		//printf("Resolving polytomy at node %d: combined children %d and %d into new internal node %d\n",nodeIndex, childIndex1, childIndex2, newNodeIndex);
+
+		// Debugging: Print the current and newNode state
+		//printf("Updated node %d: nd=%d, up={", nodeIndex, current->nd);
+		//for (int i = 0; i < current->nd; i++) {
+		//	printf("%d ", current->up[i]);
+		//}
+		//printf("}\n");
+		//printf("New Node %d: nd=%d, up={%d, %d}, down=%d\n", newNodeIndex, newNode->nd, newNode->up[0], newNode->up[1], newNode->down);
+	}
+}
+void makeBinary( struct masterArr* m, int max_nodename){
+	int i;
+	for(i=0; i<m->numNodes; i++){
+		node* n = &m->tree[i];
+		// Skip leaves
+		if ( n->nd <= 2 ){
+			continue;
+		}
+		// Resolve polytomy for nodes with more than 2 children
+		resolvePolytomy(m,i,max_nodename);
+	}
+}
 int main(int argc, char **argv){
 	Options opt;
 	opt.min_leaves=0;
@@ -865,6 +1178,7 @@ int main(int argc, char **argv){
 	opt.use_spscore=0;
 	opt.use_min_leaves=0;
 	opt.sp_score = 0.05;
+	opt.fasttree=0;
 	opt.missing_data=1;
 	opt.restart = 0;
 	opt.two_step = 0;
@@ -888,12 +1202,6 @@ int main(int argc, char **argv){
 	int max_nodename = 0;
 	int max_tax_name = 0;
 	int max_lineTaxonomy = 0;
-	/*gzFile ref = Z_NULL;
-	if (( ref = gzopen("../cluster_quality/PITS_new/clusters2_wo18_tronkodb/reference_tree.txt","r")) == (FILE *) NULL) fprintf(stderr,"MSA file could not be opened.\n");
-	i=readReferenceTree(ref);
-	gzclose(ref);
-	printf("pass\n");
-	exit(1);*/
 	hashmap_init(&mastermap,hashmap_hash_string,strcmp);
 	if (opt.number_of_trees==1 && opt.use_partitions==0){
 		printf("Using a single tree... \n");
@@ -1060,6 +1368,7 @@ int main(int argc, char **argv){
 			m->numspec = setNumspecArr(partition);
 			printf("m->numspec: %d\n",m->numspec);
 			fclose(partition);
+			m->numNodes = 0;
 			m->tree=(struct node*)malloc((2*m->numspec-1)*sizeof(struct node));
 			m->msa=(int**)malloc(m->numspec*sizeof(int*));
 			m->taxonomy=(char***)malloc(m->numspec*sizeof(char**));
@@ -1103,7 +1412,14 @@ int main(int argc, char **argv){
 				SPscoreArr[i]=0;
 				createNewRoots(i,opt,max_nodename,max_lineTaxonomy,m);
 			}
+			free(pf->tax_files[i]);
+			free(pf->msa_files[i]);
+			free(pf->tree_files[i]);
 		}
+		free(pf->tax_files);
+		free(pf->msa_files);
+		free(pf->tree_files);
+		free(pf);
 	}
 	free(SPscoreArr);
 		if ( opt.two_step == 1 ){
@@ -1313,6 +1629,15 @@ int main(int argc, char **argv){
 	}*/
 	for(i=0; i<numberOfTrees; i++){
 		freeTreeMemory(i);
+		for(j=0; j<numspecArr[i]; j++){
+			free(seqArr[i][j]);
+			for(k=0; k<7; k++){
+				free(taxonomyArr[i][j][k]);
+			}
+			free(taxonomyArr[i][j]);
+		}
+		free(taxonomyArr[i]);
+		free(seqArr[i]);
 	}
 	free(treeArr);
 	//hashmap_cleanup(&mastermap);

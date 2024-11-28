@@ -31,6 +31,7 @@ Alignment-based and composition-based assignment methods calculate the lowest co
 		-p, break the db build into two steps
 		-r, remove unused trees and copy trees from initial partition directory [can only be used with -p]
 		-i, [STRING] set the prefix for output partitions in -d
+		-a, use fasttree instead of RAxML
 
 # tronko-assign
 `tronko-assign` is for species assignment of queries. It requires a `tronko-build` database.

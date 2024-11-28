@@ -21,6 +21,7 @@ static struct Options long_options[]=
 	{"two-step-build", no_argument, 0, 'p'},
 	{"remove-unused-trees", no_argument, 0, 'r'},
 	{"prefix", required_argument, 0, 'i'},
+	{"fasttree", no_argument, 0, 'a'}
 };
 
 char usage[] = "\ntronko-build [OPTIONS] -d [OUTPUT DIRECTORY]\n\
@@ -44,6 +45,7 @@ char usage[] = "\ntronko-build [OPTIONS] -d [OUTPUT DIRECTORY]\n\
 	-p, break the db build into two steps\n\
 	-r, remove unused trees and copy trees from initial partition directory [can only be used with -p]\n\
 	-i, [STRING] set the prefix for output partitions in -d\n\
+	-a, use fasttree instead of RAxML\n\
 	\n";
 
 void print_help_statement(){
@@ -59,7 +61,7 @@ void parse_options(int argc, char **argv, Options *opt){
 		exit(0);
 	}
 	while(1){
-		c=getopt_long(argc,argv,"hspvlgryu:t:m:d:o:x:1:2:i:a:c:e:n:b:D:f:",long_options, &option_index);
+		c=getopt_long(argc,argv,"hspvlgaryu:t:m:d:o:x:1:2:i:c:e:n:b:D:f:",long_options, &option_index);
 		if (c==-1) break;
 		switch(c){
 			case 'h':
@@ -149,9 +151,7 @@ void parse_options(int argc, char **argv, Options *opt){
 					fprintf(stderr, "Invalid read 2 file.\n");
 				break;
 			case 'a':
-				success = sscanf(optarg, "%s", opt->fasta_file);
-				if (!success)
-					fprintf(stderr, "Invalid fasta file.\n");
+				opt->fasttree = 1;
 				break;
 			case 'c':
 				success = sscanf(optarg, "%d", &(opt->famsa_threads));

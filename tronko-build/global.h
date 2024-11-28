@@ -39,7 +39,7 @@ extern char ***taxonomy;
 extern char ****taxonomyArr;
 
 typedef struct node{
-	int up[2];
+	int up[1000];
 	int down;
 	int nd;
 	int depth;
@@ -123,6 +123,7 @@ typedef struct Options{
 	char prefix[2000];
 	int missing_data;
 	int famsa_threads;
+	int fasttree;
 }Options;
 
 typedef struct masterArr{
@@ -131,6 +132,7 @@ typedef struct masterArr{
 	int **msa;
 	char ***taxonomy;
 	int numspec;
+	int numNodes;
 	int root;
 	int numbase;
 	char **names;
