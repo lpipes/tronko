@@ -1,14 +1,14 @@
 #include "readfasta.h"
 
 /*some old code for reading a fasta file and storing DNA as ints*/
-void setNumspec(FILE* infile, int* specs){
+void setNumspec(gzFile infile, int* specs){
 	char buffer[FASTA_MAXLINE];
 	int countLeafNodes = 0;
 	int max_numbase=0;
 	int max_nodename=0;
 	int iter=0;
 	int i=0;
-	while( fgets(buffer,FASTA_MAXLINE,infile) != NULL ){
+	while( gzgets(infile,buffer,FASTA_MAXLINE) != NULL ){
 		if ( buffer[0] == '>' ){
 			countLeafNodes++;
 			if ( max_nodename < strlen(buffer) ){
@@ -23,6 +23,9 @@ void setNumspec(FILE* infile, int* specs){
 			iter=1;
 		}
 	}
+	if ( gzeof(infile)== 0){
+		fprintf(stderr,"Error reading file: %s\n", gzerror(infile,NULL));
+	}
 	if (specs[0] < countLeafNodes){
 		specs[0] = countLeafNodes;
 	}
@@ -33,13 +36,16 @@ void setNumspec(FILE* infile, int* specs){
 		specs[2] = max_numbase;
 	}
 }
-int setNumspecArr(FILE *partitionsFile){
+int setNumspecArr(gzFile partitionsFile){
 	char buffer[FASTA_MAXLINE];
 	int countLeafNodes = 0;
-	while( fgets(buffer,FASTA_MAXLINE,partitionsFile) != NULL ){
+	while( gzgets(partitionsFile,buffer,FASTA_MAXLINE) != NULL ){
 		if ( buffer[0] == '>' ){
 			countLeafNodes++;
 		}
+	}
+	if ( gzeof(partitionsFile)== 0){
+		fprintf(stderr,"Error reading file: %s\n", gzerror(partitionsFile,NULL));
 	}
 	return countLeafNodes;
 }
@@ -121,7 +127,7 @@ int setNumspecArr(FILE *partitionsFile){
 	}
 	if (numspecArr[whichPartitions] < 3) {printf("This is for more than two seq.s only!\n"); exit(-1);}
 }*/
-void readseq(FILE* infile, int max_nodename, struct masterArr *master){
+void readseq(gzFile infile, int max_nodename, struct masterArr *master){
 	char buffer[FASTA_MAXLINE];
 	int i, j, test, m, k=0, row=0;
 	for(i=0; i<FASTA_MAXLINE; i++){
@@ -134,7 +140,7 @@ void readseq(FILE* infile, int max_nodename, struct masterArr *master){
 	int firstIter=1;
 	int index=0;
 	int tmp1=0;
-	while( fgets(buffer,FASTA_MAXLINE,infile) != NULL){
+	while( gzgets(infile,buffer,FASTA_MAXLINE) != NULL){
 		char* buffer2;
 		s = strtok_r(buffer,"\n\0",&buffer2);
 		size = strlen(buffer);

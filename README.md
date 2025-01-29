@@ -17,7 +17,7 @@ Alignment-based and composition-based assignment methods calculate the lowest co
 		-y, use a partition directory (you want to partition or you have multiple clusters)
 		-l, use only single tree (do not partition)
 		-t [FILE], compatible only with -l, rooted phylogenetic tree [FILE: Newick]
-		-m [FILE], comptabile only with -l, multiple sequence alignment [FILE: FASTA]
+		-m [FILE], comptabile only with -l, multiple sequence alignment [FILE: FASTA] (can be gzipped)
 		-x [FILE], taxonomy file [FILE: FASTA_header	domain;phylum;class;order;family;genus;species, use only with -l]
 		-e [DIRECTORY], compatible only with -y, directory for reading multiple clusters
 		-n [INT], compatible only with -y, number of partitions in read directory

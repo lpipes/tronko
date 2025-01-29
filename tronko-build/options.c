@@ -31,7 +31,7 @@ char usage[] = "\ntronko-build [OPTIONS] -d [OUTPUT DIRECTORY]\n\
 	-y, use a partition directory (you want to partition or you have multiple clusters)\n\
 	-l, use only single tree (do not partition)\n\
 	-t [FILE], compatible only with -l, rooted phylogenetic tree [FILE: Newick]\n\
-	-m [FILE], comptabile only with -l, multiple sequence alignment [FILE: FASTA]\n\
+	-m [FILE], comptabile only with -l, multiple sequence alignment [FILE: FASTA] (can be gzipped)\n\
 	-x [FILE], taxonomy file [FILE: FASTA_header\tdomain;phylum;class;order;family;genus;species, use only with -l]\n\
 	-e [DIRECTORY], compatible only with -y, directory for reading multiple clusters\n\
 	-n [INT], compatible only with -y, number of partitions in read directory\n\

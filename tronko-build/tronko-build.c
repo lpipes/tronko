@@ -276,7 +276,7 @@ int* getTaxonomyArr_UsePartitions(int node, int whichPartitions, char**** taxono
 	if(taxIndexB != NULL) free(taxIndexB);
 	return taxonomyOfNode;
 }
-void readSeqArr(FILE *partitionsFile, int maxname, struct masterArr *master){
+void readSeqArr(gzFile partitionsFile, int maxname, struct masterArr *master){
 	char buffer[FASTA_MAXLINE];
 	int i, j, m, k=0, row=0;
 	char c;
@@ -285,7 +285,7 @@ void readSeqArr(FILE *partitionsFile, int maxname, struct masterArr *master){
 	char *s;
 	int firstIter=1;
 	int index=0;
-	while( fgets(buffer,FASTA_MAXLINE,partitionsFile) != NULL){
+	while( gzgets(partitionsFile,buffer,FASTA_MAXLINE) != NULL){
 		s = strtok(buffer,"\n");
 		size = strlen(s);
 		if ( buffer[0] == '>'){
@@ -576,7 +576,8 @@ void createNewRoots(int rootCount, Options opt, int max_nodename, int max_lineTa
 	int i,j,k,count;
 	char buffer[BUFFER_SIZE];
 	int *leaves;
-	FILE *partition, *partitionTree;
+	gzFile partition;
+	FILE *partitionTree;
 	minVariance = 99999999999999;
 	findMinVarianceArr(m->root,m->numspec,m);
 	int *partition1 = (int *)malloc(sizeof(int)*m->tree[m->tree[minVarNode].up[0]].nd);
@@ -784,9 +785,12 @@ void createNewRoots(int rootCount, Options opt, int max_nodename, int max_lineTa
 			t->filename[i] = '\0';
 		}
 		sprintf(t->index,"%d",which-1);
-		if (NULL==(partition=fopen(buf,"r"))){ puts("Cannot open partition file 1!"); exit(-1);}
+		if ((partition = gzopen(buf,"r")) == NULL ){
+			fprintf(stderr, "Cannot open %s: %s\n", buffer, strerror(errno));
+			exit(EXIT_FAILURE);
+		}
 		t->numspec=setNumspecArr(partition);
-		fclose(partition);
+		gzclose(partition);
 		t->tree=(struct node*)malloc((2*t->numspec-1)*sizeof(struct node));
 		t->names=(char**)malloc(sizeof(char*)*t->numspec);
 		for(i=0; i<t->numspec; i++){
@@ -794,9 +798,12 @@ void createNewRoots(int rootCount, Options opt, int max_nodename, int max_lineTa
 		}
 		t->msa=(int**)malloc(t->numspec*sizeof(int*));
 		t->taxonomy=(char***)malloc(t->numspec*sizeof(char**));
-		if (NULL==(partition=fopen(buf,"r"))){ puts("Cannot open partition file 2!"); exit(-1);}
+		if ((partition = gzopen(buf,"r")) == NULL ){
+			fprintf(stderr, "Cannot open %s: %s\n", buffer, strerror(errno));
+			exit(EXIT_FAILURE);
+		}
 		readSeqArr(partition,max_nodename,t);
-		fclose(partition);
+		gzclose(partition);
 		if ( opt.prefix[0] == '\0' ){
 			snprintf(buf,BUFFER_SIZE,"%s/RAxML_bestTree.partition%d.reroot",opt.partitions_directory,which);
 		}else{
@@ -1215,10 +1222,10 @@ int main(int argc, char **argv){
 		specifications[0]=0;
 		specifications[1]=0;
 		specifications[2]=0;
-		FILE* infile;
-		if (( infile = fopen(opt.msa_file,"r")) == (FILE *) NULL) fprintf(stderr,"MSA file could not be opened.\n");
+		gzFile infile;
+		if (( infile = gzopen(opt.msa_file,"r")) == NULL) fprintf(stderr,"MSA file could not be opened.\n");
 		setNumspec(infile,specifications);
-		fclose(infile);
+		gzclose(infile);
 		m->numspec = specifications[0];
 		max_nodename = specifications[1];
 		m->numbase = specifications[2];
@@ -1237,9 +1244,9 @@ int main(int argc, char **argv){
 		for(i=0; i<m->numspec; i++){
 			m->msa[i]=(int *)malloc(m->numbase*sizeof(int));
 		}
-		if (( infile = fopen(opt.msa_file,"r")) == (FILE *) NULL) fprintf(stderr,"MSA file could not be opened.\n");
+		if (( infile = gzopen(opt.msa_file,"r")) == NULL) fprintf(stderr,"MSA file could not be opened.\n");
 		readseq(infile,max_nodename,m);
-		fclose(infile);
+		gzclose(infile);
 		allocateTreeArrMemory(m,max_nodename);
 		comma=0;
 		tip=0;
@@ -1325,11 +1332,14 @@ int main(int argc, char **argv){
 			if (NULL==(taxfiles=fopen(buffer,"r"))){ puts ("Cannot open tax file!"); exit(-1); }
 			findMaxTaxName(taxfiles,tax_specs);
 			fclose(taxfiles);
-			FILE *msafiles;
+			gzFile msafiles;
 			snprintf(buffer,BUFFER_SIZE,"%s/%s",opt.readdir,pf->msa_files[i]);
-			if (NULL==(msafiles=fopen(buffer,"r"))){ puts ("Cannot open tax file!"); exit(-1); }
+			if ((msafiles=gzopen(buffer,"r"))==NULL){
+				fprintf(stderr, "Cannot open %s: %s\n", buffer, strerror(errno));
+				exit(EXIT_FAILURE);
+			}
 			setNumspec(msafiles,specifications);
-			fclose(msafiles);
+			gzclose(msafiles);
 		}
 		max_tax_name = tax_specs[0];
 		max_lineTaxonomy = tax_specs[1];
@@ -1338,7 +1348,8 @@ int main(int argc, char **argv){
 		max_nodename = specifications[1];
 		int max_numbase = specifications[2];
 		free(specifications);
-		FILE *partition, *partitionTree;
+		gzFile partition;
+		FILE *partitionTree;
 		int status;
 		int partition_count = opt.number_of_partitions;
 		for(i=0; i<partition_count; i++){
@@ -1364,10 +1375,13 @@ int main(int argc, char **argv){
 			//itoa(i,m->index,10);
 			sprintf(m->index,"%d",i);
 			snprintf(buffer,BUFFER_SIZE,"%s/%s",opt.readdir,pf->msa_files[i]);
-			if (NULL==(partition=fopen(buffer,"r"))){ puts("Cannot open partition file!"); exit(-1);}
+			if (NULL==(partition=gzopen(buffer,"r"))==NULL){
+				fprintf(stderr, "Cannot open %s: %s\n", buffer, strerror(errno));
+				exit(EXIT_FAILURE);	
+			}
 			m->numspec = setNumspecArr(partition);
 			printf("m->numspec: %d\n",m->numspec);
-			fclose(partition);
+			gzclose(partition);
 			m->numNodes = 0;
 			m->tree=(struct node*)malloc((2*m->numspec-1)*sizeof(struct node));
 			m->msa=(int**)malloc(m->numspec*sizeof(int*));
@@ -1380,9 +1394,12 @@ int main(int argc, char **argv){
 			for(j=0;j<m->numspec;j++){
 				m->names[j]=(char*)malloc(sizeof(char)*(max_nodename+1));
 			}
-			if (NULL==(partition=fopen(buffer,"r"))){ puts("Cannot open partition file!"); exit(-1);}
+			if ((partition=gzopen(buffer,"r"))==NULL){
+				fprintf(stderr,"Cannot open %s: %s\n", buffer, strerror(errno));
+				exit(EXIT_FAILURE);
+			}
 			readSeqArr(partition,max_nodename,m);
-			fclose(partition);
+			gzclose(partition);
 			allocateTreeArrMemory(m,max_nodename);
 			snprintf(buffer,BUFFER_SIZE,"%s/%s",opt.readdir,pf->tree_files[i]);
 			strcpy(m->filename,buffer);
