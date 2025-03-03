@@ -1277,7 +1277,7 @@ static void worker2(void *data, int i, int tid)
 		if (bwa_verbose >= 4) printf("=====> Finalizing read '%s' <=====\n", w->seqs[i].name);
 		mem_mark_primary_se(w->opt, w->regs[i].n, w->regs[i].a, w->n_processed + i);
 		if (w->opt->flag & MEM_F_PRIMARY5) mem_reorder_primary5(w->opt->T, &w->regs[i]);
-		printf("Is this the index? %d\n",i);
+		//printf("Is this the index? %d\n",i);
 		mem_reg2sam(w->opt, w->bns, w->pac, &w->seqs[i], &w->regs[i], 0, 0, w->concordant, i, w->startline, paired);
 		free(w->regs[i].a);
 	} else {
