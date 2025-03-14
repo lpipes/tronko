@@ -1375,7 +1375,7 @@ int main(int argc, char **argv){
 			//itoa(i,m->index,10);
 			sprintf(m->index,"%d",i);
 			snprintf(buffer,BUFFER_SIZE,"%s/%s",opt.readdir,pf->msa_files[i]);
-			if (NULL==(partition=gzopen(buffer,"r"))==NULL){
+			if ((partition=gzopen(buffer,"r"))==NULL){
 				fprintf(stderr, "Cannot open %s: %s\n", buffer, strerror(errno));
 				exit(EXIT_FAILURE);	
 			}
