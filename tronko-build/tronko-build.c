@@ -1491,9 +1491,37 @@ int main(int argc, char **argv){
 						if ( found == 0 ){
 							printf("removing %s...\n",tempfilename);
 							char partition_buffer2[BUFFER_SIZE];
-							snprintf(partition_buffer2,BUFFER_SIZE,"rm %s/*%s*",opt.partitions_directory,tempfilename);
+							snprintf(partition_buffer2,BUFFER_SIZE,"rm %s/%s_MSA.fasta",opt.partitions_directory,tempfilename);
 							int status=0;
 							status=system(partition_buffer2);	
+							snprintf(partition_buffer2,BUFFER_SIZE,"rm %s/%s_taxonomy.txt",opt.partitions_directory,tempfilename);
+							status=0;
+							status=system(partition_buffer2);
+
+							snprintf(partition_buffer2,BUFFER_SIZE,"rm %s/RAxML_bestTree.%s",opt.partitions_directory,tempfilename);
+							status=0;
+							status=system(partition_buffer2);
+							snprintf(partition_buffer2,BUFFER_SIZE,"rm %s/RAxML_bestTree.%s.reroot",opt.partitions_directory,tempfilename);
+							status=0;
+							status=system(partition_buffer2);
+							snprintf(partition_buffer2,BUFFER_SIZE,"rm %s/%s_MSA.phymlAln",opt.partitions_directory,tempfilename);
+							status=0;
+							status=system(partition_buffer2);
+							snprintf(partition_buffer2,BUFFER_SIZE,"rm %s/%s_MSA.phymlAln.reduced",opt.partitions_directory,tempfilename);
+							status=0;
+							status=system(partition_buffer2);
+							snprintf(partition_buffer2,BUFFER_SIZE,"rm %s/RAxML_log.%s",opt.partitions_directory,tempfilename);
+							status=0;
+							status=system(partition_buffer2);
+							snprintf(partition_buffer2,BUFFER_SIZE,"rm %s/RAxML_result.%s",opt.partitions_directory,tempfilename);
+							status=0;
+							status=system(partition_buffer2);
+							snprintf(partition_buffer2,BUFFER_SIZE,"rm %s/RAxML_info.%s",opt.partitions_directory,tempfilename);
+							status=0;
+							status=system(partition_buffer2);
+							snprintf(partition_buffer2,BUFFER_SIZE,"rm %s/RAxML_parsimonyTree.%s",opt.partitions_directory,tempfilename);
+							status=0;
+							status=system(partition_buffer2);
 						}
 						free(tempfilename);
 						free(tempfilename2);
