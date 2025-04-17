@@ -455,11 +455,24 @@ void find_specs_for_reads(int* specs, gzFile file, int format){
 	int max_name_length = specs[0];
 	int max_query_length = specs[1];
 	char *buffer = (char *)malloc(sizeof(char)*FASTA_MAXLINE);
+	char last_name[FASTA_MAXLINE];
 	char *s;
 	int size = 0;
 	while(gzgets(file,buffer,FASTA_MAXLINE) != NULL){
 		s = strtok(buffer,"\n");
+		if ( s == NULL || s[0] == '\0' ){
+			if ( buffer[0] == '>' || buffer[0] == '@' ){
+				fprintf(stderr,"Fatal: encountered an empty header at record for read \"%s\" — aborting.\n",last_name[0] ? last_name : "<unknown>");
+			}else{
+				fprintf(stderr,"Fatal: encountered an empty sequence for read \"%s\" — aborting.\n",last_name[0] ? last_name : "<unknown>");
+			}
+			free(buffer);
+			gzclose(file);
+			exit(EXIT_FAILURE);
+		}
 		if (buffer[0] == '>' || buffer[0] == '@' ){
+			strncpy(last_name, s, FASTA_MAXLINE-1);
+			last_name[FASTA_MAXLINE-1] = '\0';
 			size = strlen(s);
 			if (max_name_length < size ){
 				max_name_length = size;

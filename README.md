@@ -256,5 +256,5 @@ Using leave-one-species-out and simulating reads (both paired-end and single-end
 
 # Citation
 
-Pipes L, and Nielsen R (2022) A rapid phylogeny-based method for accurate community profiling of large-scale metabarcoding datasets. bioRXiv.
-https://www.biorxiv.org/content/10.1101/2022.12.06.519402v1 
+Pipes L, and Nielsen R (2024) A rapid phylogeny-based method for accurate community profiling of large-scale metabarcoding datasets. eLife.
+https://elifesciences.org/articles/85794.pdf
