@@ -18,14 +18,16 @@ static struct hashmap_base {
     int (*compare)(const void *, const void *);
     void *(*key_dup)(const void *);
     void (*key_free)(void *);
-}hashmap_base;
+} hashmap_base;
 
 void hashmap_base_init(struct hashmap_base *hb,
-        size_t (*hash_func)(const void *), int (*compare_func)(const void *, const void *));
+                       size_t (*hash_func)(const void *),
+                       int (*compare_func)(const void *, const void *));
 void hashmap_base_cleanup(struct hashmap_base *hb);
 
 void hashmap_base_set_key_alloc_funcs(struct hashmap_base *hb,
-    void *(*key_dup_func)(const void *), void (*key_free_func)(void *));
+                                      void *(*key_dup_func)(const void *),
+                                      void (*key_free_func)(void *));
 
 int hashmap_base_reserve(struct hashmap_base *hb, size_t capacity);
 
@@ -37,10 +39,13 @@ void hashmap_base_clear(struct hashmap_base *hb);
 void hashmap_base_reset(struct hashmap_base *hb);
 
 struct hashmap_entry *hashmap_base_iter(const struct hashmap_base *hb,
-        const struct hashmap_entry *pos);
-bool hashmap_base_iter_valid(const struct hashmap_base *hb, const struct hashmap_entry *iter);
-bool hashmap_base_iter_next(const struct hashmap_base *hb, struct hashmap_entry **iter);
-bool hashmap_base_iter_remove(struct hashmap_base *hb, struct hashmap_entry **iter);
+                                        const struct hashmap_entry *pos);
+bool hashmap_base_iter_valid(const struct hashmap_base *hb,
+                             const struct hashmap_entry *iter);
+bool hashmap_base_iter_next(const struct hashmap_base *hb,
+                            struct hashmap_entry **iter);
+bool hashmap_base_iter_remove(struct hashmap_base *hb,
+                              struct hashmap_entry **iter);
 const void *hashmap_base_iter_get_key(const struct hashmap_entry *iter);
 void *hashmap_base_iter_get_data(const struct hashmap_entry *iter);
 int hashmap_base_iter_set_data(struct hashmap_entry *iter, void *data);
@@ -53,4 +58,3 @@ double hashmap_base_collisions_variance(const struct hashmap_base *hb);
 size_t hashmap_hash_default(const void *data, size_t len);
 size_t hashmap_hash_string(const char *key);
 size_t hashmap_hash_string_i(const char *key);
-

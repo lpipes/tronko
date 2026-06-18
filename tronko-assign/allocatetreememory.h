@@ -8,9 +8,10 @@
 #include "global.h"
 
 void allocatetreememory_for_nucleotide_Arr(int numberOfTrees);
-//void printNewick(FILE* file, int whichRoot, int idx);
+// void printNewick(FILE* file, int whichRoot, int idx);
 void allocateTreeArrMemory(int whichPartition, int max_nodename);
 void *calloc_check(size_t nmemb, size_t size);
 void allocateMemoryForTaxArr(int whichPartitions, int max_tax_name_len);
-void getReverseComplement(char *read, char *reverseComplement, int max_query_length);
+void getReverseComplement(char *read, char *reverseComplement,
+                          int max_query_length);
 #endif /* _ALLOC_TREE */

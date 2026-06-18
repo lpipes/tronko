@@ -12,15 +12,16 @@
 #include <sys/wait.h>
 #include <sys/stat.h>
 #include <sys/mman.h>
-#include <errno.h>                      
+#include <errno.h>
 #include <fcntl.h>
 #include <string.h>
 #include <zlib.h>
 
-void setNumspec(gzFile infile, int* specs);
+void setNumspec(gzFile infile, int *specs);
 int setNumspecArr(gzFile partitionsFile);
-//void readSeqArr(FILE *partitionsFile, int whichPartitions, int maxname);
-//void readSeqArr_UsePartitions(FILE *partitionsFile, int whichPartitions,int*** seqArr_heap, char*** nodeIDsArr_heap);
+// void readSeqArr(FILE *partitionsFile, int whichPartitions, int maxname);
+// void readSeqArr_UsePartitions(FILE *partitionsFile, int
+// whichPartitions,int*** seqArr_heap, char*** nodeIDsArr_heap);
 FILE *openFasta(char *infile);
 void readfasta(FILE *infile);
 void readseq(gzFile infile, int max_nodename, struct masterArr *m);

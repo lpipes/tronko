@@ -13,7 +13,8 @@
 
 void printtree();
 void printtreeArr();
-void printTreeFile(int numberOfTrees, int max_nodename, int max_tax_name, int max_lineTaxonomy, Options opt);
+void printTreeFile(int numberOfTrees, int max_nodename, int max_tax_name,
+                   int max_lineTaxonomy, Options opt);
 void printTaxonomyArrToFile(int numberOfTrees);
 void printTaxonomyToFile();
 void printTreeToFile();
