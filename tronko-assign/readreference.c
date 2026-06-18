@@ -1,4 +1,5 @@
 #include "readreference.h"
+#include "gz_linebuffer.h"
 
 int readInXNumberOfLines_fastq(int numberOfLinesToRead, gzFile query_reads,
                                int whichPair, Options opt, int max_query_length,
@@ -336,7 +337,14 @@ void shiftUp(int iter, int jump, int numberOfLinesToRead) {
     }
 }
 
-int readReferenceTree(gzFile referenceTree, int *name_specs) {
+int readReferenceTree(char const *filename, int *name_specs) {
+    int r = gz_linebuffer_open(filename);
+    if (!r) {
+        printf("Could not open reference file \"%s\" (%s:%d)\n", filename,
+               __FILE__, __LINE__);
+        exit(EXIT_FAILURE);
+    }
+
     char buffer[BUFFER_SIZE];
     char acc_name[30];
     int up[2], taxIndex[2];
@@ -344,23 +352,21 @@ int readReferenceTree(gzFile referenceTree, int *name_specs) {
     int max_lineTaxonomy, max_tax_name, max_nodename, treeNumber, nodeNumber,
         down, depth, success, i, j, k, firstIter, numberOfTrees;
     firstIter = 1;
-    char *refTreeFlag = buffer;
-    while (refTreeFlag != NULL) {
+    int something_was_read = 1;
+    while (something_was_read) {
         if (firstIter == 1) {
-            refTreeFlag = gzgets(referenceTree, buffer, BUFFER_SIZE);
-            if (refTreeFlag == NULL) {
-                break;
-            }
+            something_was_read = gz_linebuffer_gets(buffer, BUFFER_SIZE);
+            if (!something_was_read) break;
+
             s = strtok(buffer, "\n");
             if (s == NULL) {
                 success = 0;
             } else {
                 success = sscanf(s, "%d", &numberOfTrees);
             }
-            refTreeFlag = gzgets(referenceTree, buffer, BUFFER_SIZE);
-            if (refTreeFlag == NULL) {
-                break;
-            }
+            something_was_read = gz_linebuffer_gets(buffer, BUFFER_SIZE);
+            if (!something_was_read) break;
+
             s = strtok(buffer, "\n");
             if (s == NULL) {
                 success = 0;
@@ -368,7 +374,7 @@ int readReferenceTree(gzFile referenceTree, int *name_specs) {
                 success = sscanf(s, "%d", &max_nodename);
                 name_specs[0] = max_nodename;
             }
-            refTreeFlag = gzgets(referenceTree, buffer, BUFFER_SIZE);
+            something_was_read = gz_linebuffer_gets(buffer, BUFFER_SIZE);
             s = strtok(buffer, "\n");
             if (s == NULL) {
                 success = 0;
@@ -376,7 +382,7 @@ int readReferenceTree(gzFile referenceTree, int *name_specs) {
                 success = sscanf(s, "%d", &max_tax_name);
                 name_specs[1] = max_tax_name;
             }
-            refTreeFlag = gzgets(referenceTree, buffer, BUFFER_SIZE);
+            something_was_read = gz_linebuffer_gets(buffer, BUFFER_SIZE);
             s = strtok(buffer, "\n");
             if (s == NULL) {
                 success = 0;
@@ -388,10 +394,9 @@ int readReferenceTree(gzFile referenceTree, int *name_specs) {
             rootArr = (int *)malloc(numberOfTrees * (sizeof(int)));
             numspecArr = (int *)malloc(numberOfTrees * (sizeof(int)));
             for (i = 0; i < numberOfTrees; i++) {
-                refTreeFlag = gzgets(referenceTree, buffer, BUFFER_SIZE);
-                if (refTreeFlag == NULL) {
-                    break;
-                }
+                something_was_read = gz_linebuffer_gets(buffer, BUFFER_SIZE);
+                if (!something_was_read) break;
+
                 s = strtok(buffer, "\n");
                 if (s == NULL) {
                     success = 0;
@@ -400,6 +405,7 @@ int readReferenceTree(gzFile referenceTree, int *name_specs) {
                                      &(rootArr[i]), &(numspecArr[i]));
                 }
             }
+
             // for(i=0;i<numberOfTrees;i++){
             //	printf("Tree %d Numbase: %d, Root: %d, Numspec
             //%d\n",i,numbaseArr[i],rootArr[i],numspecArr[i]);
@@ -407,10 +413,10 @@ int readReferenceTree(gzFile referenceTree, int *name_specs) {
             allocateMemoryForTaxArr(numberOfTrees, max_tax_name);
             for (i = 0; i < numberOfTrees; i++) {
                 for (j = 0; j < numspecArr[i]; j++) {
-                    refTreeFlag = gzgets(referenceTree, buffer, BUFFER_SIZE);
-                    if (refTreeFlag == NULL) {
-                        break;
-                    }
+                    something_was_read =
+                        gz_linebuffer_gets(buffer, BUFFER_SIZE);
+                    if (!something_was_read) break;
+
                     s = strtok(buffer, ";\n");
                     taxonomyArr[i][j][0] = strcpy(taxonomyArr[i][j][0], s);
                     for (k = 1; k < 7; k++) {
@@ -426,10 +432,9 @@ int readReferenceTree(gzFile referenceTree, int *name_specs) {
             // allocatetreememory_for_nucleotide_Arr(numberOfTrees);
             firstIter = 0;
         }
-        refTreeFlag = gzgets(referenceTree, buffer, BUFFER_SIZE);
-        if (refTreeFlag == NULL) {
-            break;
-        }
+        something_was_read = gz_linebuffer_gets(buffer, BUFFER_SIZE);
+        if (!something_was_read) break;
+
         s = strtok(buffer, "\n");
         sscanf(s, "%d %d %d %d %d %d %d %d %s", &treeNumber, &nodeNumber,
                &(up[0]), &(up[1]), &down, &depth, &(taxIndex[0]),
@@ -444,10 +449,9 @@ int readReferenceTree(gzFile referenceTree, int *name_specs) {
             strcpy(treeArr[treeNumber][nodeNumber].name, acc_name);
         }
         for (i = 0; i < numbaseArr[treeNumber]; i++) {
-            refTreeFlag = gzgets(referenceTree, buffer, BUFFER_SIZE);
-            if (refTreeFlag == NULL) {
-                break;
-            }
+            something_was_read = gz_linebuffer_gets(buffer, BUFFER_SIZE);
+            if (!something_was_read) break;
+
             for (j = 0; j < 4; j++) {
                 if (j == 0) {
                     s = strtok(buffer, "\t");
@@ -464,6 +468,8 @@ int readReferenceTree(gzFile referenceTree, int *name_specs) {
             }
         }
     }
+
+    gz_linebuffer_close();
     return numberOfTrees;
 }
 

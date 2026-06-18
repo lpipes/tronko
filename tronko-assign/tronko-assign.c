@@ -964,15 +964,13 @@ int main(int argc, char **argv) {
                "Exiting...\n");
         exit(-1);
     }
-    gzFile referenceTree = Z_NULL;
-    referenceTree = gzopen(opt.reference_file, "r");
-    assert(Z_NULL != referenceTree);
     int *name_specs = (int *)malloc(3 * sizeof(int));
     name_specs[0] = 0;
     name_specs[1] = 0;
     name_specs[2] = 0;
-    numberOfTrees = readReferenceTree(referenceTree, name_specs);
-    gzclose(referenceTree);
+
+    numberOfTrees = readReferenceTree(opt.reference_file,name_specs);
+
     int max_nodename = name_specs[0];
     int max_taxname = name_specs[1];
     int max_lineTaxonomy = name_specs[2];

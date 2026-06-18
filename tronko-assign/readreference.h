@@ -19,7 +19,7 @@ int readInXNumberOfLines(int numberOfLinesToRead, gzFile query_reads,
                          int whichPair, Options opt, int max_query_length,
                          int max_readname_length);
 void shiftUp(int iter, int jump, int numberOfLinesToRead);
-int readReferenceTree(gzFile referenceTree, int *name_specs);
+int readReferenceTree(char const *filename, int *name_specs);
 int setNumbase_setNumspec(int numberOfPartitions, int *specs);
 void find_specs_for_reads(int *specs, gzFile file, int format);
 #endif /* _READ_REF_ */
