@@ -969,7 +969,7 @@ int main(int argc, char **argv) {
     name_specs[1] = 0;
     name_specs[2] = 0;
 
-    numberOfTrees = readReferenceTree(opt.reference_file,name_specs);
+    numberOfTrees = readReferenceTree(opt.reference_file, name_specs);
 
     int max_nodename = name_specs[0];
     int max_taxname = name_specs[1];
@@ -1465,9 +1465,9 @@ int main(int argc, char **argv) {
     }
     for (i = 0; i < numberOfTrees; i++) {
         for (j = 0; j < 2 * numspecArr[i] - 1; j++) {
-            for (k = 0; k < numbaseArr[i]; k++) {
-                free(treeArr[i][j].posteriornc[k]);
-            }
+            // posteriornc[1], [2], ... are all allocated together with [0]
+            // so we only free posteriornc[0]
+            free(treeArr[i][j].posteriornc[0]);
             free(treeArr[i][j].posteriornc);
         }
         for (j = numspecArr[i] - 1; j < (2 * numspecArr[i] - 1); j++) {

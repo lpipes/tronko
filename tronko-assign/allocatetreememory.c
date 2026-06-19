@@ -30,13 +30,14 @@ void allocateTreeArrMemory(int whichPartition, int max_nodename) {
         // treeArr[whichPartition][i].posteriornc = NULL;
         treeArr[whichPartition][i].posteriornc =
             (double **)malloc(numbaseArr[whichPartition] * sizeof(double *));
-        for (k = 0; k < numbaseArr[whichPartition]; k++) {
+
+        // this is much faster than calling malloc(4*sizeof double) in a loop
+        // calloc also sets all entries to 0.0
+        double *posteriorncmemblock =
+            calloc(numbaseArr[whichPartition] * 4, sizeof *posteriorncmemblock);
+        for (k = 0; k < numbaseArr[whichPartition]; k++)
             treeArr[whichPartition][i].posteriornc[k] =
-                (double *)malloc(4 * (sizeof(double)));
-            for (l = 0; l < 4; l++) {
-                treeArr[whichPartition][i].posteriornc[k][l] = 0.0;
-            }
-        }
+                posteriorncmemblock + 4 * k;
     }
     for (i = numspecArr[whichPartition] - 1;
          i < (numspecArr[whichPartition] * 2 - 1); i++) {
