@@ -1,0 +1,22 @@
+name: VS17-CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  ci:
+    name: windows-vs17
+    runs-on: windows-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v3
+    - name: Configure
+      run: |
+        cmake -B build
+    - name: Build Release
+      run: cmake --build build --config Release --verbose
+    - name: Test Release
+      run: ctest --test-dir build -C Release 

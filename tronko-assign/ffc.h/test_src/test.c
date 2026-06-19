@@ -1,0 +1,730 @@
+#define SONICSV_IMPLEMENTATION
+#include "sonicsv.h"
+
+#define FFC_DEBUG 0
+#define FFC_IMPL
+#include "ffc.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include <fenv.h>
+#include <assert.h>
+#include <inttypes.h>
+#include <string.h>
+
+#define FLOAT_MAXDIGITS_10 9
+#define DOUBLE_MAXDIGITS_10 17
+
+static inline ffc_outcome parse_outcome(uint64_t len, const char* outcome_text) {
+    static const struct { const char *name; ffc_outcome val; } map[] = {
+        {"ok",           FFC_OUTCOME_OK},
+        {"out_of_range", FFC_OUTCOME_OUT_OF_RANGE},
+        {"invalid",      FFC_OUTCOME_INVALID_INPUT},
+    };
+    if (len < strlen(map[0].name)) {
+      fprintf(stderr, "unexpected outcome text: '%.*s'\n", (int)len, outcome_text);
+      return FFC_OUTCOME_OK;
+    }
+    for (size_t i = 0; i < sizeof(map)/sizeof(*map); i++) {
+        if (strncmp(outcome_text, map[i].name, (size_t)len) == 0) return map[i].val;
+    }
+    fprintf(stderr, "unexpected outcome text: '%.*s'\n", (int)len, outcome_text);
+    return FFC_OUTCOME_OK;
+}
+
+static inline char* get_outcome_name(ffc_outcome outcome) {
+  switch (outcome) {
+  case FFC_OUTCOME_OK: return "ok";
+  case FFC_OUTCOME_INVALID_INPUT: return "invalid";
+  case FFC_OUTCOME_OUT_OF_RANGE: return "out_of_range";
+  default: return "unknown";
+  }
+}
+
+static inline char* my_strndup(size_t len, const char* src) {
+  char *nt = malloc(len + 1);
+  memcpy(nt, src, len);
+  nt[len] = '\0';
+  return nt;
+}
+
+char const *round_name(int d) {
+  switch (d) {
+  case FE_UPWARD:
+    return "FE_UPWARD";
+  case FE_DOWNWARD:
+    return "FE_DOWNWARD";
+  case FE_TOWARDZERO:
+    return "FE_TOWARDZERO";
+  case FE_TONEAREST:
+    return "FE_TONEAREST";
+  default:
+    return "UNKNOWN";
+  }
+}
+
+char *fHexAndDec_double(double v) {
+    char dec[64];
+    char *ret = malloc(128);
+    snprintf(dec, sizeof(dec), "%.*g", DBL_MAX_10_EXP + 1, v);
+    snprintf(ret, 128, "%a (%s)", v, dec);
+    return ret;
+}
+
+static int FAILS = 0;
+
+bool double_eq(double exp, double act) {
+  if (exp == act) {
+    return true;
+  } else {
+    if (isnan(exp) && isnan(act)) {
+      return signbit(exp) == signbit(act);
+    } else {
+      return false;
+    }
+  };
+}
+
+bool float_eq(float exp, float act) {
+  if (exp == act) {
+    return true;
+  } else {
+    if (isnan(exp) && isnan(act)) {
+      return signbit(exp) == signbit(act);
+    } else {
+      return false;
+    }
+  };
+}
+
+void assert_double(size_t len, const char *input, double exp, double act) {
+  if (!double_eq(exp, act)) {
+    printf("\n\ninput: %.*s\n", (int)len, input);
+    printf("\texp: %f\n\tact: %f\n\n", exp, act);
+    printf("\texp bits: 0x%"PRIx64"\n\tact bits: 0x%"PRIx64"\n\n", ffc_get_double_bits(exp), ffc_get_double_bits(act));
+    FAILS += 1;
+  }
+}
+
+void assert_float(size_t len, const char *input, float exp, float act) {
+  if (!float_eq(exp, act)) {
+    printf("\n\ninput: %.*s\n", (int)len, input);
+    printf("\texp: %f\n\tact: %f\n\n", exp, act);
+    printf("\texp bits: 0x%x\n\tact bits: 0x%x\n\n", ffc_get_float_bits(exp), ffc_get_float_bits(act));
+    FAILS += 1;
+  }
+}
+
+void verify_ext(size_t len, const char *input, ffc_value exp_value, ffc_value_kind vk, ffc_outcome exp_outcome, ffc_parse_options options) {
+  ffc_value value;
+
+  ffc_result result = ffc_from_chars((char*)input, (char*)&input[len], options, &value, vk);
+
+  if (exp_outcome != result.outcome) {
+    printf("\n\ninput: %.*s\n", (int)len, input);
+    printf("\tFAIL expected %s actual %s\n", get_outcome_name(exp_outcome), get_outcome_name(result.outcome)); 
+    FAILS += 1;
+  }
+
+  if (exp_outcome == FFC_OUTCOME_OK) {
+    switch (vk) {
+    case FFC_VALUE_KIND_DOUBLE:
+      assert_double(len, input, exp_value.d, value.d);
+      break;
+
+    case FFC_VALUE_KIND_FLOAT:
+      assert_float(len, input, exp_value.f, value.f);
+      break;
+    }
+    
+  }
+}
+
+void verify_double_ext(size_t len, const char *input, double exp_value, ffc_outcome exp_outcome, ffc_parse_options options) {
+  ffc_value expected;
+  expected.d = exp_value;
+  verify_ext(len, input, expected, FFC_VALUE_KIND_DOUBLE, exp_outcome, options);
+}
+
+void verify_float_ext(size_t len, const char *input, float exp_value, ffc_outcome exp_outcome, ffc_parse_options options) {
+  ffc_value expected;
+  expected.f = exp_value;
+  verify_ext(len, input, expected, FFC_VALUE_KIND_FLOAT, exp_outcome, options);
+}
+
+void verify_float(const char *input, float exp_value) {
+  verify_float_ext(strlen(input), input, exp_value, FFC_OUTCOME_OK, ffc_parse_options_default());
+}
+
+ffc_result run_double_options(char *input, double *out, ffc_parse_options options) {
+  size_t len = strlen(input);
+  return ffc_from_chars_double_options(input, &input[len], out, options);
+}
+
+#define verify(input, value) verify_double_ext(strlen(input), input, value, FFC_OUTCOME_OK, ffc_parse_options_default())
+#define verify_oor(input, value) verify_double_ext(strlen(input), input, value, FFC_OUTCOME_OUT_OF_RANGE, ffc_parse_options_default())
+#define verify_err(input, value, outcome) verify_double_ext(strlen(input), input, value, outcome, ffc_parse_options_default())
+#define verify_options(input, value, outcome) verify_double_ext(strlen(input), input, value, outcome, options)
+
+double const DBL_INF = (double)INFINITY;
+
+// Assumes C strings
+// Caller owns returned string
+char *append_zeros(const char *str, size_t number_of_zeros) {
+  size_t len = strlen(str);
+  char *answer = malloc(len + number_of_zeros + 1);
+  memcpy(answer, str, len);
+  memset(answer + len, '0', number_of_zeros);
+  answer[len + number_of_zeros] = '\0';
+  return answer;
+}
+
+// Assumes C strings
+char *string_concat(const char *str, const char *other) {
+  size_t l1 = strlen(str);
+  size_t l2 = strlen(other);
+  size_t len = l1 + l2;
+  char *result = malloc(len + 1);
+  memcpy(result, str, l1);
+  memcpy(result + l1, other, l2);
+  result[len] = '\0';
+  return result;
+}
+
+void double_special(void) {
+  verify(append_zeros("9007199254740993.0", 1000), 0x1p+53);
+
+  struct test_case {
+    char* input_data;
+    bool expected_success;
+    double expected_result;
+  };
+  const struct test_case whitespace_tests[] = {
+    //whitespace stresstest
+    {" \r\n\t\f\v3.16227766016838 \r\n\t\f\v", true, 3.16227766016838},
+    {" \r\n\t\f\v3 \r\n\t\f\v", true, 3.0},
+    {" \r\n\t\f\v2.82842712474619 \r\n\t\f\v", true, 2.82842712474619},
+    {" \r\n\t\f\v2.44948974278318 \r\n\t\f\v", true, 2.44948974278318},
+    {" \r\n\t\f\v2 \r\n\t\f\v", true, 2.0},
+    {" \r\n\t\f\v0 \r\n\t\f\v", true, 0.0},
+    {" \r\n\t\f\v1.73205080756888 \r\n\t\f\v", true, 1.73205080756888},
+    {" \r\n\t\f\v1 \r\n\t\f\v", true, 1.0},
+    {" \r\n\t\f\v1.4142135623731 \r\n\t\f\v", true, 1.4142135623731},
+    {" \r\n\t\f\v2.23606797749979 \r\n\t\f\v", true, 2.23606797749979},
+    {" \r\n\t\f\v2.64575131106459 \r\n\t\f\v", true, 2.64575131106459},
+    {"+2.2",true,2.2 },
+    {"0.",true,0.0 },
+    {"-.1",true,-0.1 },
+    {"+.1",true,0.1 },
+    {"1e+1",true,10.0 },
+    {"+1e1",true,10.0 },
+    {"-+0",false,0.0 }
+  };
+
+  ffc_parse_options options = ffc_parse_options_default();
+  options.format |= FFC_FORMAT_FLAG_SKIP_WHITE_SPACE;
+  options.format |= FFC_FORMAT_FLAG_ALLOW_LEADING_PLUS;
+
+  for (size_t i = 0; i < sizeof(whitespace_tests)/sizeof(*whitespace_tests); i++) {
+    const struct test_case *test_data = &whitespace_tests[i];
+    ffc_outcome exp_outcome = test_data->expected_success ? FFC_OUTCOME_OK : FFC_OUTCOME_INVALID_INPUT;
+    verify_double_ext(
+      strlen(test_data->input_data),
+      test_data->input_data,
+      test_data->expected_result,
+      exp_outcome,
+      options
+    );
+  }
+
+  // {"1d+4",false,0.0 },
+  double out;
+  char *i1 = "1d+4";
+  ffc_result r = run_double_options(i1, &out, options);
+  ptrdiff_t len = r.ptr - i1;
+  assert(len == 1);
+  assert(r.outcome == FFC_OUTCOME_OK);
+  assert(out == 1.0);
+
+  // {"1d-1",false,0.0 },
+  i1 = "1d-1";
+  r = run_double_options(i1, &out, options);
+  len = r.ptr - i1;
+  assert(len == 1);
+  assert(r.outcome == FFC_OUTCOME_OK);
+  assert(out == 1.0);
+
+}
+
+typedef struct cb_test_context {
+  ffc_parse_options options;
+  ffc_value_kind value_kind;
+} cb_test_context;
+
+void cb_test(const csv_row_t *row, void *ctx) {
+  // Extract settings from context
+  if (!ctx) {
+    fprintf(stderr, "cb_test missing ctx; aborting\n");
+    abort();
+  }
+  cb_test_context *test_ctx = (cb_test_context*)ctx;
+  ffc_parse_options options;
+  ffc_value_kind vk = test_ctx->value_kind;
+  options = test_ctx->options;
+
+  if (row->num_fields < 2) {
+    fprintf(stderr, "ERROR test row %d has only %zu column\n", (int)row->row_number, row->num_fields);
+    FAILS += 1;
+    return;
+  }
+  if (row->row_number == 1) {
+    return;
+  }
+  // Required
+  const csv_field_t *input_field = csv_get_field(row, 0);
+  const csv_field_t *expected_field = csv_get_field(row, 1);
+
+  // Possibly missing
+  const csv_field_t *outcome_field = csv_get_field(row, 2);
+  const csv_field_t *comment = csv_get_field(row, 3);
+  (void)comment;
+
+  ffc_value expected_value; 
+  bool is_max = strncmp(expected_field->data, "MAX", 3) == 0;
+  bool is_neg_max = strncmp(expected_field->data, "-MAX", 4) == 0;
+  bool is_min = strncmp(expected_field->data, "MIN", 3) == 0;
+  bool is_neg_min = strncmp(expected_field->data, "-MIN", 4) == 0;
+  bool is_neg_nan = strncmp(expected_field->data, "-nan", 4) == 0;
+  switch (vk) {
+  case FFC_VALUE_KIND_DOUBLE:
+    if (is_max) {
+      expected_value.d = DBL_MAX;
+    } else if (is_neg_max) {
+      expected_value.d = -DBL_MAX;
+    } else if (is_min) {
+      expected_value.d = DBL_MIN;
+    } else if (is_neg_min) {
+      expected_value.d = -DBL_MIN;
+    } else if (is_neg_nan) {
+      expected_value.d = -NAN;
+    } else {
+      expected_value.d = strtod(my_strndup(expected_field->size, expected_field->data), NULL);
+    };
+    break;
+  case FFC_VALUE_KIND_FLOAT:
+    if (is_max) {
+      expected_value.f = FLT_MAX;
+    } else if (is_neg_max) {
+      expected_value.f = -FLT_MAX;
+    } else if (is_min) {
+      expected_value.f = FLT_MIN;
+    } else if (is_neg_min) {
+      expected_value.f = -FLT_MIN;
+    } else if (is_neg_nan) {
+      expected_value.f = -NAN;
+    } else {
+      expected_value.f = strtof(my_strndup(expected_field->size, expected_field->data), NULL);
+    };
+    break;
+  }
+  ffc_outcome exp_outcome = outcome_field ? 
+    parse_outcome(outcome_field->size, outcome_field->data) : FFC_OUTCOME_OK;
+
+  verify_ext(input_field->size, (char*)input_field->data, expected_value, vk, exp_outcome, options);
+  return;
+}
+
+void test_file(const char* filename, csv_row_callback_t cb, ffc_parse_options options, ffc_value_kind vk) {
+    csv_parser_t *p = csv_parser_create(NULL);
+    cb_test_context test_ctx = {0};
+    test_ctx.options = options;
+    test_ctx.value_kind = vk;
+    csv_parser_set_row_callback(p, cb, &test_ctx);
+    csv_error_t error = csv_parse_file(p, filename);
+    if (error != CSV_OK) {
+      fprintf(stderr, "Failed to load test file: %s\n", filename);
+      abort();
+    }
+    csv_parser_destroy(p);
+}
+
+void double_rounds_to_nearest(void) {
+ static volatile double fmin = DBL_MIN;
+    char *s1, *s2;
+
+    fesetround(FE_UPWARD);
+    s1 = fHexAndDec_double(fmin + 1.0);
+    s2 = fHexAndDec_double(1.0 - fmin);
+    free(s1); free(s2);
+    assert(fegetround() == FE_UPWARD);
+    assert(ffc_rounds_to_nearest() == false);
+
+    fesetround(FE_DOWNWARD);
+    s1 = fHexAndDec_double(fmin + 1.0);
+    s2 = fHexAndDec_double(1.0 - fmin);
+    free(s1); free(s2);
+    assert(fegetround() == FE_DOWNWARD);
+    assert(ffc_rounds_to_nearest() == false);
+
+    fesetround(FE_TOWARDZERO);
+    s1 = fHexAndDec_double(fmin + 1.0);
+    s2 = fHexAndDec_double(1.0 - fmin);
+    free(s1); free(s2);
+    assert(fegetround() == FE_TOWARDZERO);
+    assert(ffc_rounds_to_nearest() == false);
+
+    fesetround(FE_TONEAREST);
+    s1 = fHexAndDec_double(fmin + 1.0);
+    s2 = fHexAndDec_double(1.0 - fmin);
+    free(s1); free(s2);
+    assert(fegetround() == FE_TONEAREST);
+#if (FLT_EVAL_METHOD == 1) || (FLT_EVAL_METHOD == 0)
+    assert(ffc_rounds_to_nearest() == true);
+#endif
+}
+
+void double_parse_zero(void) {
+  //
+  // If this function fails, we may be left in a non-standard rounding state.
+  //
+  char const *zero = "0";
+  uint64_t float64_parsed;
+  double f = 0;
+  memcpy(&float64_parsed, &f, sizeof(f));
+  assert(float64_parsed == 0);
+
+  fesetround(FE_UPWARD);
+  ffc_result r1 = ffc_from_chars_double(zero, zero + 1, &f);
+  assert(r1.outcome == FFC_OUTCOME_OK);
+  assert(f == 0.);
+  memcpy(&float64_parsed, &f, sizeof(f));
+  assert(float64_parsed == 0);
+
+  fesetround(FE_TOWARDZERO);
+  ffc_result r2 = ffc_from_chars_double(zero, zero + 1, &f);
+  assert(r2.outcome == FFC_OUTCOME_OK);
+  assert(f == 0.);
+  memcpy(&float64_parsed, &f, sizeof(f));
+  assert(float64_parsed == 0);
+
+  fesetround(FE_DOWNWARD);
+  ffc_result r3 = ffc_from_chars_double(zero, zero + 1, &f);
+  assert(r3.outcome == FFC_OUTCOME_OK);
+  assert(f == 0.);
+  memcpy(&float64_parsed, &f, sizeof(f));
+  assert(float64_parsed == 0);
+
+  fesetround(FE_TONEAREST);
+  ffc_result r4 = ffc_from_chars_double(zero, zero + 1, &f);
+  assert(r4.outcome == FFC_OUTCOME_OK);
+  assert(f == 0.);
+  memcpy(&float64_parsed, &f, sizeof(f));
+  assert(float64_parsed == 0);
+}
+
+void double_parse_negative_zero(void) {
+  //
+  // If this function fails, we may be left in a non-standard rounding state.
+  //
+  char const *negative_zero = "-0";
+  double f = -0.;
+  assert(ffc_get_double_bits(f) == 0x8000000000000000ULL);
+
+  fesetround(FE_UPWARD);
+  ffc_result r1 = ffc_from_chars_double(negative_zero, negative_zero + 2, &f);
+  assert(r1.outcome == FFC_OUTCOME_OK);
+  char *s1 = fHexAndDec_double(f);
+  free(s1);
+  assert(f == 0.);
+  assert(ffc_get_double_bits(f) == 0x8000000000000000ULL);
+
+  fesetround(FE_TOWARDZERO);
+  ffc_result r2 = ffc_from_chars_double(negative_zero, negative_zero + 2, &f);
+  assert(r2.outcome == FFC_OUTCOME_OK);
+  char *s2 = fHexAndDec_double(f);
+  free(s2);
+  assert(f == 0.);
+  assert(ffc_get_double_bits(f) == 0x8000000000000000ULL);
+
+  fesetround(FE_DOWNWARD);
+  ffc_result r3 = ffc_from_chars_double(negative_zero, negative_zero + 2, &f);
+  assert(r3.outcome == FFC_OUTCOME_OK);
+  char *s3 = fHexAndDec_double(f);
+  free(s3);
+  assert(f == 0.);
+  assert(ffc_get_double_bits(f) == 0x8000000000000000ULL);
+
+  fesetround(FE_TONEAREST);
+  ffc_result r4 = ffc_from_chars_double(negative_zero, negative_zero + 2, &f);
+  assert(r4.outcome == FFC_OUTCOME_OK);
+  char *s4 = fHexAndDec_double(f);
+  free(s4);
+  assert(f == 0.);
+  assert(ffc_get_double_bits(f) == 0x8000000000000000ULL);
+}
+
+void float_special(void) {
+  verify_float(append_zeros("1.1754941406275178592461758986628081843312458647327962400313859427181746759860647699724722770042717456817626953125", 655), 0x1.2ced3p+0f);
+  verify_float(append_zeros("1.1754941406275178592461758986628081843312458647327962400313859427181746759860647699724722770042717456817626953125", 656), 0x1.2ced3p+0f);
+  verify_float(
+    append_zeros("1.1754941406275178592461758986628081843312458647327962400313859427181746759860647699724722770042717456817626953125", 1000),
+    0x1.2ced3p+0f
+  );
+  char *test_string;
+  test_string = string_concat(
+    append_zeros("1.1754941406275178592461758986628081843312458647327962400313859427181746759860647699724722770042717456817626953125", 655),
+    "e-38"
+  );
+  verify_float(test_string, 0x1.fffff8p-127f);
+  test_string = string_concat(
+    append_zeros("1.1754941406275178592461758986628081843312458647327962400313859427181746759860647699724722770042717456817626953125", 656),
+    "e-38"
+  );
+  verify_float(test_string, 0x1.fffff8p-127f),
+  test_string = string_concat(
+    append_zeros("1.1754941406275178592461758986628081843312458647327962400313859427181746759860647699724722770042717456817626953125", 1000),
+    "e-38"
+  );
+  verify_float(test_string, 0x1.fffff8p-127f);
+
+  verify_float("1.00000006e+09", 1.00000006e+09f);
+  verify_float("1.4012984643e-45f", 1.4012984643e-45f);
+  verify_float("1.1754942107e-38f", 1.1754942107e-38f);
+  verify_float("1.1754943508e-45f", 1.1754943508e-45f);
+}
+
+void double_json_mode(void) {
+  struct test_case {
+    char *input;
+    ffc_outcome expected_outcome;
+    double expected_value;
+  };
+
+  // valid stuff
+  const struct test_case ok_cases[] = {
+    {"0",       FFC_OUTCOME_OK, 0.0},
+    {"-0",      FFC_OUTCOME_OK, 0.0},
+    {"1",       FFC_OUTCOME_OK, 1.0},
+    {"-1",      FFC_OUTCOME_OK, -1.0},
+    {"123",     FFC_OUTCOME_OK, 123.0},
+    {"1.5",     FFC_OUTCOME_OK, 1.5},
+    {"-1.5",    FFC_OUTCOME_OK, -1.5},
+    {"0.5",     FFC_OUTCOME_OK, 0.5},
+    {"1e3",     FFC_OUTCOME_OK, 1000.0},
+    {"1E3",     FFC_OUTCOME_OK, 1000.0},
+    {"1e+3",    FFC_OUTCOME_OK, 1000.0},
+    {"1e-3",    FFC_OUTCOME_OK, 0.001},
+    {"1.5e2",   FFC_OUTCOME_OK, 150.0},
+    {"-1.5e-2", FFC_OUTCOME_OK, -0.015},
+  };
+
+  // invalid stuff
+  const char * const invalid_cases[] = {
+    "",
+    "-",
+    ".5",
+    "1.",
+    "1e",
+    "1E",
+    "1e+",
+    "1e-",
+    "1.5e",
+    "01",
+    "00",
+    "-01",
+    "+1",
+  };
+
+  ffc_parse_options json_opts = ffc_parse_options_default();
+  json_opts.format = FFC_PRESET_JSON;
+
+  for (size_t i = 0; i < sizeof(ok_cases)/sizeof(*ok_cases); i++) {
+    const struct test_case *t = &ok_cases[i];
+    verify_double_ext(strlen(t->input), t->input, t->expected_value,
+                      t->expected_outcome, json_opts);
+  }
+  for (size_t i = 0; i < sizeof(invalid_cases)/sizeof(*invalid_cases); i++) {
+    verify_double_ext(strlen(invalid_cases[i]), invalid_cases[i], 0.0,
+                      FFC_OUTCOME_INVALID_INPUT, json_opts);
+  }
+}
+
+void json_number_unified(void) {
+  // valid ints
+  struct int_case { const char *input; int64_t expected; };
+  const struct int_case int_ok[] = {
+    {"0",                    0},
+    {"-0",                   0},
+    {"1",                    1},
+    {"-1",                  -1},
+    {"123",                123},
+    {"12345678901234567",  12345678901234567LL},
+    {"-9223372036854775808", INT64_MIN},
+    {"9223372036854775807",  INT64_MAX},
+  };
+  for (size_t i = 0; i < sizeof(int_ok)/sizeof(*int_ok); i++) {
+    ffc_json_number nr = {0};
+    ffc_result r = ffc_parse_json_number(
+        int_ok[i].input,
+        int_ok[i].input + strlen(int_ok[i].input),
+        &nr
+    );
+    if (r.outcome != FFC_OUTCOME_OK) {
+      printf("\nFAIL json_number_unified \"%s\": outcome %s (expected ok)\n",
+             int_ok[i].input, get_outcome_name(r.outcome));
+      FAILS += 1;
+      continue;
+    }
+    if (nr.kind != FFC_JSON_NUM_KIND_INT64) {
+      printf("\nFAIL json_number_unified \"%s\": expected kind INT64, got DOUBLE\n",
+             int_ok[i].input);
+      FAILS += 1;
+      continue;
+    }
+    if (nr.value.i64 != int_ok[i].expected) {
+      printf("\nFAIL json_number_unified \"%s\": expected %lld, got %lld\n",
+             int_ok[i].input, (long long)int_ok[i].expected, (long long)nr.value.i64);
+      FAILS += 1;
+    }
+  }
+
+  // valid doubles
+  struct float_case { const char *input; double expected; };
+  const struct float_case double_ok[] = {
+    {"1.0",      1.0},
+    {"-1.5",    -1.5},
+    {"0.5",      0.5},
+    {"1e0",      1.0},
+    {"1E0",      1.0},
+    {"1e3",   1000.0},
+    {"1e+3",  1000.0},
+    {"1e-3",     0.001},
+    {"1.5e2",  150.0},
+    {"-1.5e-2", -0.015},
+  };
+  for (size_t i = 0; i < sizeof(double_ok)/sizeof(*double_ok); i++) {
+    ffc_json_number nr = {0};
+    ffc_result r = ffc_parse_json_number(
+        double_ok[i].input,
+        double_ok[i].input + strlen(double_ok[i].input),
+        &nr
+    );
+    if (r.outcome != FFC_OUTCOME_OK) {
+      printf("\nFAIL json_number_unified \"%s\": outcome %s (expected ok)\n",
+             double_ok[i].input, get_outcome_name(r.outcome));
+      FAILS += 1;
+      continue;
+    }
+    if (nr.kind != FFC_JSON_NUM_KIND_DOUBLE) {
+      printf("\nFAIL json_number_unified \"%s\": expected kind DOUBLE, got INT64\n",
+             double_ok[i].input);
+      FAILS += 1;
+      continue;
+    }
+    if (nr.value.f64 != double_ok[i].expected) {
+      printf("\nFAIL json_number_unified \"%s\": expected %g, got %g\n",
+             double_ok[i].input, double_ok[i].expected, nr.value.f64);
+      FAILS += 1;
+    }
+  }
+
+  // out of range outcomes with large int and double
+  {
+    const char *input = "99999999999999999999999999";
+    ffc_json_number nr = {0};
+    ffc_result r = ffc_parse_json_number(input, input + strlen(input), &nr);
+    if (r.outcome != FFC_OUTCOME_OUT_OF_RANGE || nr.kind != FFC_JSON_NUM_KIND_INT64) {
+      printf("\nFAIL json_number_unified big int \"%s\": outcome=%s kind=%d\n",
+             input, get_outcome_name(r.outcome), (int)nr.kind);
+      FAILS += 1;
+    }
+  }
+  {
+    const char *input = "1e400";
+    ffc_json_number nr = {0};
+    ffc_result r = ffc_parse_json_number(input, input + strlen(input), &nr);
+    if (r.outcome != FFC_OUTCOME_OUT_OF_RANGE || nr.kind != FFC_JSON_NUM_KIND_DOUBLE) {
+      printf("\nFAIL json_number_unified big double \"%s\": outcome=%s kind=%d\n",
+             input, get_outcome_name(r.outcome), (int)nr.kind);
+      FAILS += 1;
+    }
+  }
+
+  // json number invalid stuff
+  const char * const invalid[] = {
+    "",
+    "-",
+    ".5",
+    "1.",
+    "01",
+    "1e",
+    "1E",
+    "0.1e",
+    "0.1E",
+    "+1",
+  };
+  for (size_t i = 0; i < sizeof(invalid)/sizeof(*invalid); i++) {
+    ffc_json_number nr = {0};
+    ffc_result r = ffc_parse_json_number(
+        invalid[i],
+        invalid[i] + strlen(invalid[i]),
+        &nr
+    );
+    if (r.outcome != FFC_OUTCOME_INVALID_INPUT) {
+      printf("\nFAIL json_number_unified invalid \"%s\": outcome %s (expected invalid)\n",
+             invalid[i], get_outcome_name(r.outcome));
+      FAILS += 1;
+    }
+  }
+
+  // stop at first non-number, ptr should point to it
+  {
+    const char *input = "123}";
+    ffc_json_number nr = {0};
+    ffc_result r = ffc_parse_json_number(input, input + strlen(input), &nr);
+    if (r.outcome != FFC_OUTCOME_OK || nr.kind != FFC_JSON_NUM_KIND_INT64
+        || nr.value.i64 != 123 || r.ptr != input + 3) {
+      printf("\nFAIL json_number_unified \"123}\": outcome=%s kind=%d i64=%lld ptr_off=%ld\n",
+             get_outcome_name(r.outcome), (int)nr.kind,
+             (long long)nr.value.i64, (long)(r.ptr - input));
+      FAILS += 1;
+    }
+  }
+}
+
+int main(void) {
+  // verify_float("1.1754942807573642917e-38", 0x1.fffffcp-127f);
+  // exit(0);
+
+  /*
+   * We store our test cases in csv files of the format:
+   * input,expected,code,comment
+   * 
+   * We use strtod/strtof to parse 'expected', we compare bit-for-bit with our result
+   * Valid values for 'code' are determined by `parse_outcome`: "ok","out_of_range","invalid"
+   */
+
+  ffc_parse_options opts = ffc_parse_options_default();
+  ffc_parse_options comma = opts;
+  comma.decimal_point = ',';
+  test_file("test_src/double_cases_general.csv", &cb_test, opts, FFC_VALUE_KIND_DOUBLE);
+  test_file("test_src/double_cases_infnan.csv", &cb_test, opts, FFC_VALUE_KIND_DOUBLE);
+  test_file("test_src/double_cases_comma.csv", &cb_test, comma, FFC_VALUE_KIND_DOUBLE);
+
+  test_file("test_src/float_cases.csv", &cb_test, opts, FFC_VALUE_KIND_FLOAT);
+
+  double_special();
+  double_rounds_to_nearest();
+  double_parse_zero();
+  double_parse_negative_zero();
+  double_json_mode();
+  json_number_unified();
+
+  float_special();
+
+  if (FAILS != 0) {
+    fprintf(stderr, "Test failures from csvs: %d\n", FAILS);
+    return 1;
+  }
+
+  return 0;
+}

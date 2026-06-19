@@ -1,6 +1,9 @@
 #include "readreference.h"
 #include "gz_linebuffer.h"
 
+#define FFC_IMPL
+#include "ffc.h/src/ffc.h"
+
 int readInXNumberOfLines_fastq(int numberOfLinesToRead, gzFile query_reads,
                                int whichPair, Options opt, int max_query_length,
                                int max_readname_length, int first_iter) {
@@ -448,23 +451,19 @@ int readReferenceTree(char const *filename, int *name_specs) {
         if (up[0] == -1 && up[1] == -1) {
             strcpy(treeArr[treeNumber][nodeNumber].name, acc_name);
         }
+
         for (i = 0; i < numbaseArr[treeNumber]; i++) {
             something_was_read = gz_linebuffer_gets(buffer, BUFFER_SIZE);
             if (!something_was_read) break;
 
-            for (j = 0; j < 4; j++) {
-                if (j == 0) {
-                    s = strtok(buffer, "\t");
-                } else {
-                    s = strtok(NULL, "\t");
-                }
-                if (s == NULL) {
-                    success = 0;
-                } else {
-                    success = sscanf(
-                        s, "%lf",
-                        &(treeArr[treeNumber][nodeNumber].posteriornc[i][j]));
-                }
+            char *p = buffer;
+            for (int t = 0; t < 4; t++) {
+                ffc_result res = ffc_parse_double(
+                    BUFFER_SIZE, /*for the sake of speed we assume the input is
+                                    in the correct format*/
+                    p, &(treeArr[treeNumber][nodeNumber].posteriornc[i][t]));
+
+                p = (char *)res.ptr + 1; /*the +1 skips the '\t' character*/
             }
         }
     }
