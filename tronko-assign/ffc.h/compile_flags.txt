@@ -1,0 +1,8 @@
+-xc
+-std=c11
+-Wall
+-Wextra
+-Wpedantic
+-DFFC_IMPL
+-Isrc
+-Itest_src
