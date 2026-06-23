@@ -1,45 +1,26 @@
 #include "printtree.h"
 
-/*old code for printing a tree*/
+// Prints a tree specified by `whichRoot` in human-readable format (for
+// debugging)
 void printtreeArr(int whichRoot) {
     int i, j;
     printf("\n");
     j = whichRoot;
     for (i = 0; i < 2 * numspecArr[j] - 1; i++) {
-        if (treeArr[j][i].up[0] != -1) {
-            printf("Node %i: up: (%i, %i) down: %i, name: %s, taxIndex[0]: %d, "
-                   "taxIndex[1]: %d, depth: %d, nd: %d, ",
-                   i, treeArr[j][i].up[0], treeArr[j][i].up[1],
-                   treeArr[j][i].down, treeArr[j][i].name,
-                   treeArr[j][i].taxIndex[0], treeArr[j][i].taxIndex[1],
-                   treeArr[j][i].depth, treeArr[j][i].nd);
-            if (treeArr[j][i].taxIndex[0] != -1 &&
-                treeArr[j][i].taxIndex[1] != -1) {
-                printf("taxonomy, %s", taxonomyArr[j][treeArr[j][i].taxIndex[0]]
-                                                  [treeArr[j][i].taxIndex[1]]);
-            } else {
-                printf("taxonomy, Domain");
-            }
-        } else {
-            printf("(Node %i): up: (%i, %i) down: %i, name: %s, taxIndex[0]: "
-                   "%d, taxIndex[1]: %d, depth: %d, nd: %d, ",
-                   i, treeArr[j][i].up[0], treeArr[j][i].up[1],
-                   treeArr[j][i].down, treeArr[j][i].name,
-                   treeArr[j][i].taxIndex[0], treeArr[j][i].taxIndex[1],
-                   treeArr[j][i].depth, treeArr[j][i].nd);
-            if (treeArr[j][i].taxIndex[0] != -1 &&
-                treeArr[j][i].taxIndex[1] != -1) {
-                printf("taxonomy, %s", taxonomyArr[j][treeArr[j][i].taxIndex[0]]
-                                                  [treeArr[j][i].taxIndex[1]]);
-            } else {
-                printf("taxonomy, Domain");
-            }
-        }
-        if (i != rootArr[j]) {
-            printf(" (bl: %f)\n", treeArr[j][i].bl);
-        } else {
-            printf("\n");
-        }
+        struct node *cnode = &(treeArr[j][i]);
+        printf("Node %5i: up: (%5i, %5i), down: %5i, spec=%4d, mrca=%4d, "
+               "s=%2d, taxIndex[0]: %5d, taxIndex[1]: %1d, depth: "
+               "%2d, nd: %d, name: %s, ",
+               i, cnode->up[0], cnode->up[1], cnode->down, cnode->spec,
+               cnode->mrca, cnode->s, cnode->taxIndex[0], cnode->taxIndex[1],
+               cnode->depth, cnode->nd, cnode->name);
+        if (cnode->taxIndex[0] != -1 && cnode->taxIndex[1] != -1)
+            printf("taxonomy: %s",
+                   taxonomyArr[j][cnode->taxIndex[0]][cnode->taxIndex[1]]);
+        else printf("taxonomy: Domain");
+
+        if (i != rootArr[j]) printf(" (bl: %f)", cnode->bl);
+        printf("\n");
     }
 }
 
@@ -107,69 +88,4 @@ void printTreeFile(int numberOfTrees, int max_nodename, int max_tax_name,
         }
     }
     fclose(outputTree);
-}
-
-void printTaxonomyArrToFile(int numberOfTrees) {
-    int i, j, k;
-    FILE *outputTaxArr =
-        fopen("/space/s2/lenore/partitions2/taxonomy_reference.txt", "w");
-    if (outputTaxArr == NULL) {
-        printf("Error opening file!\n");
-        exit(1);
-    }
-    for (i = 0; i < numberOfTrees; i++) {
-        fprintf(outputTaxArr, "TREE %d\n", i);
-        for (j = 0; j < numspecArr[i]; j++) {
-            fprintf(outputTaxArr, "%d", j);
-            for (k = 0; k < 7; k++) {
-                fprintf(outputTaxArr, "\t%s", taxonomyArr[i][j][k]);
-            }
-            fprintf(outputTaxArr, "\n");
-        }
-    }
-    fclose(outputTaxArr);
-}
-
-void printPP() {
-    int i, j;
-    FILE *outputPP;
-    outputPP = fopen("/space/s2/lenore/partitions2/initial_tree_PP.txt", "w");
-    if (outputPP == NULL) {
-        printf("Error opening file!\n");
-        exit(1);
-    }
-    printf("numspec is %d\n", numspec);
-    for (i = 0; i < 2 * numspec - 1; i++) {
-        printf("NODE\t%d\t%d\n", i, numbase);
-        // fprintf(stderr,"NODE\t%d\n",i);
-        for (j = 0; j < numbase; j++) {
-            printf("%d\t%lf\t%lf\t%lf\t%lf\n", j, PP[i][j][0], PP[i][j][1],
-                   PP[i][j][2], PP[i][j][3]);
-            fprintf(outputPP, "%d\t%lf\t%lf\t%lf\t%lf\n", j, PP[i][j][0],
-                    PP[i][j][1], PP[i][j][2], PP[i][j][3]);
-        }
-    }
-    fclose(outputPP);
-}
-
-void printPP_Arr(int numberOfTrees) {
-    int i, j, k;
-    FILE *outputPP;
-    outputPP = fopen("/space/s2/lenore/partitions2/PP_Arr.txt", "w");
-    if (outputPP == NULL) {
-        printf("Error opening file!\n");
-        exit(1);
-    }
-    for (i = 0; i < numberOfTrees; i++) {
-        fprintf(outputPP, "TREE\t%d\n", i);
-        for (j = 0; j < 2 * numspecArr[i] - 1; j++) {
-            fprintf(outputPP, "NODE\t%d\n", j);
-            for (k = 0; k < numbaseArr[i]; k++) {
-                fprintf(outputPP, "%d\t%lf\t%lf\t%lf\t%lf\n", k,
-                        PP_Arr[i][j][k][0], PP_Arr[i][j][k][1],
-                        PP_Arr[i][j][k][2], PP_Arr[i][j][k][3]);
-            }
-        }
-    }
-    fclose(outputPP);
 }

@@ -11,14 +11,8 @@
 #include "global.h"
 #include "opt.h"
 
-void printtree();
-void printtreeArr();
+void printtreeArr(int whichRoot);
 void printTreeFile(int numberOfTrees, int max_nodename, int max_tax_name,
                    int max_lineTaxonomy, Options opt);
-void printTaxonomyArrToFile(int numberOfTrees);
-void printTaxonomyToFile();
-void printTreeToFile();
-void printSeqArr(int numberOfTrees);
-void printSeqToFile();
 
 #endif /* _PRINTTREE_ */
