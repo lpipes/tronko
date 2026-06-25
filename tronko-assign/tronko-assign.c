@@ -17,6 +17,7 @@
 #include "options.h"
 #include "printAlignments.h"
 #include "bwa_source_files_include.h"
+#include "readsam.h"
 #include "hashmap.h"
 #include "allocateMemoryForResults.h"
 #include "WFA2/wavefront_align.h"
@@ -29,6 +30,7 @@ struct queryMatSingle *singleQueryMat;
 type_of_PP Cinterval;
 // struct hashmap_base map;
 // struct map;
+void set_sam_dump_file(FILE *f);
 int *numspecArr, *numbaseArr, *rootArr;
 struct timespec tstart = {0, 0}, tend = {0.0};
 
@@ -326,9 +328,14 @@ void *runAssignmentOnChunk_WithBWA(void *ptr) {
             (max_query_length + mstr->max_numbase + 1) * sizeof(int));
     }
     struct leafMap *leaf_map;
-    run_bwa(mstr->start, end, bwa_results, mstr->concordant, mstr->ntree,
-            mstr->databasefile, paired, max_query_length, max_readname_length,
-            max_acc_name);
+    if (mstr->use_sam) {
+        read_sam(mstr->start, end, bwa_results, mstr->concordant, mstr->ntree,
+                 paired, max_query_length, max_readname_length, max_acc_name);
+    } else {
+        run_bwa(mstr->start, end, bwa_results, mstr->concordant, mstr->ntree,
+                mstr->databasefile, paired, max_query_length,
+                max_readname_length, max_acc_name);
+    }
     for (lineNumber = mstr->start; lineNumber < end; lineNumber++) {
         for (i = 0; i < mstr->ntree; i++) {
             trees_search[i] = -1;
@@ -946,7 +953,37 @@ int main(int argc, char **argv) {
     opt.number_of_lines_to_read = 50000;
     opt.score_constant = 0.01;
     opt.print_all_nodes = 0;
+    opt.use_sam = 0;
+    opt.sam_file[0] = '\0';
+    opt.dump_sam = 0;
+    opt.dump_sam_file[0] = '\0';
     parse_options(argc, argv, &opt);
+    if (opt.use_sam) {
+        printf("Reading alignments from SAM/BAM file: %s (skipping internal "
+               "bwa-mem)\n",
+               opt.sam_file);
+        sam_stream_open(opt.sam_file);
+    }
+    FILE *sam_dump = NULL;
+    if (opt.dump_sam) {
+        if (opt.use_sam) {
+            printf("Cannot use -D (dump-sam) together with -b (read-sam). "
+                   "Exiting...\n");
+            exit(-1);
+        }
+        if (opt.number_of_cores != 1) {
+            printf("Note: -D (dump-sam) requires a single core to preserve "
+                   "read order; forcing -C 1.\n");
+            opt.number_of_cores = 1;
+        }
+        sam_dump = fopen(opt.dump_sam_file, "w");
+        if (sam_dump == NULL) {
+            printf("Error opening dump-sam file!\n");
+            exit(-1);
+        }
+        set_sam_dump_file(sam_dump);
+        printf("Dumping internal bwa-mem SAM to: %s\n", opt.dump_sam_file);
+    }
     struct stat st = {0};
     if (stat(opt.reference_file, &st) == -1) {
         printf("Cannot find reference_tree.txt file. Exiting...\n");
@@ -1024,6 +1061,9 @@ int main(int argc, char **argv) {
     maxNumBase = specs[1];
     free(specs);
     Cinterval = opt.cinterval;
+    if (opt.use_sam) {
+        build_leaf_map_global(numberOfTrees);
+    }
     // HASHMAP(char, leafMap) map;
     // hashmap_init(&map, hashmap_hash_string, strcmp);
     // for(i=0; i<numberOfTrees; i++){
@@ -1060,7 +1100,7 @@ int main(int argc, char **argv) {
     mystruct mstr[opt.number_of_cores]; // array of stuct that contains input
                                         // and output for each thread
     if (strcmp("single", opt.paired_or_single) == 0) {
-        if (opt.skip_build == 0) {
+        if (opt.skip_build == 0 && opt.use_sam == 0) {
             bwa_index(2, opt.fasta_file);
         }
         gzFile *reads_file = gzopen(opt.read1_file, "r");
@@ -1146,6 +1186,7 @@ int main(int argc, char **argv) {
             mstr[i].max_lineTaxonomy = max_lineTaxonomy;
             mstr[i].number_of_total_nodes = number_of_total_nodes;
             mstr[i].print_all_nodes = opt.print_all_nodes;
+            mstr[i].use_sam = opt.use_sam;
         }
         while (1) {
             if (opt.fastq == 0) {
@@ -1183,12 +1224,20 @@ int main(int argc, char **argv) {
                                (sizeof(char)));
                 }
             }
+            if (opt.use_sam) {
+                sam_load_batch(returnLineNumber,
+                               strcmp("single", opt.paired_or_single) == 0 ? 0
+                                                                           : 1);
+            }
             for (i = 0; i < opt.number_of_cores; i++) {
                 pthread_create(&threads[i], NULL, runAssignmentOnChunk_WithBWA,
                                &mstr[i]);
             }
             for (i = 0; i < opt.number_of_cores; i++) {
                 pthread_join(threads[i], NULL);
+            }
+            if (opt.use_sam) {
+                sam_free_batch();
             }
             for (i = 0; i < opt.number_of_cores; i++) {
                 for (j = 0; j < (mstr[i].end - mstr[i].start); j++) {
@@ -1234,7 +1283,7 @@ int main(int argc, char **argv) {
         max_name_length = read_specs[0];
         max_query_length = read_specs[1];
         free(read_specs);
-        if (opt.skip_build == 0) {
+        if (opt.skip_build == 0 && opt.use_sam == 0) {
             bwa_index(2, opt.fasta_file);
         }
         pairedQueryMat = malloc(sizeof(struct queryMatPaired));
@@ -1350,6 +1399,7 @@ int main(int argc, char **argv) {
             mstr[i].max_lineTaxonomy = max_lineTaxonomy;
             mstr[i].number_of_total_nodes = number_of_total_nodes;
             mstr[i].print_all_nodes = opt.print_all_nodes;
+            mstr[i].use_sam = opt.use_sam;
         }
         while (1) {
             if (opt.fastq == 0) {
@@ -1393,12 +1443,20 @@ int main(int argc, char **argv) {
                                (sizeof(char)));
                 }
             }
+            if (opt.use_sam) {
+                sam_load_batch(returnLineNumber,
+                               strcmp("single", opt.paired_or_single) == 0 ? 0
+                                                                           : 1);
+            }
             for (i = 0; i < opt.number_of_cores; i++) {
                 pthread_create(&threads[i], NULL, runAssignmentOnChunk_WithBWA,
                                &mstr[i]);
             }
             for (i = 0; i < opt.number_of_cores; i++) {
                 pthread_join(threads[i], NULL);
+            }
+            if (opt.use_sam) {
+                sam_free_batch();
             }
             for (i = 0; i < opt.number_of_cores; i++) {
                 for (j = 0; j < (mstr[i].end - mstr[i].start); j++) {
@@ -1479,4 +1537,10 @@ int main(int argc, char **argv) {
     free(numbaseArr);
     free(rootArr);
     free(numspecArr);
+    if (opt.use_sam) {
+        sam_stream_close();
+    }
+    if (sam_dump != NULL) {
+        fclose(sam_dump);
+    }
 }

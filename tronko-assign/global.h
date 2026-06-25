@@ -123,6 +123,7 @@ typedef struct mystruct {
     int max_lineTaxonomy;
     int number_of_total_nodes;
     int print_all_nodes;
+    int use_sam;
 } mystruct;
 
 typedef struct bwaMatches {
@@ -185,6 +186,10 @@ typedef struct Options {
     int print_leave_seqs;
     double score_constant;
     int print_all_nodes;
+    char sam_file[2000];
+    int use_sam;
+    char dump_sam_file[2000];
+    int dump_sam;
 } Options;
 
 // extern node *tree;
