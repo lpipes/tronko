@@ -30,7 +30,9 @@ static struct Options long_options[] = {
     {"print-node-info", required_argument, 0, '5'},
     {"skip-bwa-build", no_argument, 0, '6'},
     {"score-constant", required_argument, 0, 'u'},
-    {"print-all-scores", no_argument, 0, '7'}};
+    {"print-all-scores", no_argument, 0, '7'},
+    {"sam-file", required_argument, 0, 'b'},
+    {"dump-sam", required_argument, 0, 'D'}};
 
 char usage[] =
     "\ntronko-assign [OPTIONS] -r -f [TRONKO-BUILD DB FILE] -a [REF FASTA FILE] -o [OUTPUT FILE]\n\
@@ -59,6 +61,8 @@ char usage[] =
 	-6, Skip the bwa build if database already exists\n\
 	-u, Score constant [default: 0.01]\n\
 	-7, Print scores for all nodes [scores_all_nodes.txt]\n\
+	-b [FILE], read alignments from a SAM/BAM file instead of running bwa-mem internally (.bam is read via samtools). Must be in read order (unsorted aligner output). Reference names must match the tree leaf/accession names. Still requires the read file(s) via -g or -1/-2.\n\
+	-D [FILE], debug: dump the SAM produced by the internal bwa-mem to FILE (forces a single core); the file can be fed back via -b to verify identical output.\n\
 	\n";
 
 void print_help_statement() {
@@ -75,7 +79,7 @@ void parse_options(int argc, char **argv, Options *opt) {
     }
     while (1) {
         c = getopt_long(argc, argv,
-                        "hpsrqw6yevUzP75:f:u:t:m:d:o:x:g:1:2:a:c:n:3:4:C:L:",
+                        "hpsrqw6yevUzP75:f:u:t:m:d:o:x:g:1:2:a:c:n:3:4:C:L:b:D:",
                         long_options, &option_index);
         if (c == -1) break;
         switch (c) {
@@ -196,6 +200,20 @@ void parse_options(int argc, char **argv, Options *opt) {
         case 'L':
             success = sscanf(optarg, "%d", &(opt->number_of_lines_to_read));
             if (!success) fprintf(stderr, "Invalid number");
+            break;
+        case 'b':
+            success = sscanf(optarg, "%s", opt->sam_file);
+            if (!success)
+                fprintf(stderr, "Invalid SAM/BAM file\n");
+            else
+                opt->use_sam = 1;
+            break;
+        case 'D':
+            success = sscanf(optarg, "%s", opt->dump_sam_file);
+            if (!success)
+                fprintf(stderr, "Invalid dump-sam file\n");
+            else
+                opt->dump_sam = 1;
             break;
         }
     }

@@ -16,9 +16,17 @@
 #include "../hashmap_base.h"
 #include "kseq.h"
 #include "../global.h"
+#include <pthread.h>
 KSEQ_DECLARE(gzFile)
 
 extern unsigned char nst_nt4_table[256];
+
+/* Optional debug: dump the SAM that internal bwa-mem produces, so it can be
+ * fed back through tronko-assign -b to verify the SAM reader is faithful.
+ * Set once (single-threaded) before workers start; writes are mutex-guarded. */
+static FILE *g_sam_dump = NULL;
+static pthread_mutex_t g_sam_dump_mutex = PTHREAD_MUTEX_INITIALIZER;
+void set_sam_dump_file(FILE *f){ g_sam_dump = f; }
 
 void *kopen(const char *fn, int *_fd);
 int kclose(void *a);
@@ -165,6 +173,14 @@ static void *process(void *shared, int step, void *_data)
 				}*/
 			//}else if ( data->seqs[i].sam && aux->concordant==0){
 			if ( data->seqs[i].sam ){
+				if (g_sam_dump != NULL){
+					size_t sl = strlen(data->seqs[i].sam);
+					pthread_mutex_lock(&g_sam_dump_mutex);
+					fputs(data->seqs[i].sam, g_sam_dump);
+					if (sl == 0 || data->seqs[i].sam[sl-1] != '\n')
+						fputc('\n', g_sam_dump);
+					pthread_mutex_unlock(&g_sam_dump_mutex);
+				}
 				char *token;
 				char readname[aux->max_readname_length];
 				char read1[aux->max_acc_name];
