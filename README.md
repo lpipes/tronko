@@ -61,6 +61,8 @@ Alignment-based and composition-based assignment methods calculate the lowest co
 		-5 [FILE], Print tree number and leaf number and exit
 		-6, Skip the bwa build if database already exists
 		-u, Score constant [default: 0.01]
+		-b [FILE], read alignments from a SAM/BAM file instead of running bwa mem internally (must be in read order/unsorted; .bam read via samtools; reference names must match tree leaf names)
+		-D [FILE], debug: dump the SAM produced by the internal bwa mem to FILE (forces single core); feed back via -b to verify identical output
 
 Tronko uses the <a href="https://github.com/smarco/WFA2-lib">Wavefront Alignment Algorithm (version 2)</a> or <a href="https://github.com/noporpoise/seq-align">Needleman-Wunsch Algorithm</a> for semi-global alignments. It uses <a href="https://github.com/lh3/bwa">bwa</a> for alignment to leaf nodes, and uses <a href="https://github.com/DavidLeeds/hashmap">David Leeds' hashmap</a> for hashmap implementation in C. `tronko-assign` does not reverse complement your reads automatically. You must use options `-v` or `-z` to reverse complement your read for better alignment to the reference database. For more information on the direction of your reads based on your library prep, please refer to this helpful blog here: <a href="http://onetipperday.blogspot.com/2012/07/how-to-tell-which-library-type-to-use.html">http://onetipperday.blogspot.com/2012/07/how-to-tell-which-library-type-to-use.html</a>.
 
@@ -84,7 +86,7 @@ GU572157.1_3_1	Eukaryota;Chordata;Aves;Charadriiformes;Alcidae;Uria;Uria aalge	-
 2. Run `make` in the `tronko-build` and `tronko-assign` directories.
 3. Copy the `tronko-build` and `tronko-assign` binaries to your path.
 
-`tronko-assign` uses [pthreads](http://en.wikipedia.org/wiki/POSIX_Threads) and [zlib](http://en.wikipedia.org/wiki/Zlib) as its dependencies. `tronko-build` only has dependencies if using the partition procedure for the initial trees. These are <a href="https://github.com/stamatak/standard-RAxML">`raxmlHPC-PTHREADS`</a>, <a href="https://github.com/refresh-bio/FAMSA">`famsa`</a>, `nw_reroot` from <a href="https://anaconda.org/bioconda/newick_utils/files">Newick utilties</a>, <a href="https://raw.githubusercontent.com/lpipes/tronko/main/scripts/fasta2phyml.pl">`fasta2phyml.pl`</a>, and <a href="https://ftp.gnu.org/gnu/sed/">`sed`</a>, which must be installed in your path. By default, `tronko-build` uses `raxmlHPC-PTHREADS` to estimate trees, if you choose the `-a` option to use `FastTree` instead, you must have `FastTree` installed in your path.
+`tronko-assign` uses [pthreads](http://en.wikipedia.org/wiki/POSIX_Threads) and [zlib](http://en.wikipedia.org/wiki/Zlib) as its dependencies. Additionally, [`samtools`](http://www.htslib.org/) must be on your `PATH` only if you supply a **`.bam`** alignment file to `-b` (it is read via `samtools view`); plain or gzipped SAM passed to `-b` needs no extra dependency, and the default (internal `bwa mem`) path needs no `samtools` at all. `tronko-build` only has dependencies if using the partition procedure for the initial trees. These are <a href="https://github.com/stamatak/standard-RAxML">`raxmlHPC-PTHREADS`</a>, <a href="https://github.com/refresh-bio/FAMSA">`famsa`</a>, `nw_reroot` from <a href="https://anaconda.org/bioconda/newick_utils/files">Newick utilties</a>, <a href="https://raw.githubusercontent.com/lpipes/tronko/main/scripts/fasta2phyml.pl">`fasta2phyml.pl`</a>, and <a href="https://ftp.gnu.org/gnu/sed/">`sed`</a>, which must be installed in your path. By default, `tronko-build` uses `raxmlHPC-PTHREADS` to estimate trees, if you choose the `-a` option to use `FastTree` instead, you must have `FastTree` installed in your path.
 
 	cd tronko/tronko-build
 	make
@@ -113,6 +115,31 @@ tronko-assign -r -f [tronko-build REFERENCE DB FILE] -p -1 [FORWARD READS FASTA]
 Assigning single-end reads in FASTA format:
 ```
 tronko-assign -r -f [tronko-build REFERENCE DB FILE] -s -g [READS FASTA] -a [REFERENCE SEQUENCES FASTA] -o [OUTPUT FILE]
+```
+
+## Using your own alignments (SAM/BAM) instead of the internal `bwa mem`
+By default `tronko-assign` runs `bwa mem` internally to map reads to the reference leaf sequences. If you would rather use your own aligner (or your own `bwa mem` parameters), you can supply a pre-computed alignment file with `-b [FILE]`. When `-b` is given, the internal `bwa index`/`bwa mem` steps are skipped (so `-a` is not needed) and the matches are read from your file instead. You still provide the read file(s) with `-g` (single) or `-1`/`-2` (paired), because the reads themselves are needed for the phylogenetic placement step.
+
+The alignment file is **streamed in lockstep with the read batches**, so memory stays flat no matter how many reads you assign (only one batch of records is held at a time). Requirements:
+- The file must be in the **same order as your read file(s)** — i.e. the aligner's natural, **unsorted** output (e.g. `bwa mem reads.fq`). A coordinate-sorted or name-sorted BAM will **not** work; the order is validated and tronko exits with an error if records are out of read order.
+- A path ending in `.bam` is read by streaming it through `samtools view`, so `samtools` must be on your `PATH`. Any other path is read directly and may be plain or gzipped SAM.
+- The reference names (`RNAME`/`RNEXT`) in the file must exactly match the leaf/accession names in the `tronko-build` database (use `-5 [FILE]` to print all accession names).
+- Reads with no record in the file are reported as `unassigned`. To capture secondary hits to multiple leaves, run your aligner so each hit is its own alignment line (e.g. `bwa mem -a`).
+
+Assigning paired-end reads using a BAM file:
+```
+tronko-assign -r -f [tronko-build REFERENCE DB FILE] -p -1 [FORWARD READS FASTA] -2 [REVERSE READS FASTA] -b [ALIGNMENTS.bam] -o [OUTPUT FILE]
+```
+Assigning single-end reads using a SAM file:
+```
+tronko-assign -r -f [tronko-build REFERENCE DB FILE] -s -g [READS FASTA] -b [ALIGNMENTS.sam] -o [OUTPUT FILE]
+```
+
+To verify that the SAM reader reproduces the internal `bwa mem` path exactly, dump the SAM the internal aligner produces with `-D [FILE]` (single core), then feed it back via `-b`; the two runs produce byte-identical output:
+```
+tronko-assign -r -f [DB] -a [REF FASTA] -s -g [READS] -o internal.txt   -w -C 1 -D internal.sam
+tronko-assign -r -f [DB]                 -s -g [READS] -o roundtrip.txt -w -C 1 -b internal.sam
+diff internal.txt roundtrip.txt   # identical
 ```
 
 # `tronko-build` Usage
