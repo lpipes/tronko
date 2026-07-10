@@ -4,6 +4,8 @@
 #ifndef _GLOBAL_
 #define _GLOBAL_
 
+#include <stdio.h>
+
 #define STATESPACE                                                             \
     20 /*number of categories in approximation of gamma distribution for Ne.   \
           Must be at least 4 because some of the memory is used for the        \
@@ -11,9 +13,6 @@
 #define MAXNUMBEROFINDINSPECIES                                                \
     500 /*maximum number of individuals belonging to a species*/
 #define MAXQUERYLENGTH 1000 /*the maximum length of the query seqeunce*/
-#define NUMCAT                                                                 \
-    1 /*number of categories in the discretization of the gamma for the        \
-         nucleotide substituion model*/
 #define MINBL 0.000001
 #define MAXBL 2.0
 #define MAXTIEBREAK 64
@@ -29,25 +28,17 @@
 #define MAXTAXLENGTHNAME 256
 #define MAXFILENAME 1000
 #define BUFFER_SIZE 1000
-extern FILE *infile, *outfile, *treefile;
-extern int numspec, numbase, **seq, numundspec[MAXNUMBEROFINDINSPECIES + 1];
 extern int *rootArr, *numspecArr, *numbaseArr, ***seqArr;
-extern int root, tip, comma; /*globals used to read in the tree*/
+extern int tip, comma; /*globals used to read in the tree*/
 extern double Logfactorial[MAXNUMBEROFINDINSPECIES];
 extern double LRVEC[STATESPACE][STATESPACE], RRVEC[STATESPACE][STATESPACE],
     RRVAL[STATESPACE], PMAT1[STATESPACE][STATESPACE],
     PMAT2[STATESPACE][STATESPACE];
-extern double LRVECnc[4][4], RRVECnc[4][4], RRVALnc[4], PMATnc[2][4][5];
-extern double *statevector, UFC, *UFCnc, **templike_nc;
-// extern int ***PP; // WE SHOULD TEST WHAT IS THE FASTEST. MAYBE MOVE TO
-// UNSIGNED SHORT?
-extern type_of_PP ***PP;
-extern type_of_PP ***PPcopy;
-extern type_of_PP ****PP_Arr;
+extern double **templike_nc;
 extern char ***taxonomy;
 extern char ****taxonomyArr;
 
-typedef struct node {
+struct node {
     int up[1000];
     int down;
     int nd;
@@ -61,15 +52,19 @@ typedef struct node {
     int numsites; /*total number of sites summed over all individuals in specie.
                      numsites/numbase is number of individuals if there are no
                      missing data*/
-    int spec;     /*indicates which species the node belongs to. -1 if no single
-                     species*/
-    int mrca;     /*is 1 if node is a MFRCA for a spcies*/
+    int spec;     /* Indicates which species the node belongs to. Species are
+                     numbered 1, 2, ...; the value 0 is unused. If both children of
+                     a node are of species X, then the parent node will also be
+                     species X. This field will be -1 if some descendants of
+                     the node belong to different species. The value -2 means
+                     "uninitialized". */
+    int mrca;     /*is 1 if node is a MRCA for a spcies*/
     char *name;
     int taxIndex[2];
     type_of_PP score;
     // int nw_fail;
     int SP_fail;
-} node;
+};
 
 typedef struct queryMatPaired {
     char **query1Mat;
@@ -140,7 +135,7 @@ typedef struct Options {
 
 typedef struct masterArr {
     char index[10];
-    node *tree;
+    struct node *tree;
     int **msa;
     char ***taxonomy;
     int numspec;
@@ -151,34 +146,11 @@ typedef struct masterArr {
     char *filename;
 } masterArr;
 
-// extern node *treeArr[MAX_NUMBEROFROOTS];
-extern node **treeArr;
-extern int COUNT2;
-extern int COUNT;
-extern double *localpi;
-extern int localnode;
+
+extern struct node **treeArr;
 extern double currentestimate[10];
 
-// extern char *locQuery;
-// extern int positions[MAXQUERYLENGTH];
-extern char *seqInRoot;
-extern char **nodeIDs;
-extern char ***nodeIDsArr;
-extern double parameters[10];
-extern double maxpar[4];
-extern double ml;
-// extern int open;
-extern int closed;
-extern type_of_PP Cinterval;
-extern double *nw_scores;
-extern int *nodesToCut;
 extern double minVariance;
 extern int minVarNode;
-extern int *nodesToCutMinVar;
-extern int *partitionSizes;
-extern int returnNode;
-// extern int SPscoreArr[MAX_NUMBEROFROOTS];
 extern int *SPscoreArr;
-// extern struct hashmap map;
-// extern struct hashmap leaf_map;
 #endif

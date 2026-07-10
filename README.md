@@ -1,3 +1,7 @@
+<em>(Tronko has received various updates since the paper release (Pipes and Nielsen, 2024). See the commit history for details.)</em>
+
+---
+
 # tronko
 A rapid phylogeny-based method for accurate community profiling of large-scale metabarcoding datasets
 

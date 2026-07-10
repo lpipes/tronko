@@ -11,7 +11,7 @@ void setNumspec(gzFile infile, int *specs) {
     while (gzgets(infile, buffer, FASTA_MAXLINE) != NULL) {
         if (buffer[0] == '>') {
             countLeafNodes++;
-            if (max_nodename < strlen(buffer)) {
+            if (max_nodename < (int)strlen(buffer)) {
                 max_nodename = strlen(buffer);
             }
         } else if (iter == 0) {
@@ -137,20 +137,17 @@ seq.s only!\n"); exit(-1);}
 }*/
 void readseq(gzFile infile, int max_nodename, struct masterArr *master) {
     char buffer[FASTA_MAXLINE];
-    int i, j, test, m, k = 0, row = 0;
+    int i, m, row = 0;
     for (i = 0; i < FASTA_MAXLINE; i++) {
         buffer[i] = '\0';
     }
     char c;
     int size;
     char nodename[max_nodename];
-    char *s;
-    int firstIter = 1;
     int index = 0;
-    int tmp1 = 0;
     while (gzgets(infile, buffer, FASTA_MAXLINE) != NULL) {
         char *buffer2;
-        s = strtok_r(buffer, "\n\0", &buffer2);
+        strtok_r(buffer, "\n\0", &buffer2);
         size = strlen(buffer);
         if (buffer[0] == '>') {
             if (size > max_nodename) {
@@ -183,43 +180,8 @@ void readseq(gzFile infile, int max_nodename, struct masterArr *master) {
             row++;
         }
     }
-    int tmp2 = 0;
     if (master->numspec < 3) {
         printf("This is for more than two seqs only!\n");
         exit(-1);
     }
-}
-
-void readfasta(FILE *infile) {
-    char buffer[FASTA_MAXLINE];
-    int i;
-    char *seqname;
-    seqname = malloc(sizeof(char) * 20);
-    char *s;
-    int size;
-    char *locQuery;
-    locQuery = malloc(sizeof(char) * 250);
-    // int alength=150;
-    // infile = openFasta("Todiramphus_chloris_COI_reads.fasta");
-    // infile = openFasta("testreads.fasta");
-    while (fgets(buffer, FASTA_MAXLINE, infile) != NULL) {
-        s = strtok(buffer, "\n");
-        size = strlen(s);
-        if (buffer[0] == '>') {
-            if (size > 20) {
-                size = 20;
-            }
-            for (i = 1; i < size; i++) {
-                seqname[i - 1] = buffer[i];
-            }
-        } else {
-            // for(i=0; i<size; i++){
-            // printf("char is %c\n",buffer[i]);
-            //	locQuery[i]=buffer[i];
-            strcpy(locQuery, buffer);
-            locQuery[strlen(buffer)] = '\0';
-        }
-    }
-    printf("seqname is %s\n", seqname);
-    fclose(infile);
 }

@@ -19,11 +19,6 @@
 
 void setNumspec(gzFile infile, int *specs);
 int setNumspecArr(gzFile partitionsFile);
-// void readSeqArr(FILE *partitionsFile, int whichPartitions, int maxname);
-// void readSeqArr_UsePartitions(FILE *partitionsFile, int
-// whichPartitions,int*** seqArr_heap, char*** nodeIDsArr_heap);
-FILE *openFasta(char *infile);
-void readfasta(FILE *infile);
 void readseq(gzFile infile, int max_nodename, struct masterArr *m);
 
 #endif /* _READ_FASTA */

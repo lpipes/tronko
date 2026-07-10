@@ -1,6 +1,6 @@
 #include "options.h"
 
-static struct Options long_options[] = {
+static struct option long_options[] = {
     {"help", no_argument, 0, 'h'},
     {"partition-directory", no_argument, 0, 'y'},
     {"sum-of-pairs", required_argument, 0, 'u'},
@@ -46,7 +46,7 @@ char usage[] = "\ntronko-build [OPTIONS] -d [OUTPUT DIRECTORY]\n\
 	-a, use fasttree instead of RAxML\n\
 	\n";
 
-void print_help_statement() {
+void print_help_statement(void) {
     printf("%s", &usage[0]);
     return;
 }

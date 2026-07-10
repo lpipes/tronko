@@ -1,22 +1,6 @@
+#include <string.h>
 #include "allocatetreememory.h"
 
-/*void allocatetreememmory_for_nucleotide()
-{
-  int i, j;
-
-  for (i=0; i<(numspec*2-1); i++){
-    tree[i].likenc = malloc(numbase*(sizeof(double *)));
-    tree[i].posteriornc = malloc(numbase*(sizeof(double *)));
-    for (j=0; j<numbase; j++){
-      tree[i].likenc[j] = malloc(4*(sizeof(double)));
-      tree[i].posteriornc[j] = malloc(4*(sizeof(double)));
-    }
-  }
-  for (i=0;i<4;i++){
-    PMATnc[MAX_NUMBEROFROOTS][0][i][4]=1.0;//missing data
-    PMATnc[MAX_NUMBEROFROOTS][1][i][4]=1.0;//missing data
-  }
-}*/
 void allocatetreememory_for_nucleotide_Arr(int numberOfTrees) {
     int i, j, k;
     for (k = 0; k < numberOfTrees; k++) {
@@ -30,12 +14,6 @@ void allocatetreememory_for_nucleotide_Arr(int numberOfTrees) {
             }
         }
     }
-    // for(k=0;k<numberOfTrees; k++){
-    for (i = 0; i < 4; i++) {
-        PMATnc[0][i][4] = 1.0; // missing data
-        PMATnc[1][i][4] = 1.0; // missing data
-    }
-    //}
 }
 
 void allocateTreeArrMemory(struct masterArr *m, int max_nodename) {
@@ -61,7 +39,7 @@ void allocateTreeArrMemory(struct masterArr *m, int max_nodename) {
 }
 
 void freeTreeMemory(int whichPartition) {
-    int i, j, k;
+    int i, j;
     for (i = 0; i < 2 * numspecArr[whichPartition] - 1; i++) {
         for (j = 0; j < numbaseArr[whichPartition]; j++) {
             free(treeArr[whichPartition][i].likenc[j]);
@@ -88,25 +66,4 @@ void *calloc_check(size_t nmemb, size_t size) {
         exit(1);
     }
     return ptr;
-}
-
-void allocateMemoryForTaxArr(int whichPartitions, int max_tax_name) {
-    int phylogenyLevels = 7;
-    int max_tax_name_len = max_tax_name;
-    int i, j, k;
-    // allocate the array to contain the different 'base' taxonomies / lists
-    taxonomyArr = (char ****)calloc_check(whichPartitions, sizeof(char ***));
-    for (k = 0; k < whichPartitions; k++) {
-        taxonomyArr[k] = (char ***)calloc_check(numspecArr[k], sizeof(char **));
-        for (i = 0; i < numspecArr[k]; i++) {
-            // first, allocate the space for each taxonomy  (= list of taxonomic
-            // classifications, from most specific to least specific)
-            taxonomyArr[k][i] =
-                (char **)calloc_check(phylogenyLevels, sizeof(char *));
-            for (j = 0; j < phylogenyLevels; j++) {
-                taxonomyArr[k][i][j] =
-                    (char *)calloc_check(max_tax_name_len, sizeof(char));
-            }
-        }
-    }
 }
