@@ -943,6 +943,7 @@ int main(int argc, char **argv) {
     opt.results_file[0] = '\0';
     opt.reference_file[0] = '\0';
     opt.print_trees_dir[0] = '\0';
+    opt.cinterval = 5; // set the default LCA cut-off to 5
     opt.fastq = 0;                    // default is FASTA
     opt.unassigned = 0;               // don't print unassigned sequences
     opt.print_alignments_to_file = 0; // don't print alignments to file
